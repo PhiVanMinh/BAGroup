@@ -171,3 +171,4 @@ F:\Project\api\BA-API\obj\Debug\net6.0\refint\BA-API.dll
 F:\Project\api\BA-API\obj\Debug\net6.0\BA-API.pdb
 F:\Project\api\BA-API\obj\Debug\net6.0\BA-API.genruntimeconfig.cache
 F:\Project\api\BA-API\obj\Debug\net6.0\ref\BA-API.dll
+F:\Project\api\BA-API\bin\Debug\net6.0\AutoMapper.dll
