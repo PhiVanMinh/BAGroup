@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\Project\\api\\Domain\\Domain.csproj",
+      "projectUniqueName": "F:\\LAB\\BAGroup\\Domain\\Domain.csproj",
       "projectName": "Domain",
-      "projectPath": "F:\\Project\\api\\Domain\\Domain.csproj",
+      "projectPath": "F:\\LAB\\BAGroup\\Domain\\Domain.csproj",
       "packagesPath": "C:\\Users\\minhpv\\.nuget\\packages\\",
-      "outputPath": "F:\\Project\\api\\Domain\\obj\\",
+      "outputPath": "F:\\LAB\\BAGroup\\Domain\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\minhpv\\AppData\\Roaming\\NuGet\\NuGet.Config",

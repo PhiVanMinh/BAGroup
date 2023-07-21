@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "8YtClZEjMBl/yVNO+fZYO+WO6ePaT84Ya/frTjQzjGI9x9Kthkm5VCZNpNPeJLVLzKjd26IFeFfIOedQcV4s4A==",
+  "dgSpecHash": "fbe40yTqTdhfn2xV6HqgKU5XlA5d7zcscuzlIU3yeEvas81cWwtGpzgSZTD+2BhqpqUIhP5869BGAYbApDTtkQ==",
   "success": true,
-  "projectFilePath": "F:\\Project\\api\\Domain\\Domain.csproj",
+  "projectFilePath": "F:\\LAB\\BAGroup\\Domain\\Domain.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

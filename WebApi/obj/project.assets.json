@@ -9368,11 +9368,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\Project\\api\\WebApi\\WebApi.csproj",
+      "projectUniqueName": "F:\\LAB\\BAGroup\\WebApi\\WebApi.csproj",
       "projectName": "WebApi",
-      "projectPath": "F:\\Project\\api\\WebApi\\WebApi.csproj",
+      "projectPath": "F:\\LAB\\BAGroup\\WebApi\\WebApi.csproj",
       "packagesPath": "C:\\Users\\minhpv\\.nuget\\packages\\",
-      "outputPath": "F:\\Project\\api\\WebApi\\obj\\",
+      "outputPath": "F:\\LAB\\BAGroup\\WebApi\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\minhpv\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -9389,11 +9389,11 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "F:\\Project\\api\\Application\\Application.csproj": {
-              "projectPath": "F:\\Project\\api\\Application\\Application.csproj"
+            "F:\\LAB\\BAGroup\\Application\\Application.csproj": {
+              "projectPath": "F:\\LAB\\BAGroup\\Application\\Application.csproj"
             },
-            "F:\\Project\\api\\Infrastructure\\Infrastructure.csproj": {
-              "projectPath": "F:\\Project\\api\\Infrastructure\\Infrastructure.csproj"
+            "F:\\LAB\\BAGroup\\Infrastructure\\Infrastructure.csproj": {
+              "projectPath": "F:\\LAB\\BAGroup\\Infrastructure\\Infrastructure.csproj"
             }
           }
         }

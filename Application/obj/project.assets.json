@@ -639,11 +639,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\Project\\api\\Application\\Application.csproj",
+      "projectUniqueName": "F:\\LAB\\BAGroup\\Application\\Application.csproj",
       "projectName": "Application",
-      "projectPath": "F:\\Project\\api\\Application\\Application.csproj",
+      "projectPath": "F:\\LAB\\BAGroup\\Application\\Application.csproj",
       "packagesPath": "C:\\Users\\minhpv\\.nuget\\packages\\",
-      "outputPath": "F:\\Project\\api\\Application\\obj\\",
+      "outputPath": "F:\\LAB\\BAGroup\\Application\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\minhpv\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -660,8 +660,8 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "F:\\Project\\api\\Domain\\Domain.csproj": {
-              "projectPath": "F:\\Project\\api\\Domain\\Domain.csproj"
+            "F:\\LAB\\BAGroup\\Domain\\Domain.csproj": {
+              "projectPath": "F:\\LAB\\BAGroup\\Domain\\Domain.csproj"
             }
           }
         }

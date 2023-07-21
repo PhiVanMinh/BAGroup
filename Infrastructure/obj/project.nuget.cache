@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "fHKSMDykdkGWie3a+P+teyZTSyma5IqZAP7n+7kuso8L7HHtxJyMPoDey5ToBvAIoMBJ9wa+HDqptmYv8TjJgw==",
+  "dgSpecHash": "rdVR6LmNeyOQ4tkSgVuPCn3m1GHAT3zGPDYQrWqZUpGwpGPzLoNyKdEm9mEW/cecr02YGO0qItXG6zUzsv2maw==",
   "success": true,
-  "projectFilePath": "F:\\Project\\api\\Infrastructure\\Infrastructure.csproj",
+  "projectFilePath": "F:\\LAB\\BAGroup\\Infrastructure\\Infrastructure.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\minhpv\\.nuget\\packages\\abp\\7.0.0\\abp.7.0.0.nupkg.sha512",
     "C:\\Users\\minhpv\\.nuget\\packages\\abp.dapper\\6.5.0\\abp.dapper.6.5.0.nupkg.sha512",

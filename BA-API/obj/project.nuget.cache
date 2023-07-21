@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "2J/Xy0cgJSlwvJuBV2XiRR5bhD742ztY+LM9DyMSr/f6VfspF70Q5EXjvxWZ1opuIO7a5u/RV+0crCzFzqqx8g==",
+  "dgSpecHash": "bpLH6t4mwJ6UXh3n/29aMFGrjxnjh37xAIg/MkhEbNwWWMjS5aiPHvH2yGLGDFwcv2Agw7fJ2CoYMocdeg58RQ==",
   "success": true,
-  "projectFilePath": "F:\\Project\\api\\BA-API\\BA-API.csproj",
+  "projectFilePath": "F:\\LAB\\BAGroup\\BA-API\\BA-API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\minhpv\\.nuget\\packages\\abp\\7.0.0\\abp.7.0.0.nupkg.sha512",
     "C:\\Users\\minhpv\\.nuget\\packages\\abp.dapper\\6.5.0\\abp.dapper.6.5.0.nupkg.sha512",

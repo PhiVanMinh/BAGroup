@@ -8950,11 +8950,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\Project\\api\\BA-API\\BA-API.csproj",
+      "projectUniqueName": "F:\\LAB\\BAGroup\\BA-API\\BA-API.csproj",
       "projectName": "BA-API",
-      "projectPath": "F:\\Project\\api\\BA-API\\BA-API.csproj",
+      "projectPath": "F:\\LAB\\BAGroup\\BA-API\\BA-API.csproj",
       "packagesPath": "C:\\Users\\minhpv\\.nuget\\packages\\",
-      "outputPath": "F:\\Project\\api\\BA-API\\obj\\",
+      "outputPath": "F:\\LAB\\BAGroup\\BA-API\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\minhpv\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -8971,11 +8971,11 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "F:\\Project\\api\\Application\\Application.csproj": {
-              "projectPath": "F:\\Project\\api\\Application\\Application.csproj"
+            "F:\\LAB\\BAGroup\\Application\\Application.csproj": {
+              "projectPath": "F:\\LAB\\BAGroup\\Application\\Application.csproj"
             },
-            "F:\\Project\\api\\Infrastructure\\Infrastructure.csproj": {
-              "projectPath": "F:\\Project\\api\\Infrastructure\\Infrastructure.csproj"
+            "F:\\LAB\\BAGroup\\Infrastructure\\Infrastructure.csproj": {
+              "projectPath": "F:\\LAB\\BAGroup\\Infrastructure\\Infrastructure.csproj"
             }
           }
         }

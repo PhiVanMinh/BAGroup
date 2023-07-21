@@ -34,3 +34,15 @@ F:\Project\api\Domain\obj\Debug\net6.0\Domain.dll
 F:\Project\api\Domain\obj\Debug\net6.0\refint\Domain.dll
 F:\Project\api\Domain\obj\Debug\net6.0\Domain.pdb
 F:\Project\api\Domain\obj\Debug\net6.0\ref\Domain.dll
+F:\LAB\BAGroup\Domain\bin\Debug\net6.0\Domain.deps.json
+F:\LAB\BAGroup\Domain\bin\Debug\net6.0\Domain.dll
+F:\LAB\BAGroup\Domain\bin\Debug\net6.0\Domain.pdb
+F:\LAB\BAGroup\Domain\obj\Debug\net6.0\Domain.csproj.AssemblyReference.cache
+F:\LAB\BAGroup\Domain\obj\Debug\net6.0\Domain.GeneratedMSBuildEditorConfig.editorconfig
+F:\LAB\BAGroup\Domain\obj\Debug\net6.0\Domain.AssemblyInfoInputs.cache
+F:\LAB\BAGroup\Domain\obj\Debug\net6.0\Domain.AssemblyInfo.cs
+F:\LAB\BAGroup\Domain\obj\Debug\net6.0\Domain.csproj.CoreCompileInputs.cache
+F:\LAB\BAGroup\Domain\obj\Debug\net6.0\Domain.dll
+F:\LAB\BAGroup\Domain\obj\Debug\net6.0\refint\Domain.dll
+F:\LAB\BAGroup\Domain\obj\Debug\net6.0\Domain.pdb
+F:\LAB\BAGroup\Domain\obj\Debug\net6.0\ref\Domain.dll
