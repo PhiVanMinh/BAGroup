@@ -37,33 +37,38 @@ namespace WebApi.Controllers
             if (userFromRepo == null)
                 return Unauthorized();
 
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, userFromRepo.Id.ToString()),
-                new Claim(ClaimTypes.Name, userFromRepo.UserName)
-                  };
+            var mapperConfig = new MapperConfiguration(cfg => {
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8
-                .GetBytes(_config.GetSection("AppSettings:Token").Value));
+                cfg.CreateMap<User, UserLogInInfo>();
 
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            });
 
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddDays(1),
-                SigningCredentials = creds
-            };
+            var mapper = mapperConfig.CreateMapper();
 
-            var tokenHandler = new JwtSecurityTokenHandler();
+            var user = mapper.Map<UserLogInInfo>(userFromRepo);
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
+            string key = "my_secret_key_12345"; //Secret key which will be used later during validation    
+            var issuer = "http://mysite.com";  //normally this will be your site URL    
 
-            var user = _mapper.Map<UserLogInInfo>(userFromRepo);
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            //Create a List of Claims, Keep claims name short    
+            var permClaims = new List<Claim>();
+            permClaims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
+
+            //Create Security Token object by giving required parameters    
+            var token = new JwtSecurityToken(issuer, //Issure    
+                            issuer,  //Audience    
+                            permClaims,
+                            expires: DateTime.Now.AddDays(1),
+                            signingCredentials: credentials);
+            var jwt_token = new JwtSecurityTokenHandler().WriteToken(token);
+
+            user.Token = jwt_token;
 
             return Ok( new
             {
-                token = tokenHandler.WriteToken(token),
                 user
             });
 

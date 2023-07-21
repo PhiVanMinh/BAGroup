@@ -15,5 +15,6 @@ namespace Domain.Dto.Users
         public DateTime? BirthDay { get; set; }
         public byte? Gender { get; set; }
         public string? PhoneNumber { get; set; }
+        public string? Token { get; set; }
     }
 }

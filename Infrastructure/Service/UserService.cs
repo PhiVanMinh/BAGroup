@@ -69,11 +69,11 @@ namespace Infrastructure.Service
 
         private async Task CreateUser(CreateOrEditUserDto user)
         {
-            var checkUser = _unitOfWork.UserRepository.AnyAsync(e => e.UserName == user.UserName);
-            if (checkUser != null)
-            {
-                throw new Exception("UserName is exist");
-            }
+            //var checkUser = _unitOfWork.UserRepository.AnyAsync(e => e.UserName == user.UserName);
+            //if (checkUser != null)
+            //{
+            //    throw new Exception("UserName is exist");
+            //}
 
             byte[] passwordHash, passwordSalt;
             CreatePasswordHash(user.Password, out passwordHash, out passwordSalt);
@@ -85,6 +85,8 @@ namespace Infrastructure.Service
                 Password = user.Password,
                 Email = user.Email,
                 BirthDay = user.BirthDay,
+                Gender = user.Gender,
+                PhoneNumber = user.PhoneNumber,
                 CreatorUserId = user.CurrentUserId,
                 CreateDate = DateTime.Now,
                 PasswordHash = passwordHash,
