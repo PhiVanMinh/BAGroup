@@ -19,7 +19,7 @@ namespace Infrastructure.Service
 
         public async Task<User> Login(UserForLoginDto userLogin)
         {
-            var userFromRepo = await _unitOfWork.AuthRepository.Login(userLogin.Username.ToLower(), userLogin.Password);
+            var userFromRepo = await _unitOfWork.AuthRepository.Login(userLogin.UserName.ToLower(), userLogin.Password);
             return userFromRepo;
 
             

@@ -2,9 +2,12 @@
 using Application.IService;
 using Domain.Dto.Users;
 using Domain.Master;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -39,15 +42,38 @@ namespace Infrastructure.Service
             return Task.CompletedTask;
         }
 
-        public async Task<List<User>> GetAll()
+        public Task<PagedResultDto> GetAll(GetAllUserInput input)
         {
-            var result = await _unitOfWork.UserRepository.GetAllAsync();
-            return result.ToList();
+            var result = from user in _unitOfWork.UserRepository.GetAll()
+                                .Where(e => string.IsNullOrWhiteSpace(input.ValueFilter)
+                                            || ( input.TypeFilter == 1 ? e.UserName.ToLower().Contains(input.ValueFilter.ToLower()) 
+                                                : (input.TypeFilter == 2 ? e.EmpName.ToLower().Contains(input.ValueFilter.ToLower()) 
+                                                    : (input.TypeFilter == 3 ? e.Email.ToLower().Contains(input.ValueFilter.ToLower()) 
+                                                        : e.PhoneNumber.ToLower().Contains(input.ValueFilter.ToLower())
+                                                )))
+                                       )
+                                .Where(e => input.Gender > 0 ? input.Gender == e.Gender : true)
+                                .Where(e =>  e.IsDeleted == false)
+                                .Where(e => input.FromDate != null ? e.BirthDay >= input.FromDate : true)
+                                .Where(e => input.ToDate != null ? e.BirthDay <= input.ToDate : true)
+                                select new GetAllUserDto
+                                {
+                                    Id = user.Id,
+                                    BirthDay = user.BirthDay,
+                                    PhoneNumber = user.PhoneNumber,
+                                    EmpName = user.EmpName,
+                                    UserName = user.UserName,
+                                    Email = user.Email,
+                                    Gender = user.Gender,
+                                };
+            var totalCount = result.Count();
+            var pageAndFilterResult = result.Skip((input.Page - 1) * input.PageSize).Take(input.PageSize);
+            return Task.FromResult( new PagedResultDto { TotalCount = totalCount, Result = pageAndFilterResult.ToList()});
         }
 
         private async Task UpdateUser(CreateOrEditUserDto user)
         {
-            var userUpdate = _unitOfWork.UserRepository.GetAll().Where(e => e.Id == user.Id).FirstOrDefault();
+            var userUpdate = _unitOfWork.UserRepository.FirstOrDefault(e => e.Id == user.Id);
             if (userUpdate != null)
             {
                 userUpdate.EmpName = user.EmpName;
@@ -69,11 +95,11 @@ namespace Infrastructure.Service
 
         private async Task CreateUser(CreateOrEditUserDto user)
         {
-            //var checkUser = _unitOfWork.UserRepository.AnyAsync(e => e.UserName == user.UserName);
-            //if (checkUser != null)
-            //{
-            //    throw new Exception("UserName is exist");
-            //}
+            var checkUser = _unitOfWork.UserRepository.FirstOrDefault(e => e.UserName == user.UserName);
+            if (checkUser != null)
+            {
+                throw new Exception("UserName is exist");
+            }
 
             byte[] passwordHash, passwordSalt;
             CreatePasswordHash(user.Password, out passwordHash, out passwordSalt);

@@ -37,15 +37,7 @@ namespace WebApi.Controllers
             if (userFromRepo == null)
                 return Unauthorized();
 
-            var mapperConfig = new MapperConfiguration(cfg => {
-
-                cfg.CreateMap<User, UserLogInInfo>();
-
-            });
-
-            var mapper = mapperConfig.CreateMapper();
-
-            var user = mapper.Map<UserLogInInfo>(userFromRepo);
+            var user = _mapper.Map<UserLogInInfo>(userFromRepo);
 
             string key = "my_secret_key_12345"; //Secret key which will be used later during validation    
             var issuer = "http://mysite.com";  //normally this will be your site URL    

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Domain.Dto.Users
 {
-    public class UserForLoginDto
+    public class PagedResultDto
     {
-        public string? UserName { get; set; }
-        public string? Password { get; set; }
+        public int TotalCount { get; set; }
+        public List<GetAllUserDto> Result { get; set; }
     }
 }

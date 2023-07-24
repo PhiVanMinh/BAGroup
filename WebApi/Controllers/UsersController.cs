@@ -16,9 +16,9 @@ namespace WebApi.Controllers
             _user = user;
         }
 
-        [HttpGet("employees")]
-        public async Task<IEnumerable<User>> GetAll()
-          => await _user.GetAll();
+        [HttpPost("employees")]
+        public async Task<PagedResultDto> GetAll(GetAllUserInput input)
+          => await _user.GetAll(input);
 
 
         [HttpPost("createOrEdit-employees")]

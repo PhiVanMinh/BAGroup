@@ -24,7 +24,7 @@ namespace Infrastructure.Common
 
 
         public void Add(T entity)
-            => _dbContext.Add(entity);
+      => _dbContext.Add(entity);
 
 
         public async Task AddAsync(T entity, CancellationToken cancellationToken = default)
@@ -38,18 +38,18 @@ namespace Infrastructure.Common
         public async Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
             => await _dbContext.AddRangeAsync(entities, cancellationToken);
 
+        public Task<bool> AnyAsync(Expression<Func<T, bool>> expression)
+             => _entitiySet.AnyAsync(expression);
 
-        public T Get(Expression<Func<T, bool>> expression)
+        public T FirstOrDefault(Expression<Func<T, bool>> expression)
             => _entitiySet.FirstOrDefault(expression);
 
 
-        public IEnumerable<T> GetAll()
-            => _entitiySet.AsEnumerable();
-
+        public IQueryable<T> GetAll()
+            => _entitiySet.AsNoTracking().AsQueryable();
 
         public IEnumerable<T> GetAll(Expression<Func<T, bool>> expression)
             => _entitiySet.Where(expression).AsEnumerable();
-
 
         public async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default)
             => await _entitiySet.ToListAsync(cancellationToken);
@@ -59,11 +59,8 @@ namespace Infrastructure.Common
             => await _entitiySet.Where(expression).ToListAsync(cancellationToken);
 
 
-        public async Task<T> GetAsync(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default)
+        public async Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> expression, CancellationToken cancellationToken = default)
             => await _entitiySet.FirstOrDefaultAsync(expression, cancellationToken);
-
-        public async Task<bool> AnyAsync(Expression<Func<T, bool>> expression)
-            => await _entitiySet.AnyAsync(expression);
 
 
         public void Remove(T entity)
@@ -80,6 +77,5 @@ namespace Infrastructure.Common
 
         public void UpdateRange(IEnumerable<T> entities)
             => _dbContext.UpdateRange(entities);
-
     }
 }
