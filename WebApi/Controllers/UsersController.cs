@@ -28,7 +28,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost("delete-employees")]
-        public async Task CreateOrEditUsers([FromBody] DeletedUserInput input)
+        public async Task DeleteUsers([FromBody] DeletedUserInput input)
         {
             await _user.DeleteUser(input);
         }

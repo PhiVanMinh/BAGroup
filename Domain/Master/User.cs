@@ -17,6 +17,7 @@ namespace Domain.Master
         public string? PhoneNumber { get; set; }
         public byte[]? PasswordHash { get; set; }
         public byte[]? PasswordSalt { get; set; }
+        public byte? Role { get; set; }
 
         public int? CreatorUserId { get; set; }
         public int? LastModifyUserId { get; set; }

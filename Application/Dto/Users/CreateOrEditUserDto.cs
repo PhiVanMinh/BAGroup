@@ -21,5 +21,6 @@ namespace Application.Dto.Users
         public byte? Gender { get; set; }
         public string? PhoneNumber { get; set; }
         public int? CurrentUserId { get; set; }
+        public byte? Role { get; set; }
     }
 }

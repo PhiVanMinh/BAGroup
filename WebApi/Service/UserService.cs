@@ -84,6 +84,7 @@ namespace WebApi.Service
                 userUpdate.PhoneNumber = user.PhoneNumber;
                 userUpdate.LastModifyUserId = user.CurrentUserId;
                 userUpdate.LastModifyDate = DateTime.Now;
+                userUpdate.Role = user.Role ?? 2;
 
                 _unitOfWork.UserRepository.Update(userUpdate);
                 await _unitOfWork.SaveAsync();
@@ -116,6 +117,7 @@ namespace WebApi.Service
                 CreateDate = DateTime.Now,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
+                Role = user.Role ?? 2,
             };
             _unitOfWork.UserRepository.Add(newUser);
             await _unitOfWork.SaveAsync();
