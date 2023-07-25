@@ -4,7 +4,7 @@ using AutoMapper;
 using Domain.Dto.Users;
 using Domain.Master;
 
-namespace Infrastructure.Service
+namespace WebApi.Service
 {
     public class AuthService : IAuthService
     {
@@ -22,7 +22,7 @@ namespace Infrastructure.Service
             var userFromRepo = await _unitOfWork.AuthRepository.Login(userLogin.UserName.ToLower(), userLogin.Password);
             return userFromRepo;
 
-            
+
         }
     }
 }

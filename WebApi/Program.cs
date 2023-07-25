@@ -2,13 +2,13 @@ using Application.Interfaces;
 using Application.IService;
 using Infrastructure;
 using Infrastructure.Repository;
-using Infrastructure.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Infrastructure.CustomMapper;
+using WebApi.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 

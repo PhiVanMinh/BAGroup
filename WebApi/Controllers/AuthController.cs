@@ -61,6 +61,7 @@ namespace WebApi.Controllers
 
             return Ok( new
             {
+                jwt_token,
                 user
             });
 

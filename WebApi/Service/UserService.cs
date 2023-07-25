@@ -2,16 +2,8 @@
 using Application.IService;
 using Domain.Dto.Users;
 using Domain.Master;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Drawing.Printing;
-using System.Linq;
-using System.Linq.Dynamic.Core;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Infrastructure.Service
+namespace WebApi.Service
 {
     public class UserService : IUserService
     {
@@ -36,8 +28,10 @@ namespace Infrastructure.Service
                 {
                     e.IsDeleted = true;
                     e.DeletedUserId = input.CurrentUserId;
+                    e.LastModifyDate = DateTime.Now;
                 });
                 _unitOfWork.UserRepository.UpdateRange(users);
+                _unitOfWork.SaveAsync();
             }
             return Task.CompletedTask;
         }
@@ -46,29 +40,36 @@ namespace Infrastructure.Service
         {
             var result = from user in _unitOfWork.UserRepository.GetAll()
                                 .Where(e => string.IsNullOrWhiteSpace(input.ValueFilter)
-                                            || ( input.TypeFilter == 1 ? e.UserName.ToLower().Contains(input.ValueFilter.ToLower()) 
-                                                : (input.TypeFilter == 2 ? e.EmpName.ToLower().Contains(input.ValueFilter.ToLower()) 
-                                                    : (input.TypeFilter == 3 ? e.Email.ToLower().Contains(input.ValueFilter.ToLower()) 
+                                            || (input.TypeFilter == 1 ? e.UserName.ToLower().Contains(input.ValueFilter.ToLower())
+                                                : (input.TypeFilter == 2 ? e.EmpName.ToLower().Contains(input.ValueFilter.ToLower())
+                                                    : (input.TypeFilter == 3 ? e.Email.ToLower().Contains(input.ValueFilter.ToLower())
                                                         : e.PhoneNumber.ToLower().Contains(input.ValueFilter.ToLower())
                                                 )))
                                        )
                                 .Where(e => input.Gender > 0 ? input.Gender == e.Gender : true)
-                                .Where(e =>  e.IsDeleted == false)
+                                .Where(e => e.IsDeleted == false)
                                 .Where(e => input.FromDate != null ? e.BirthDay >= input.FromDate : true)
-                                .Where(e => input.ToDate != null ? e.BirthDay <= input.ToDate : true)
-                                select new GetAllUserDto
-                                {
-                                    Id = user.Id,
-                                    BirthDay = user.BirthDay,
-                                    PhoneNumber = user.PhoneNumber,
-                                    EmpName = user.EmpName,
-                                    UserName = user.UserName,
-                                    Email = user.Email,
-                                    Gender = user.Gender,
-                                };
+                                .Where(e => input.ToDate != null ? e.BirthDay < input.ToDate.Value.AddDays(1) : true)
+                         orderby user.Id
+                         select new GetAllUserDto
+                         {
+                             Id = user.Id,
+                             BirthDay = user.BirthDay,
+                             PhoneNumber = user.PhoneNumber,
+                             EmpName = user.EmpName,
+                             UserName = user.UserName,
+                             Email = user.Email,
+                             Gender = user.Gender,
+                         };
             var totalCount = result.Count();
             var pageAndFilterResult = result.Skip((input.Page - 1) * input.PageSize).Take(input.PageSize);
-            return Task.FromResult( new PagedResultDto { TotalCount = totalCount, Result = pageAndFilterResult.ToList()});
+            return Task.FromResult(
+                    new PagedResultDto
+                    {
+                        TotalCount = totalCount,
+                        Result = pageAndFilterResult.ToList()
+                    }
+                );
         }
 
         private async Task UpdateUser(CreateOrEditUserDto user)
@@ -77,8 +78,6 @@ namespace Infrastructure.Service
             if (userUpdate != null)
             {
                 userUpdate.EmpName = user.EmpName;
-                //userUpdate.UserName = user.UserName;
-                //userUpdate.Password = user.Password;
                 userUpdate.Email = user.Email;
                 userUpdate.BirthDay = user.BirthDay;
                 userUpdate.Gender = user.Gender;
