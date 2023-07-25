@@ -1,5 +1,5 @@
-﻿using AutoMapper;
-using Domain.Dto.Users;
+﻿using Application.Dto.Users;
+using AutoMapper;
 using Domain.Master;
 using System;
 using System.Collections.Generic;

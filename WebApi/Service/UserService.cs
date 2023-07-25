@@ -1,6 +1,6 @@
-﻿using Application.Interfaces;
+﻿using Application.Dto.Users;
+using Application.Interfaces;
 using Application.IService;
-using Domain.Dto.Users;
 using Domain.Master;
 
 namespace WebApi.Service

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Dto.Users
+namespace Application.Dto.Users
 {
-    public class UserLogInInfo
+     public class GetAllUserDto
     {
         public int Id { get; set; }
         public string? UserName { get; set; }
@@ -15,6 +15,5 @@ namespace Domain.Dto.Users
         public DateTime? BirthDay { get; set; }
         public byte? Gender { get; set; }
         public string? PhoneNumber { get; set; }
-        public string? Token { get; set; }
     }
 }

@@ -1,5 +1,5 @@
-﻿using Application.IService;
-using Domain.Dto.Users;
+﻿using Application.Dto.Users;
+using Application.IService;
 using Domain.Master;
 using Microsoft.AspNetCore.Mvc;
 

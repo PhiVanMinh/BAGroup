@@ -1,7 +1,7 @@
-﻿using Application.Interfaces;
+﻿using Application.Dto.Users;
+using Application.Interfaces;
 using Application.IService;
 using AutoMapper;
-using Domain.Dto.Users;
 using Domain.Master;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;

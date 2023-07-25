@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Dto.Users
+namespace Application.Dto.Users
 {
     public class DeletedUserInput
     {
