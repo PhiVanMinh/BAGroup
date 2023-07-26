@@ -2,8 +2,13 @@
 using Application.Interfaces;
 using Application.IService;
 using Domain.Master;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace WebApi.Service
+namespace Infrastructures.Service
 {
     public class UserService : IUserService
     {

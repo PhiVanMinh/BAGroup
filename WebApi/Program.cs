@@ -8,7 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Infrastructure.CustomMapper;
-using WebApi.Service;
+using Infrastructures.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
