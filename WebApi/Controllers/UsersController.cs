@@ -22,15 +22,31 @@ namespace WebApi.Controllers
 
 
         [HttpPost("createOrEdit-employees")]
-        public async Task CreateOrEditUsers([FromBody] CreateOrEditUserDto user)
+        public async Task<IActionResult> CreateOrEditUsers([FromBody] CreateOrEditUserDto user)
         {
-            await _user.CreateOrEditUser(user);
+            try
+            {
+                await _user.CreateOrEditUser(user);
+                return Ok(true);
+            } catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost("delete-employees")]
-        public async Task DeleteUsers([FromBody] DeletedUserInput input)
+        public async Task<IActionResult> DeleteUsers([FromBody] DeletedUserInput input)
         {
-            await _user.DeleteUser(input);
+            
+            try
+            {
+                await _user.DeleteUser(input);
+                return Ok(true);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

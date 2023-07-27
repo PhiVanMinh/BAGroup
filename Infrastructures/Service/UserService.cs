@@ -27,7 +27,11 @@ namespace Infrastructures.Service
         public Task DeleteUser(DeletedUserInput input)
         {
             var users = _unitOfWork.UserRepository.GetAll().Where(e => input.ListId.Contains(e.Id)).ToList();
-            if (users.Count() > 0)
+            if(users.Count() == 0)
+            {
+                throw new Exception("Can not find user !");
+            }
+            else
             {
                 users.ForEach(e =>
                 {
