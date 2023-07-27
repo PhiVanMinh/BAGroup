@@ -104,8 +104,8 @@
               "F:\\LAB\\BAGroup\\Application\\Application.csproj": {
                 "projectPath": "F:\\LAB\\BAGroup\\Application\\Application.csproj"
               },
-              "F:\\LAB\\BAGroup\\Infrastructure\\Infrastructure.csproj": {
-                "projectPath": "F:\\LAB\\BAGroup\\Infrastructure\\Infrastructure.csproj"
+              "F:\\LAB\\BAGroup\\Infrastructure\\Persistence.csproj": {
+                "projectPath": "F:\\LAB\\BAGroup\\Infrastructure\\Persistence.csproj"
               }
             }
           }
@@ -197,12 +197,12 @@
         }
       }
     },
-    "F:\\LAB\\BAGroup\\Infrastructure\\Infrastructure.csproj": {
+    "F:\\LAB\\BAGroup\\Infrastructure\\Persistence.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\LAB\\BAGroup\\Infrastructure\\Infrastructure.csproj",
-        "projectName": "Infrastructure",
-        "projectPath": "F:\\LAB\\BAGroup\\Infrastructure\\Infrastructure.csproj",
+        "projectUniqueName": "F:\\LAB\\BAGroup\\Infrastructure\\Persistence.csproj",
+        "projectName": "Persistence",
+        "projectPath": "F:\\LAB\\BAGroup\\Infrastructure\\Persistence.csproj",
         "packagesPath": "C:\\Users\\minhpv\\.nuget\\packages\\",
         "outputPath": "F:\\LAB\\BAGroup\\Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
@@ -246,6 +246,10 @@
               "version": "[7.0.0, )"
             },
             "AutoMapper": {
+              "target": "Package",
+              "version": "[11.0.0, )"
+            },
+            "AutoMapper.Extensions.Microsoft.DependencyInjection": {
               "target": "Package",
               "version": "[11.0.0, )"
             },

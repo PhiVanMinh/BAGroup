@@ -3123,7 +3123,22 @@
           "bin/placeholder/Domain.dll": {}
         }
       },
-      "Infrastructure/1.0.0": {
+      "Infrastructures/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "dependencies": {
+          "Application": "1.0.0",
+          "AutoMapper": "11.0.0",
+          "AutoMapper.Extensions.Microsoft.DependencyInjection": "11.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Infrastructures.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Infrastructures.dll": {}
+        }
+      },
+      "Persistence/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
         "dependencies": {
@@ -3131,6 +3146,7 @@
           "Abp.EntityFrameworkCore": "7.0.0",
           "Application": "1.0.0",
           "AutoMapper": "11.0.0",
+          "AutoMapper.Extensions.Microsoft.DependencyInjection": "11.0.0",
           "Microsoft.EntityFrameworkCore.SqlServer": "6.0.1",
           "Microsoft.Extensions.Configuration.EnvironmentVariables": "6.0.0",
           "Microsoft.Extensions.Configuration.FileExtensions": "6.0.0",
@@ -3140,10 +3156,10 @@
           "System.IdentityModel.Tokens.Jwt": "6.18.0"
         },
         "compile": {
-          "bin/placeholder/Infrastructure.dll": {}
+          "bin/placeholder/Persistence.dll": {}
         },
         "runtime": {
-          "bin/placeholder/Infrastructure.dll": {}
+          "bin/placeholder/Persistence.dll": {}
         }
       }
     }
@@ -9342,10 +9358,15 @@
       "path": "../Domain/Domain.csproj",
       "msbuildProject": "../Domain/Domain.csproj"
     },
-    "Infrastructure/1.0.0": {
+    "Infrastructures/1.0.0": {
       "type": "project",
-      "path": "../Infrastructure/Infrastructure.csproj",
-      "msbuildProject": "../Infrastructure/Infrastructure.csproj"
+      "path": "../Infrastructures/Infrastructures.csproj",
+      "msbuildProject": "../Infrastructures/Infrastructures.csproj"
+    },
+    "Persistence/1.0.0": {
+      "type": "project",
+      "path": "../Infrastructure/Persistence.csproj",
+      "msbuildProject": "../Infrastructure/Persistence.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -9353,11 +9374,12 @@
       "Application >= 1.0.0",
       "AutoMapper >= 11.0.0",
       "AutoMapper.Extensions.Microsoft.DependencyInjection >= 11.0.0",
-      "Infrastructure >= 1.0.0",
+      "Infrastructures >= 1.0.0",
       "Microsoft.AspNetCore.Authentication.JwtBearer >= 6.0.1",
       "Microsoft.AspNetCore.Authorization >= 6.0.1",
       "Microsoft.EntityFrameworkCore.Design >= 6.0.1",
       "Microsoft.IdentityModel.Tokens >= 6.18.0",
+      "Persistence >= 1.0.0",
       "Swashbuckle.AspNetCore >= 6.2.3",
       "System.IdentityModel.Tokens.Jwt >= 6.18.0"
     ]
@@ -9392,8 +9414,11 @@
             "F:\\LAB\\BAGroup\\Application\\Application.csproj": {
               "projectPath": "F:\\LAB\\BAGroup\\Application\\Application.csproj"
             },
-            "F:\\LAB\\BAGroup\\Infrastructure\\Infrastructure.csproj": {
-              "projectPath": "F:\\LAB\\BAGroup\\Infrastructure\\Infrastructure.csproj"
+            "F:\\LAB\\BAGroup\\Infrastructures\\Infrastructures.csproj": {
+              "projectPath": "F:\\LAB\\BAGroup\\Infrastructures\\Infrastructures.csproj"
+            },
+            "F:\\LAB\\BAGroup\\Infrastructure\\Persistence.csproj": {
+              "projectPath": "F:\\LAB\\BAGroup\\Infrastructure\\Persistence.csproj"
             }
           }
         }

@@ -1,14 +1,15 @@
 {
   "version": 2,
-  "dgSpecHash": "rdVR6LmNeyOQ4tkSgVuPCn3m1GHAT3zGPDYQrWqZUpGwpGPzLoNyKdEm9mEW/cecr02YGO0qItXG6zUzsv2maw==",
+  "dgSpecHash": "95Qd6fiqTS4TE0IWnSqYya954/glMs4Ec/oAxbgBjgXTwMJ3mP0DpjKPYD+pt3Uo2tvfWdhpFQXBrplUDWozmA==",
   "success": true,
-  "projectFilePath": "F:\\LAB\\BAGroup\\Infrastructure\\Infrastructure.csproj",
+  "projectFilePath": "F:\\LAB\\BAGroup\\Infrastructure\\Persistence.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\minhpv\\.nuget\\packages\\abp\\7.0.0\\abp.7.0.0.nupkg.sha512",
     "C:\\Users\\minhpv\\.nuget\\packages\\abp.dapper\\6.5.0\\abp.dapper.6.5.0.nupkg.sha512",
     "C:\\Users\\minhpv\\.nuget\\packages\\abp.entityframework.common\\7.0.0\\abp.entityframework.common.7.0.0.nupkg.sha512",
     "C:\\Users\\minhpv\\.nuget\\packages\\abp.entityframeworkcore\\7.0.0\\abp.entityframeworkcore.7.0.0.nupkg.sha512",
     "C:\\Users\\minhpv\\.nuget\\packages\\automapper\\11.0.0\\automapper.11.0.0.nupkg.sha512",
+    "C:\\Users\\minhpv\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\11.0.0\\automapper.extensions.microsoft.dependencyinjection.11.0.0.nupkg.sha512",
     "C:\\Users\\minhpv\\.nuget\\packages\\castle.core\\4.4.1\\castle.core.4.4.1.nupkg.sha512",
     "C:\\Users\\minhpv\\.nuget\\packages\\castle.core.asyncinterceptor\\2.0.0\\castle.core.asyncinterceptor.2.0.0.nupkg.sha512",
     "C:\\Users\\minhpv\\.nuget\\packages\\castle.loggingfacility\\5.1.1\\castle.loggingfacility.5.1.1.nupkg.sha512",

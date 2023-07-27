@@ -106,6 +106,19 @@
           }
         }
       },
+      "AutoMapper.Extensions.Microsoft.DependencyInjection/11.0.0": {
+        "type": "package",
+        "dependencies": {
+          "AutoMapper": "11.0.0",
+          "Microsoft.Extensions.Options": "6.0.0"
+        },
+        "compile": {
+          "lib/netstandard2.1/AutoMapper.Extensions.Microsoft.DependencyInjection.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.1/AutoMapper.Extensions.Microsoft.DependencyInjection.dll": {}
+        }
+      },
       "Castle.Core/4.4.1": {
         "type": "package",
         "dependencies": {
@@ -2940,7 +2953,7 @@
           "bin/placeholder/Domain.dll": {}
         }
       },
-      "Infrastructure/1.0.0": {
+      "Persistence/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
         "dependencies": {
@@ -2948,6 +2961,7 @@
           "Abp.EntityFrameworkCore": "7.0.0",
           "Application": "1.0.0",
           "AutoMapper": "11.0.0",
+          "AutoMapper.Extensions.Microsoft.DependencyInjection": "11.0.0",
           "Microsoft.EntityFrameworkCore.SqlServer": "6.0.1",
           "Microsoft.Extensions.Configuration.EnvironmentVariables": "6.0.0",
           "Microsoft.Extensions.Configuration.FileExtensions": "6.0.0",
@@ -2957,10 +2971,10 @@
           "System.IdentityModel.Tokens.Jwt": "6.18.0"
         },
         "compile": {
-          "bin/placeholder/Infrastructure.dll": {}
+          "bin/placeholder/Persistence.dll": {}
         },
         "runtime": {
-          "bin/placeholder/Infrastructure.dll": {}
+          "bin/placeholder/Persistence.dll": {}
         }
       }
     }
@@ -3039,6 +3053,20 @@
         "icon.png",
         "lib/netstandard2.1/AutoMapper.dll",
         "lib/netstandard2.1/AutoMapper.xml"
+      ]
+    },
+    "AutoMapper.Extensions.Microsoft.DependencyInjection/11.0.0": {
+      "sha512": "0asw5WxdCFh2OTi9Gv+oKyH9SzxwYQSnO8TV5Dd0GggovILzJW4UimP26JAcxc3yB5NnC5urooZ1BBs8ElpiBw==",
+      "type": "package",
+      "path": "automapper.extensions.microsoft.dependencyinjection/11.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "automapper.extensions.microsoft.dependencyinjection.11.0.0.nupkg.sha512",
+        "automapper.extensions.microsoft.dependencyinjection.nuspec",
+        "icon.png",
+        "lib/netstandard2.1/AutoMapper.Extensions.Microsoft.DependencyInjection.dll"
       ]
     },
     "Castle.Core/4.4.1": {
@@ -8932,16 +8960,16 @@
       "path": "../Domain/Domain.csproj",
       "msbuildProject": "../Domain/Domain.csproj"
     },
-    "Infrastructure/1.0.0": {
+    "Persistence/1.0.0": {
       "type": "project",
-      "path": "../Infrastructure/Infrastructure.csproj",
-      "msbuildProject": "../Infrastructure/Infrastructure.csproj"
+      "path": "../Infrastructure/Persistence.csproj",
+      "msbuildProject": "../Infrastructure/Persistence.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net6.0": [
       "Application >= 1.0.0",
-      "Infrastructure >= 1.0.0"
+      "Persistence >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -8974,8 +9002,8 @@
             "F:\\LAB\\BAGroup\\Application\\Application.csproj": {
               "projectPath": "F:\\LAB\\BAGroup\\Application\\Application.csproj"
             },
-            "F:\\LAB\\BAGroup\\Infrastructure\\Infrastructure.csproj": {
-              "projectPath": "F:\\LAB\\BAGroup\\Infrastructure\\Infrastructure.csproj"
+            "F:\\LAB\\BAGroup\\Infrastructure\\Persistence.csproj": {
+              "projectPath": "F:\\LAB\\BAGroup\\Infrastructure\\Persistence.csproj"
             }
           }
         }

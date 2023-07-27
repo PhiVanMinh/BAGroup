@@ -11,11 +11,12 @@
           "Application": "1.0.0",
           "AutoMapper": "11.0.0",
           "AutoMapper.Extensions.Microsoft.DependencyInjection": "11.0.0",
-          "Infrastructure": "1.0.0",
+          "Infrastructures": "1.0.0",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "6.0.1",
           "Microsoft.AspNetCore.Authorization": "6.0.1",
           "Microsoft.EntityFrameworkCore.Design": "6.0.1",
           "Microsoft.IdentityModel.Tokens": "6.18.0",
+          "Persistence": "1.0.0",
           "Swashbuckle.AspNetCore": "6.2.3",
           "System.IdentityModel.Tokens.Jwt": "6.18.0"
         },
@@ -1714,12 +1715,23 @@
           "Domain.dll": {}
         }
       },
-      "Infrastructure/1.0.0": {
+      "Infrastructures/1.0.0": {
+        "dependencies": {
+          "Application": "1.0.0",
+          "AutoMapper": "11.0.0",
+          "AutoMapper.Extensions.Microsoft.DependencyInjection": "11.0.0"
+        },
+        "runtime": {
+          "Infrastructures.dll": {}
+        }
+      },
+      "Persistence/1.0.0": {
         "dependencies": {
           "Abp.Dapper": "6.5.0",
           "Abp.EntityFrameworkCore": "7.0.0",
           "Application": "1.0.0",
           "AutoMapper": "11.0.0",
+          "AutoMapper.Extensions.Microsoft.DependencyInjection": "11.0.0",
           "Microsoft.EntityFrameworkCore.SqlServer": "6.0.1",
           "Microsoft.Extensions.Configuration.EnvironmentVariables": "6.0.0",
           "Microsoft.Extensions.Configuration.FileExtensions": "6.0.0",
@@ -1729,7 +1741,7 @@
           "System.IdentityModel.Tokens.Jwt": "6.18.0"
         },
         "runtime": {
-          "Infrastructure.dll": {}
+          "Persistence.dll": {}
         }
       }
     }
@@ -2961,7 +2973,12 @@
       "serviceable": false,
       "sha512": ""
     },
-    "Infrastructure/1.0.0": {
+    "Infrastructures/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Persistence/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

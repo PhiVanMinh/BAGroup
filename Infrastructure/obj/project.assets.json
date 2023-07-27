@@ -106,6 +106,19 @@
           }
         }
       },
+      "AutoMapper.Extensions.Microsoft.DependencyInjection/11.0.0": {
+        "type": "package",
+        "dependencies": {
+          "AutoMapper": "11.0.0",
+          "Microsoft.Extensions.Options": "6.0.0"
+        },
+        "compile": {
+          "lib/netstandard2.1/AutoMapper.Extensions.Microsoft.DependencyInjection.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.1/AutoMapper.Extensions.Microsoft.DependencyInjection.dll": {}
+        }
+      },
       "Castle.Core/4.4.1": {
         "type": "package",
         "dependencies": {
@@ -3061,6 +3074,20 @@
         "icon.png",
         "lib/netstandard2.1/AutoMapper.dll",
         "lib/netstandard2.1/AutoMapper.xml"
+      ]
+    },
+    "AutoMapper.Extensions.Microsoft.DependencyInjection/11.0.0": {
+      "sha512": "0asw5WxdCFh2OTi9Gv+oKyH9SzxwYQSnO8TV5Dd0GggovILzJW4UimP26JAcxc3yB5NnC5urooZ1BBs8ElpiBw==",
+      "type": "package",
+      "path": "automapper.extensions.microsoft.dependencyinjection/11.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "automapper.extensions.microsoft.dependencyinjection.11.0.0.nupkg.sha512",
+        "automapper.extensions.microsoft.dependencyinjection.nuspec",
+        "icon.png",
+        "lib/netstandard2.1/AutoMapper.Extensions.Microsoft.DependencyInjection.dll"
       ]
     },
     "Castle.Core/4.4.1": {
@@ -9016,6 +9043,7 @@
       "Abp.EntityFrameworkCore >= 7.0.0",
       "Application >= 1.0.0",
       "AutoMapper >= 11.0.0",
+      "AutoMapper.Extensions.Microsoft.DependencyInjection >= 11.0.0",
       "Microsoft.EntityFrameworkCore.Design >= 6.0.1",
       "Microsoft.EntityFrameworkCore.SqlServer >= 6.0.1",
       "Microsoft.EntityFrameworkCore.Tools >= 6.0.1",
@@ -9033,9 +9061,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\LAB\\BAGroup\\Infrastructure\\Infrastructure.csproj",
-      "projectName": "Infrastructure",
-      "projectPath": "F:\\LAB\\BAGroup\\Infrastructure\\Infrastructure.csproj",
+      "projectUniqueName": "F:\\LAB\\BAGroup\\Infrastructure\\Persistence.csproj",
+      "projectName": "Persistence",
+      "projectPath": "F:\\LAB\\BAGroup\\Infrastructure\\Persistence.csproj",
       "packagesPath": "C:\\Users\\minhpv\\.nuget\\packages\\",
       "outputPath": "F:\\LAB\\BAGroup\\Infrastructure\\obj\\",
       "projectStyle": "PackageReference",
@@ -9079,6 +9107,10 @@
             "version": "[7.0.0, )"
           },
           "AutoMapper": {
+            "target": "Package",
+            "version": "[11.0.0, )"
+          },
+          "AutoMapper.Extensions.Microsoft.DependencyInjection": {
             "target": "Package",
             "version": "[11.0.0, )"
           },

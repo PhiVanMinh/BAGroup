@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "bpLH6t4mwJ6UXh3n/29aMFGrjxnjh37xAIg/MkhEbNwWWMjS5aiPHvH2yGLGDFwcv2Agw7fJ2CoYMocdeg58RQ==",
+  "dgSpecHash": "aa3F537JgahB9UY6cov/JoASsYayiueeFRR7rwhOztIVvL+plPfESSjCoZ0+U0r3aYMqHHeAxyAPuW8xxbTT3Q==",
   "success": true,
   "projectFilePath": "F:\\LAB\\BAGroup\\BA-API\\BA-API.csproj",
   "expectedPackageFiles": [
@@ -9,6 +9,7 @@
     "C:\\Users\\minhpv\\.nuget\\packages\\abp.entityframework.common\\7.0.0\\abp.entityframework.common.7.0.0.nupkg.sha512",
     "C:\\Users\\minhpv\\.nuget\\packages\\abp.entityframeworkcore\\7.0.0\\abp.entityframeworkcore.7.0.0.nupkg.sha512",
     "C:\\Users\\minhpv\\.nuget\\packages\\automapper\\11.0.0\\automapper.11.0.0.nupkg.sha512",
+    "C:\\Users\\minhpv\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\11.0.0\\automapper.extensions.microsoft.dependencyinjection.11.0.0.nupkg.sha512",
     "C:\\Users\\minhpv\\.nuget\\packages\\castle.core\\4.4.1\\castle.core.4.4.1.nupkg.sha512",
     "C:\\Users\\minhpv\\.nuget\\packages\\castle.core.asyncinterceptor\\2.0.0\\castle.core.asyncinterceptor.2.0.0.nupkg.sha512",
     "C:\\Users\\minhpv\\.nuget\\packages\\castle.loggingfacility\\5.1.1\\castle.loggingfacility.5.1.1.nupkg.sha512",
