@@ -13,23 +13,25 @@ using Infrastructures.Service;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-//builder.Services.AddAutoMapper(typeof(Program).Assembly);
+
+// Mapper
 builder.Services.AddAutoMapper(typeof(CustomMapper));
-//Service
+
+// Service
 builder.Services.AddTransient(typeof(IUserService), typeof(UserService));
 builder.Services.AddTransient(typeof(IAuthService), typeof(AuthService));
 
 builder.Services.AddCors();
 
-//Dependency Injection
+// Dependency Injection
 builder.Services.AddPersistence(builder.Configuration);
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+// Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {

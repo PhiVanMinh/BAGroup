@@ -15,12 +15,12 @@ namespace WebApi.Controllers
         {
             _user = user;
         }
-
+        // Lấy danh sách user
         [HttpPost("employees")]
         public async Task<PagedResultDto> GetAll(GetAllUserInput input)
           => await _user.GetAll(input);
 
-
+        // Thêm hoặc cập nhật thông tin user
         [HttpPost("createOrEdit-employees")]
         public async Task<IActionResult> CreateOrEditUsers([FromBody] CreateOrEditUserDto user)
         {
@@ -33,7 +33,7 @@ namespace WebApi.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
+        // xóa thông tin user
         [HttpPost("delete-employees")]
         public async Task<IActionResult> DeleteUsers([FromBody] DeletedUserInput input)
         {

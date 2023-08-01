@@ -2,11 +2,6 @@
 using Application.Interfaces;
 using Application.IService;
 using Domain.Master;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructures.Service
 {
@@ -17,13 +12,14 @@ namespace Infrastructures.Service
         {
             _unitOfWork = unitOfWork;
         }
+        // Thêm hoặc cập nhật thông tin user
         public async Task CreateOrEditUser(CreateOrEditUserDto user)
         {
             if (user.Id > 0) await UpdateUser(user);
             else await CreateUser(user);
             return;
         }
-
+        // Xóa thông tin user
         public Task DeleteUser(DeletedUserInput input)
         {
             var users = _unitOfWork.UserRepository.GetAll().Where(e => input.ListId.Contains(e.Id)).ToList();
@@ -44,7 +40,7 @@ namespace Infrastructures.Service
             }
             return Task.CompletedTask;
         }
-
+        // Lấy danh sách thông tin user 
         public Task<PagedResultDto> GetAll(GetAllUserInput input)
         {
             var result = from user in _unitOfWork.UserRepository.GetAll()
@@ -80,7 +76,7 @@ namespace Infrastructures.Service
                     }
                 );
         }
-
+        // Cập nhật thông tin user
         private async Task UpdateUser(CreateOrEditUserDto user)
         {
             var userUpdate = _unitOfWork.UserRepository.FirstOrDefault(e => e.Id == user.Id);
@@ -101,7 +97,7 @@ namespace Infrastructures.Service
             else throw new Exception("Can not find user !");
             return;
         }
-
+        // Thêm mới thông tin user
         private async Task CreateUser(CreateOrEditUserDto user)
         {
             var checkUser = _unitOfWork.UserRepository.FirstOrDefault(e => e.UserName == user.UserName);
@@ -132,7 +128,7 @@ namespace Infrastructures.Service
             await _unitOfWork.SaveAsync();
             return;
         }
-
+        // Tạo mã hóa thông tin user
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
             using (var hmac = new System.Security.Cryptography.HMACSHA512())

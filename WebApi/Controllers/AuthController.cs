@@ -1,8 +1,6 @@
 ﻿using Application.Dto.Users;
-using Application.Interfaces;
 using Application.IService;
 using AutoMapper;
-using Domain.Master;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -17,13 +15,11 @@ namespace WebApi.Controllers
     {
         private readonly IAuthService _repo;
 
-        private readonly IConfiguration _config;
         private readonly IMapper _mapper;
 
-        public AuthController(IAuthService repo, IConfiguration config, IMapper mapper)
+        public AuthController(IAuthService repo, IMapper mapper)
         {
             _repo = repo;
-            _config = config;
             _mapper = mapper;
         }
         

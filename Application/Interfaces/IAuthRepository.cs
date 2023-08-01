@@ -1,10 +1,4 @@
-﻿using Application.Common.Interfaces;
-using Domain.Master;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Domain.Master;
 
 namespace Application.Interfaces
 {
