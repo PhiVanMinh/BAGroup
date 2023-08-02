@@ -10,43 +10,47 @@ namespace WebApi.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _user;
+        private readonly ILogger<UsersController> _logger;
 
-        public UsersController(IUserService user)
+        public UsersController
+            (
+            IUserService user,
+            ILogger<UsersController> logger
+            )
         {
             _user = user;
+            _logger = logger;
         }
+
         // Lấy danh sách user
         [HttpPost("employees")]
-        public async Task<PagedResultDto> GetAll(GetAllUserInput input)
-          => await _user.GetAll(input);
+        public async Task<IActionResult> GetAll(GetAllUserInput input)
+        {
+            var respon = await _user.GetAll(input);
+            if (!string.IsNullOrEmpty(respon.Message)) _logger.LogInformation(respon.Message);
+            return Ok(respon);
+        }
 
         // Thêm hoặc cập nhật thông tin user
         [HttpPost("createOrEdit-employees")]
         public async Task<IActionResult> CreateOrEditUsers([FromBody] CreateOrEditUserDto user)
         {
-            try
-            {
-                await _user.CreateOrEditUser(user);
-                return Ok(true);
-            } catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var respon = await _user.CreateOrEditUser(user);
+            if (!string.IsNullOrEmpty(respon.Message)) _logger.LogInformation(respon.Message);
+            return Ok(respon);
         }
+
         // xóa thông tin user
         [HttpPost("delete-employees")]
         public async Task<IActionResult> DeleteUsers([FromBody] DeletedUserInput input)
         {
-            
-            try
+            if (input.ListId != null && input.ListId.Count() == 0) 
             {
-                await _user.DeleteUser(input);
-                return Ok(true);
+                return BadRequest("Vui lòng chọn 1 bản ghi để xóa !");
             }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var respon = await _user.DeleteUser(input);
+            if (!string.IsNullOrEmpty(respon.Message)) _logger.LogInformation(respon.Message);
+            return Ok(respon);
         }
     }
 }

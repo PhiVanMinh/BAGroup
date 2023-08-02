@@ -9,8 +9,17 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Infrastructure.CustomMapper;
 using Infrastructures.Service;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//Logger
+var logger = new LoggerConfiguration().ReadFrom
+    .Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
 
 // Add services to the container.
 builder.Services.AddControllers();

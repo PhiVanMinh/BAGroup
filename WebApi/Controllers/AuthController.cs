@@ -16,23 +16,33 @@ namespace WebApi.Controllers
         private readonly IAuthService _repo;
 
         private readonly IMapper _mapper;
+        private readonly ILogger<AuthController> _logger;
 
-        public AuthController(IAuthService repo, IMapper mapper)
+        public AuthController
+            (
+                IAuthService repo,
+                IMapper mapper,
+                ILogger<AuthController> logger
+            )
         {
             _repo = repo;
             _mapper = mapper;
+            _logger = logger;
         }
         
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
         {
+            _logger.LogInformation("Seri Log is Working");
             var userFromRepo = await _repo.Login(userForLoginDto);
 
             if (userFromRepo == null)
+            {
                 return Unauthorized();
-
-            var user = _mapper.Map<UserLogInInfo>(userFromRepo);
+            };
+            
+            var user = _mapper.Map<UserLoginInfo>(userFromRepo);
 
             string key = "my_secret_key_12345"; //Secret key which will be used later during validation    
             var issuer = "http://mysite.com";  //normally this will be your site URL    
