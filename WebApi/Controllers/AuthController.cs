@@ -1,6 +1,7 @@
 ﻿using Application.Dto.Users;
 using Application.IService;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -29,20 +30,27 @@ namespace WebApi.Controllers
             _mapper = mapper;
             _logger = logger;
         }
-        
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
         {
-            _logger.LogInformation("Seri Log is Working");
+            if( string.IsNullOrWhiteSpace(userForLoginDto.UserName)|| string.IsNullOrWhiteSpace(userForLoginDto.Password))
+            {
+                _logger.LogInformation("UserName or Password incorrect");
+                return Unauthorized();
+            }    
             var userFromRepo = await _repo.Login(userForLoginDto);
 
-            if (userFromRepo == null)
+            // Kiểm tra thông tin đăng nhập
+            if (userFromRepo.User == null)
             {
+                _logger.LogInformation("UserName or Password incorrect");
                 return Unauthorized();
             };
             
-            var user = _mapper.Map<UserLoginInfo>(userFromRepo);
+            var user = _mapper.Map<UserLoginInfo>(userFromRepo.User);
+
+            // Gen token cho phiên đăng nhập
 
             string key = "my_secret_key_12345"; //Secret key which will be used later during validation    
             var issuer = "http://mysite.com";  //normally this will be your site URL    
@@ -53,6 +61,10 @@ namespace WebApi.Controllers
             //Create a List of Claims, Keep claims name short    
             var permClaims = new List<Claim>();
             permClaims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
+            foreach (var role in userFromRepo.Roles)
+            {
+                permClaims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             //Create Security Token object by giving required parameters    
             var token = new JwtSecurityToken(issuer, //Issure    

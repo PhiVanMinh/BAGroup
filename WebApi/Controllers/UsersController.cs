@@ -1,6 +1,7 @@
 ﻿using Application.Dto.Users;
 using Application.IService;
 using Domain.Master;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers
@@ -22,26 +23,38 @@ namespace WebApi.Controllers
             _logger = logger;
         }
 
-        // Lấy danh sách user
+        #region -- Lấy danh sách user
         [HttpPost("employees")]
         public async Task<IActionResult> GetAll(GetAllUserInput input)
         {
+            if (input.Page == null || input.PageSize == null)
+            {
+                return BadRequest("Vui lóng nhập đủ số trang và kích thước trang! ");
+            }
             var respon = await _user.GetAll(input);
             if (!string.IsNullOrEmpty(respon.Message)) _logger.LogInformation(respon.Message);
             return Ok(respon);
         }
+        #endregion
 
-        // Thêm hoặc cập nhật thông tin user
+        #region Thêm hoặc cập nhật thông tin user
         [HttpPost("createOrEdit-employees")]
         public async Task<IActionResult> CreateOrEditUsers([FromBody] CreateOrEditUserDto user)
         {
+            if (user.Id ==  null)
+            {
+                return BadRequest("Mã người dùng cần cập nhật không hợp lệ !");
+            }
             var respon = await _user.CreateOrEditUser(user);
             if (!string.IsNullOrEmpty(respon.Message)) _logger.LogInformation(respon.Message);
             return Ok(respon);
         }
+        #endregion
 
-        // xóa thông tin user
+        #region xóa thông tin user
         [HttpPost("delete-employees")]
+        //[Authorize(Policy = "DeleteAccess")]
+
         public async Task<IActionResult> DeleteUsers([FromBody] DeletedUserInput input)
         {
             if (input.ListId != null && input.ListId.Count() == 0) 
@@ -52,5 +65,6 @@ namespace WebApi.Controllers
             if (!string.IsNullOrEmpty(respon.Message)) _logger.LogInformation(respon.Message);
             return Ok(respon);
         }
+        #endregion
     }
 }
