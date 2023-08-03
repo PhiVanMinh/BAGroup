@@ -10,10 +10,12 @@ namespace Application.Dto.Users
     {
         public int Id { get; set; }
 
+        // Tên người dùng
         public string? EmpName { get; set; }
 
         public string? Token { get; set; }
 
+        // Quyền
         public byte? Role { get; set; }
     }
 }

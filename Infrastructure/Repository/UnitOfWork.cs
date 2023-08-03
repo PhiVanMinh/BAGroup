@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces;
 using Infrastructure.Persistence;
+using Persistence.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,8 @@ namespace Infrastructure.Repository
         private readonly ApplicationDBContext _dbContext;
         private IUserRepository _userRepository;
         private IAuthRepository _authRepository;
+        private IRoleRepository _roleRepository;
+        private IUserRoleRepository _userRoleRepository;
 
 
         public UnitOfWork(
@@ -31,6 +34,16 @@ namespace Infrastructure.Repository
         public IAuthRepository AuthRepository
         {
             get { return _authRepository = _authRepository ?? new AuthRepository(_dbContext); }
+        }
+
+        public IRoleRepository RoleRepository
+        {
+            get { return _roleRepository = _roleRepository ?? new RoleRepository(_dbContext); }
+        }
+
+        public IUserRoleRepository UserRoleRepository
+        {
+            get { return _userRoleRepository = _userRoleRepository ?? new UserRoleRepository(_dbContext); }
         }
 
 

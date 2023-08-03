@@ -14,6 +14,8 @@ namespace Infrastructure.Repository
             _context = context;
         }
 
+        #region -- Đăng nhập
+        // Tìm kiếm thông tin user theo thông tin đầu vào , xác minh thông tin đăng nhập
         public async Task<User> Login(string username, string password)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == username);
@@ -26,7 +28,7 @@ namespace Infrastructure.Repository
             return user;
         }
 
-        // Mã hóa mật khẩu
+        // Xác minh mật khẩu
         private bool VerifyPasswordHash(string password, string passwordHash, byte[] passwordSalt)
         {
             using (var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt))
@@ -36,5 +38,6 @@ namespace Infrastructure.Repository
             }
             return true;
         }
+        #endregion
     }
 }

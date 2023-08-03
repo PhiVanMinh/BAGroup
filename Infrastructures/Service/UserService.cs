@@ -1,5 +1,6 @@
 ﻿using Application.Dto.Common;
 using Application.Dto.Users;
+using Application.Enum;
 using Application.Interfaces;
 using Application.IService;
 using Domain.Master;
@@ -16,6 +17,7 @@ namespace Infrastructures.Service
         }
 
         #region -- Xóa thông tin user
+        // Kiểm tra thông tin user có hợp lệ không nếu không đưa ra thông báo. Ngược lại cập nhật thông tin xóa của bản ghi
         public Task<ResponDto<bool>> DeleteUser(DeletedUserInput input)
         {
             var respon = new ResponDto<bool>();
@@ -33,7 +35,7 @@ namespace Infrastructures.Service
                     if (input.ListId.Any(e => e == input.CurrentUserId))
                     {
                         respon.StatusCode = 400;
-                        respon.Message = $" Không thể xóa nhân viên {input.CurrentUserName} !";
+                        respon.Message = $" Không thể xóa nhân viên {input.CurrentEmpName} !";
                         return Task.FromResult(respon);
                     }
                     users.ForEach(e =>
@@ -57,23 +59,25 @@ namespace Infrastructures.Service
         #endregion
 
         #region -- Lấy danh sách thông tin user 
+        // Lấy danh sách nhân viên theo giá trị lọc. Nếu hệ thống lỗi đưa ra giá trị mặc định
         public Task<ResponDto<PagedResultDto>> GetAll(GetAllUserInput input)
         {
             var respon = new ResponDto<PagedResultDto>();
             try
             {
                 var result = from user in _unitOfWork.UserRepository.GetAll()
-                                    .Where(e => string.IsNullOrWhiteSpace(input.ValueFilter)
-                                                || (input.TypeFilter == 1 ? e.UserName.ToLower().Contains(input.ValueFilter.ToLower())
-                                                    : (input.TypeFilter == 2 ? e.EmpName.ToLower().Contains(input.ValueFilter.ToLower())
-                                                        : (input.TypeFilter == 3 ? e.Email.ToLower().Contains(input.ValueFilter.ToLower())
+                                    .Where(e => (string.IsNullOrWhiteSpace(input.ValueFilter)
+                                                || (input.TypeFilter == FilterType.UserName ? e.UserName.ToLower().Contains(input.ValueFilter.ToLower())
+                                                    : (input.TypeFilter == FilterType.FullName ? e.EmpName.ToLower().Contains(input.ValueFilter.ToLower())
+                                                        : (input.TypeFilter == FilterType.Email ? e.Email.ToLower().Contains(input.ValueFilter.ToLower())
                                                             : e.PhoneNumber.ToLower().Contains(input.ValueFilter.ToLower())
-                                                    )))
-                                           )
-                                    .Where(e => input.Gender > 0 ? input.Gender == e.Gender : true)
-                                    .Where(e => e.IsDeleted == false)
-                                    .Where(e => input.FromDate != null ? e.BirthDay >= input.FromDate : true)
-                                    .Where(e => input.ToDate != null ? e.BirthDay < input.ToDate.Value.AddDays(1) : true)
+                                                    ))))
+ 
+                                                && input.Gender > 0 ? input.Gender == e.Gender : true
+                                                && e.IsDeleted == false
+                                                && input.FromDate != null ? e.BirthDay >= input.FromDate : true
+                                                && input.ToDate != null ? e.BirthDay < input.ToDate.Value.AddDays(1) : true
+                                    )
                              orderby user.Id
                              select new GetAllUserDto
                              {
@@ -124,7 +128,9 @@ namespace Infrastructures.Service
             return respon;
         }
 
-        // Cập nhật thông tin user
+        // Cập nhật thông tin user :
+        // + Kiểm tra thông tin người dùng cần cập nhật có tồn tại không nếu không đưa ra thông báo.
+        //   Ngược lại nếu thỏa mãn thì cập nhật các thông tin cho người dùng cần cập nhật
         private async Task<ResponDto<bool>> UpdateUser(CreateOrEditUserDto user)
         {
             var responUpdate = new ResponDto<bool>();
@@ -151,7 +157,9 @@ namespace Infrastructures.Service
             }    
             return responUpdate;
         }
-        // Thêm mới thông tin user
+        // Thêm mới thông tin user:
+        //  + Kiểm tra tên đăng nhập đã tồn tại chưa nếu rồi đưa ra thông báo lỗi và không tạo người dùng mới.
+        //    Ngược lại Mã hóa mật khẩu của người dùng , tạo thông tin người dùng mới
         private async Task<ResponDto<bool>> CreateUser(CreateOrEditUserDto user)
         {
             var responCreate = new ResponDto<bool>();
@@ -163,6 +171,7 @@ namespace Infrastructures.Service
                 return responCreate;
             }
 
+            // Mã hóa mật khẩu
             byte[] passwordHash, passwordSalt;
             CreatePasswordHash(user.Password, out passwordHash, out passwordSalt);
 

@@ -9,7 +9,7 @@ namespace Infrastructure.CustomMapper
 
         public CustomMapper ()
         {
-            CreateMap<User, UserLogInInfo>();
+            CreateMap<User, UserLoginInfo>();
         }
     }
 }
