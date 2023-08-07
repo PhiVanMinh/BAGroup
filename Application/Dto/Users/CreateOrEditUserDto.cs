@@ -4,7 +4,7 @@ namespace Application.Dto.Users
 {
     public class CreateOrEditUserDto
     {
-        public int Id { get; set; }
+        public Guid? UserId { get; set; }
 
         // Tên đăng nhập
         public string? UserName { get; set; }
@@ -21,7 +21,7 @@ namespace Application.Dto.Users
         public DateTime? BirthDay { get; set; }
 
         // Người tạo
-        public int? CreatorUserId { get; set; }
+        public Guid? CreatorUserId { get; set; }
 
         // Giới tính
         public byte? Gender { get; set; }
@@ -30,7 +30,7 @@ namespace Application.Dto.Users
         public string? PhoneNumber { get; set; }
 
         // Id người đang đăng nhập
-        public int? CurrentUserId { get; set; }
+        public Guid? CurrentUserId { get; set; }
 
         // Quyền
         public byte? Role { get; set; }

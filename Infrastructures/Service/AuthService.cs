@@ -29,15 +29,15 @@ namespace Infrastructures.Service
             var result = new ResponLoginDto();
             var userFromRepo = await _unitOfWork.AuthRepository.Login(userLogin.UserName.ToLower(), userLogin.Password);
 
-            if( userFromRepo != null )
+            if( userFromRepo != null && userFromRepo.UserId.ToString() != "")
             {
                 var roles = await (from role in _unitOfWork.RoleRepository.GetAll().Where(e => e.Status == 1)
                                    join ur in _unitOfWork.UserRoleRepository.GetAll().AsNoTracking() on role.Id equals ur.RoleId
-                                   where ur.UserId == userFromRepo.Id
+                                   where ur.UserId == userFromRepo.UserId.ToString()
                                    select role.RoleName).ToListAsync();
                 result.Roles = roles;
+                result.User = userFromRepo;
             }
-            result.User = userFromRepo;
             return result;
         }
         #endregion

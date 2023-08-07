@@ -3,7 +3,7 @@ namespace Application.Dto.Users
 {
      public class GetAllUserDto
     {
-        public int Id { get; set; }
+        public Guid UserId { get; set; }
 
         // Tên đăng nhập
         public string? UserName { get; set; }

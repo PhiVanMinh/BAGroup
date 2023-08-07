@@ -8,7 +8,7 @@ namespace Application.Dto.Users
 {
     public class UserLoginInfo
     {
-        public int Id { get; set; }
+        public Guid UserId { get; set; }
 
         // Tên người dùng
         public string? EmpName { get; set; }

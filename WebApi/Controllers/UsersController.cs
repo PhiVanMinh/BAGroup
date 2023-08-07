@@ -27,7 +27,7 @@ namespace WebApi.Controllers
         [HttpPost("employees")]
         public async Task<IActionResult> GetAll(GetAllUserInput input)
         {
-            if (input.Page == null || input.PageSize == null)
+            if (input.Page == 0 || input.PageSize == 0)
             {
                 return BadRequest("Vui lóng nhập đủ số trang và kích thước trang! ");
             }
@@ -41,10 +41,10 @@ namespace WebApi.Controllers
         [HttpPost("createOrEdit-employees")]
         public async Task<IActionResult> CreateOrEditUsers([FromBody] CreateOrEditUserDto user)
         {
-            if (user.Id ==  null)
-            {
-                return BadRequest("Mã người dùng cần cập nhật không hợp lệ !");
-            }
+            //if (user.UserId == null)
+            //{
+            //    return BadRequest("Mã người dùng cần cập nhật không hợp lệ !");
+            //}
             var respon = await _user.CreateOrEditUser(user);
             if (!string.IsNullOrEmpty(respon.Message)) _logger.LogInformation(respon.Message);
             return Ok(respon);

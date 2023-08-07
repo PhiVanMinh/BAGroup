@@ -18,13 +18,14 @@ namespace Infrastructure.Repository
         // Tìm kiếm thông tin user theo thông tin đầu vào , xác minh thông tin đăng nhập
         public async Task<User> Login(string username, string password)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == username);
-            if (user == null)
-                return null;
+            var user = new User();
+            var userLogin = await _context.Users.FirstOrDefaultAsync(x => x.UserName == username);
+            if (userLogin == null)
+                return user;
 
-            if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
-                return null;
-
+            if (!VerifyPasswordHash(password, userLogin.PasswordHash, userLogin.PasswordSalt))
+                return user;
+            user = userLogin;
             return user;
         }
 

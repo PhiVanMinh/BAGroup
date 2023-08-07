@@ -9,7 +9,7 @@ namespace Domain.Master
     public class UserRole : BaseEntity<int>
     {
         // Mã người dùng
-        public int UserId { get; set; }
+        public string UserId { get; set; }
 
         // Mã quyền
         public int RoleId { get; set; }

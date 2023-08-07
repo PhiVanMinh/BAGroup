@@ -5,8 +5,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Master
 {
-    public class User : BaseEntity<int>
+    public class User
     {
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid UserId { get; set; }
         // Tên đăng nhập
         [StringLength(50)]
         public string? UserName { get; set; }
@@ -39,10 +41,10 @@ namespace Domain.Master
         public byte? Role { get; set; }
 
         // Người tạo
-        public int? CreatorUserId { get; set; }
+        public string? CreatorUserId { get; set; }
 
         // Người sửa cuối cùng
-        public int? LastModifyUserId { get; set; }
+        public string? LastModifyUserId { get; set; }
         [Column(TypeName = "datetime2")]
 
         // Ngày tạo
@@ -56,7 +58,7 @@ namespace Domain.Master
         public bool IsDeleted { get; set; }
 
         // Người xóa
-        public int DeletedUserId { get; set; }
+        public string? DeletedUserId { get; set; }
 
         // Ngày xóa
         [Column(TypeName = "datetime2")]

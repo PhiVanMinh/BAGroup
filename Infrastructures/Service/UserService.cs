@@ -23,7 +23,7 @@ namespace Infrastructures.Service
             var respon = new ResponDto<bool>();
             try
             {
-                var users = _unitOfWork.UserRepository.GetAll().Where(e => input.ListId.Contains(e.Id)).ToList();
+                var users = _unitOfWork.UserRepository.GetAll().Where(e => input.ListId.Contains(e.UserId)).ToList();
                 if (users.Count() == 0)
                 {
                     respon.StatusCode = 400;
@@ -41,8 +41,8 @@ namespace Infrastructures.Service
                     users.ForEach(e =>
                     {
                         e.IsDeleted = true;
-                        e.DeletedUserId = input.CurrentUserId;
-                        e.LastModifyDate = DateTime.Now;
+                        e.DeletedUserId = input.CurrentUserId.ToString();
+                        e.DeletedDate = DateTime.Now;
                     });
                     _unitOfWork.UserRepository.UpdateRange(users);
                     _unitOfWork.SaveAsync();
@@ -66,22 +66,22 @@ namespace Infrastructures.Service
             try
             {
                 var result = from user in _unitOfWork.UserRepository.GetAll()
-                                    .Where(e => (string.IsNullOrWhiteSpace(input.ValueFilter)
-                                                || (input.TypeFilter == FilterType.UserName ? e.UserName.ToLower().Contains(input.ValueFilter.ToLower())
-                                                    : (input.TypeFilter == FilterType.FullName ? e.EmpName.ToLower().Contains(input.ValueFilter.ToLower())
-                                                        : (input.TypeFilter == FilterType.Email ? e.Email.ToLower().Contains(input.ValueFilter.ToLower())
-                                                            : e.PhoneNumber.ToLower().Contains(input.ValueFilter.ToLower())
-                                                    ))))
- 
+                                    .Where(e =>
+                                                string.IsNullOrWhiteSpace(input.ValueFilter) ? true 
+                                                    :  input.TypeFilter == FilterType.UserName ? (e.UserName ?? "").ToLower().Contains(input.ValueFilter.ToLower())
+                                                        : (input.TypeFilter == FilterType.FullName ? (e.EmpName ?? "").ToLower().Contains(input.ValueFilter.ToLower())
+                                                            : (input.TypeFilter == FilterType.Email ? (e.Email ?? "").ToLower().Contains(input.ValueFilter.ToLower())
+                                                                : (e.PhoneNumber ?? "").ToLower().Contains(input.ValueFilter.ToLower())
+                                                        ))
                                                 && input.Gender > 0 ? input.Gender == e.Gender : true
                                                 && e.IsDeleted == false
                                                 && input.FromDate != null ? e.BirthDay >= input.FromDate : true
                                                 && input.ToDate != null ? e.BirthDay < input.ToDate.Value.AddDays(1) : true
                                     )
-                             orderby user.Id
+                             orderby user.UserId
                              select new GetAllUserDto
                              {
-                                 Id = user.Id,
+                                 UserId = user.UserId,
                                  BirthDay = user.BirthDay,
                                  PhoneNumber = user.PhoneNumber,
                                  EmpName = user.EmpName,
@@ -117,7 +117,7 @@ namespace Infrastructures.Service
             var respon = new ResponDto<bool>();
             try
             {
-                if (user.Id > 0) respon = await UpdateUser(user);
+                if (user.UserId != null) respon = await UpdateUser(user);
                 else respon = await CreateUser(user);
             }
             catch (Exception ex)
@@ -134,7 +134,7 @@ namespace Infrastructures.Service
         private async Task<ResponDto<bool>> UpdateUser(CreateOrEditUserDto user)
         {
             var responUpdate = new ResponDto<bool>();
-            var userUpdate = _unitOfWork.UserRepository.FirstOrDefault(e => e.Id == user.Id);
+            var userUpdate = _unitOfWork.UserRepository.FirstOrDefault(e => e.UserId == user.UserId);
             if (userUpdate != null)
             {
                 userUpdate.EmpName = user.EmpName;
@@ -142,7 +142,7 @@ namespace Infrastructures.Service
                 userUpdate.BirthDay = user.BirthDay;
                 userUpdate.Gender = user.Gender;
                 userUpdate.PhoneNumber = user.PhoneNumber;
-                userUpdate.LastModifyUserId = user.CurrentUserId;
+                userUpdate.LastModifyUserId = user.CurrentUserId.ToString();
                 userUpdate.LastModifyDate = DateTime.Now;
                 userUpdate.Role = user.Role ?? 2;
 
@@ -183,7 +183,7 @@ namespace Infrastructures.Service
                 BirthDay = user.BirthDay,
                 Gender = user.Gender,
                 PhoneNumber = user.PhoneNumber,
-                CreatorUserId = user.CurrentUserId,
+                CreatorUserId = user.CurrentUserId.ToString(),
                 CreateDate = DateTime.Now,
                 PasswordHash = Convert.ToBase64String(passwordHash),
                 PasswordSalt = passwordSalt,
