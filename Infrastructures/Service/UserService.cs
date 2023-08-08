@@ -88,6 +88,7 @@ namespace Infrastructures.Service
                                  UserName = user.UserName,
                                  Email = user.Email,
                                  Gender = user.Gender,
+                                 UserType = user.UserType,
                              };
                 var totalCount = result.Count();
                 var pageAndFilterResult = result.Skip((input.Page - 1) * input.PageSize).Take(input.PageSize);
@@ -144,7 +145,7 @@ namespace Infrastructures.Service
                 userUpdate.PhoneNumber = user.PhoneNumber;
                 userUpdate.LastModifyUserId = user.CurrentUserId.ToString();
                 userUpdate.LastModifyDate = DateTime.Now;
-                userUpdate.Role = user.Role ?? 2;
+                userUpdate.UserType = user.UserType;
 
                 _unitOfWork.UserRepository.Update(userUpdate);
                 await _unitOfWork.SaveAsync();
@@ -187,7 +188,7 @@ namespace Infrastructures.Service
                 CreateDate = DateTime.Now,
                 PasswordHash = Convert.ToBase64String(passwordHash),
                 PasswordSalt = passwordSalt,
-                Role = user.Role ?? 2,
+                UserType = user.UserType ?? 2,
             };
             _unitOfWork.UserRepository.Add(newUser);
             await _unitOfWork.SaveAsync();

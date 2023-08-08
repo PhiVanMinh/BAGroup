@@ -21,5 +21,7 @@ namespace Application.Dto.Users
 
         // Số điện thoại
         public string? PhoneNumber { get; set; }
+        // Loại tài khoản
+        public byte? UserType { get; set; }
     }
 }

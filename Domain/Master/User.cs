@@ -38,7 +38,7 @@ namespace Domain.Master
         public byte[]? PasswordSalt { get; set; }
 
         // Quyền
-        public byte? Role { get; set; }
+        public byte? UserType { get; set; }
 
         // Người tạo
         public string? CreatorUserId { get; set; }

@@ -3,6 +3,7 @@ using Application.IService;
 using Domain.Master;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebApi.Authorization;
 
 namespace WebApi.Controllers
 {
@@ -25,6 +26,7 @@ namespace WebApi.Controllers
 
         #region -- Lấy danh sách user
         [HttpPost("employees")]
+        [Authorize(Policy = Policies.UserView)]
         public async Task<IActionResult> GetAll(GetAllUserInput input)
         {
             if (input.Page == 0 || input.PageSize == 0)
@@ -39,12 +41,16 @@ namespace WebApi.Controllers
 
         #region Thêm hoặc cập nhật thông tin user
         [HttpPost("createOrEdit-employees")]
+        [Authorize(Policy = Policies.CreateOrUpdateUser)]
         public async Task<IActionResult> CreateOrEditUsers([FromBody] CreateOrEditUserDto user)
         {
-            //if (user.UserId == null)
-            //{
-            //    return BadRequest("Mã người dùng cần cập nhật không hợp lệ !");
-            //}
+            if (user.CurrentUserId == null)
+            {
+                return BadRequest("Mã người dùng đang đăng nhập không hợp lệ !");
+            }
+            if(((user.Password ?? "").Length < 6 || (user.Password ?? "").Length > 100) && user.UserId == null) return BadRequest("Mật Khẩu phải ít nhất 6 kí tự và nhiều nhất 100 kí tự !");
+            if(user.BirthDay == null || (user.BirthDay > DateTime.Now.AddYears(-18))) { return BadRequest("Người dùng chưa đủ 18 tuổi !"); }
+
             var respon = await _user.CreateOrEditUser(user);
             if (!string.IsNullOrEmpty(respon.Message)) _logger.LogInformation(respon.Message);
             return Ok(respon);
@@ -53,13 +59,17 @@ namespace WebApi.Controllers
 
         #region xóa thông tin user
         [HttpPost("delete-employees")]
-        //[Authorize(Policy = "DeleteAccess")]
+        [Authorize(Policy = Policies.UserDelete)]
 
         public async Task<IActionResult> DeleteUsers([FromBody] DeletedUserInput input)
         {
             if (input.ListId != null && input.ListId.Count() == 0) 
             {
                 return BadRequest("Vui lòng chọn 1 bản ghi để xóa !");
+            }
+            if (input.CurrentUserId == null)
+            {
+                return BadRequest("Mã người dùng đang đăng nhập không hợp lệ !");
             }
             var respon = await _user.DeleteUser(input);
             if (!string.IsNullOrEmpty(respon.Message)) _logger.LogInformation(respon.Message);

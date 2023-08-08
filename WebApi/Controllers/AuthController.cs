@@ -18,22 +18,27 @@ namespace WebApi.Controllers
 
         private readonly IMapper _mapper;
         private readonly ILogger<AuthController> _logger;
+        private readonly IConfiguration _config;
 
         public AuthController
             (
                 IAuthService repo,
                 IMapper mapper,
-                ILogger<AuthController> logger
+                ILogger<AuthController> logger,
+                IConfiguration config
             )
         {
             _repo = repo;
             _mapper = mapper;
             _logger = logger;
+            _config = config;
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
         {
+            // Kiểm  tra dữ liệu đăng nhập đầu vào
             if( string.IsNullOrWhiteSpace(userForLoginDto.UserName)|| string.IsNullOrWhiteSpace(userForLoginDto.Password))
             {
                 _logger.LogInformation("UserName or Password incorrect");
@@ -48,14 +53,12 @@ namespace WebApi.Controllers
                 return Unauthorized();
             };
             
+            // Map thông tin user
             var user = _mapper.Map<UserLoginInfo>(userFromRepo.User);
 
             // Gen token cho phiên đăng nhập
 
-            string key = "my_secret_key_12345"; //Secret key which will be used later during validation    
-            var issuer = "http://mysite.com";  //normally this will be your site URL    
-
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Auth0:SecretKey"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             //Create a List of Claims, Keep claims name short    
@@ -67,8 +70,9 @@ namespace WebApi.Controllers
             }
 
             //Create Security Token object by giving required parameters    
-            var token = new JwtSecurityToken(issuer, //Issure    
-                            issuer,  //Audience    
+            var token = new JwtSecurityToken(
+                            issuer: _config["Auth0:Issuer"],
+                            audience: _config["Auth0:Audience"],
                             permClaims,
                             expires: DateTime.Now.AddDays(1),
                             signingCredentials: credentials);
