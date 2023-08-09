@@ -1,7 +1,7 @@
 ﻿using Domain.Master;
 using Microsoft.AspNetCore.Authorization;
 
-namespace WebApi.Authorization
+namespace Infrastructures.Authorization
 {
     public static class Policies
     {

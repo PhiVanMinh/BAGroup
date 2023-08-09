@@ -8,7 +8,7 @@ using System.Text;
 using Infrastructure.CustomMapper;
 using Infrastructures.Service;
 using Serilog;
-using WebApi.Authorization;
+using Infrastructures.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 

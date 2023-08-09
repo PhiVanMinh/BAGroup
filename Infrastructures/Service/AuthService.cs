@@ -27,9 +27,9 @@ namespace Infrastructures.Service
         public async Task<ResponLoginDto> Login(UserForLoginDto userLogin)
         {
             var result = new ResponLoginDto();
-            var userFromRepo = await _unitOfWork.AuthRepository.Login(userLogin.UserName.ToLower(), userLogin.Password);
+            var userFromRepo = await _unitOfWork.AuthRepository.Login((userLogin.UserName ?? "").ToLower(), (userLogin.Password ?? ""));
 
-            if( userFromRepo != null && userFromRepo.UserId.ToString() != "")
+            if( userFromRepo != null && userFromRepo.UserId != Guid.Empty)
             {
                 var roles = await (from role in _unitOfWork.RoleRepository.GetAll().Where(e => e.Status == 1)
                                    join ur in _unitOfWork.UserRoleRepository.GetAll().AsNoTracking() on role.Id equals ur.RoleId

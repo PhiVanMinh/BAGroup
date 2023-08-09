@@ -1,9 +1,8 @@
 ﻿using Application.Dto.Users;
 using Application.IService;
-using Domain.Master;
+using Infrastructures.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebApi.Authorization;
 
 namespace WebApi.Controllers
 {

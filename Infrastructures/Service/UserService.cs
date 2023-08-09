@@ -4,10 +4,13 @@ using Application.Enum;
 using Application.Interfaces;
 using Application.IService;
 using Domain.Master;
+using Infrastructures.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 
 namespace Infrastructures.Service
 {
+    [Authorize]
     public class UserService : IUserService
     {
         public IUnitOfWork _unitOfWork;
@@ -132,6 +135,7 @@ namespace Infrastructures.Service
         // Cập nhật thông tin user :
         // + Kiểm tra thông tin người dùng cần cập nhật có tồn tại không nếu không đưa ra thông báo.
         //   Ngược lại nếu thỏa mãn thì cập nhật các thông tin cho người dùng cần cập nhật
+        [Authorize(Policy = Policies.UserUpdate)]
         private async Task<ResponDto<bool>> UpdateUser(CreateOrEditUserDto user)
         {
             var responUpdate = new ResponDto<bool>();
@@ -161,6 +165,7 @@ namespace Infrastructures.Service
         // Thêm mới thông tin user:
         //  + Kiểm tra tên đăng nhập đã tồn tại chưa nếu rồi đưa ra thông báo lỗi và không tạo người dùng mới.
         //    Ngược lại Mã hóa mật khẩu của người dùng , tạo thông tin người dùng mới
+        [Authorize(Policy = Policies.UserCreate)]
         private async Task<ResponDto<bool>> CreateUser(CreateOrEditUserDto user)
         {
             var responCreate = new ResponDto<bool>();
