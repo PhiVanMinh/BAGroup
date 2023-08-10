@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Infrastructure.CustomMapper;
-using Infrastructures.Service;
 using Serilog;
-using Infrastructures.Authorization;
+using Infra_Persistence.Services;
+using Infra_Persistence.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,6 +1,6 @@
 ﻿using Application.Dto.Users;
 using Application.IService;
-using Infrastructures.Authorization;
+using Infra_Persistence.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -47,7 +47,7 @@ namespace WebApi.Controllers
             {
                 return BadRequest("Mã người dùng đang đăng nhập không hợp lệ !");
             }
-            if(((user.Password ?? "").Length < 6 || (user.Password ?? "").Length > 100) && user.UserId == null) return BadRequest("Mật Khẩu phải ít nhất 6 kí tự và nhiều nhất 100 kí tự !");
+            if(((user.Password ?? "").Length < 6 || (user.Password ?? "").Length > 100) && ( user.UserId == null || user.UserId == Guid.Empty)) return BadRequest("Mật Khẩu phải ít nhất 6 kí tự và nhiều nhất 100 kí tự !");
             if(user.BirthDay == null || (user.BirthDay > DateTime.Now.AddYears(-18))) { return BadRequest("Người dùng chưa đủ 18 tuổi !"); }
 
             var respon = await _user.CreateOrEditUser(user);

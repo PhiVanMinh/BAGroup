@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "aa3F537JgahB9UY6cov/JoASsYayiueeFRR7rwhOztIVvL+plPfESSjCoZ0+U0r3aYMqHHeAxyAPuW8xxbTT3Q==",
+  "dgSpecHash": "V3PZPN5gffny8+vSpdRWIExAUX+CjbB4nbaaIKyLLnDglGPKx//M9I7Hy/fiK1NZfxnBNhaP3tq7CN2IgCRukA==",
   "success": true,
   "projectFilePath": "F:\\LAB\\BAGroup\\BA-API\\BA-API.csproj",
   "expectedPackageFiles": [
@@ -17,6 +17,8 @@
     "C:\\Users\\minhpv\\.nuget\\packages\\dapper\\2.0.90\\dapper.2.0.90.nupkg.sha512",
     "C:\\Users\\minhpv\\.nuget\\packages\\dapperextensions.dotnetcore\\1.0.1\\dapperextensions.dotnetcore.1.0.1.nupkg.sha512",
     "C:\\Users\\minhpv\\.nuget\\packages\\jetbrains.annotations\\2021.3.0\\jetbrains.annotations.2021.3.0.nupkg.sha512",
+    "C:\\Users\\minhpv\\.nuget\\packages\\microsoft.aspnetcore.authorization\\6.0.1\\microsoft.aspnetcore.authorization.6.0.1.nupkg.sha512",
+    "C:\\Users\\minhpv\\.nuget\\packages\\microsoft.aspnetcore.metadata\\6.0.1\\microsoft.aspnetcore.metadata.6.0.1.nupkg.sha512",
     "C:\\Users\\minhpv\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512",
     "C:\\Users\\minhpv\\.nuget\\packages\\microsoft.data.sqlclient\\2.1.4\\microsoft.data.sqlclient.2.1.4.nupkg.sha512",
     "C:\\Users\\minhpv\\.nuget\\packages\\microsoft.data.sqlclient.sni.runtime\\2.1.1\\microsoft.data.sqlclient.sni.runtime.2.1.1.nupkg.sha512",

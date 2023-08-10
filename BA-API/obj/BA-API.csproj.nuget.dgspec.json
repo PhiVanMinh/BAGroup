@@ -104,8 +104,8 @@
               "F:\\LAB\\BAGroup\\Application\\Application.csproj": {
                 "projectPath": "F:\\LAB\\BAGroup\\Application\\Application.csproj"
               },
-              "F:\\LAB\\BAGroup\\Infrastructure\\Persistence.csproj": {
-                "projectPath": "F:\\LAB\\BAGroup\\Infrastructure\\Persistence.csproj"
+              "F:\\LAB\\BAGroup\\Infrastructure\\Infrastructure.csproj": {
+                "projectPath": "F:\\LAB\\BAGroup\\Infrastructure\\Infrastructure.csproj"
               }
             }
           }
@@ -197,12 +197,12 @@
         }
       }
     },
-    "F:\\LAB\\BAGroup\\Infrastructure\\Persistence.csproj": {
+    "F:\\LAB\\BAGroup\\Infrastructure\\Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\LAB\\BAGroup\\Infrastructure\\Persistence.csproj",
-        "projectName": "Persistence",
-        "projectPath": "F:\\LAB\\BAGroup\\Infrastructure\\Persistence.csproj",
+        "projectUniqueName": "F:\\LAB\\BAGroup\\Infrastructure\\Infrastructure.csproj",
+        "projectName": "Infrastructure",
+        "projectPath": "F:\\LAB\\BAGroup\\Infrastructure\\Infrastructure.csproj",
         "packagesPath": "C:\\Users\\minhpv\\.nuget\\packages\\",
         "outputPath": "F:\\LAB\\BAGroup\\Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
@@ -223,6 +223,9 @@
             "projectReferences": {
               "F:\\LAB\\BAGroup\\Application\\Application.csproj": {
                 "projectPath": "F:\\LAB\\BAGroup\\Application\\Application.csproj"
+              },
+              "F:\\LAB\\BAGroup\\Infra_Persistence\\Infra_Persistence.csproj": {
+                "projectPath": "F:\\LAB\\BAGroup\\Infra_Persistence\\Infra_Persistence.csproj"
               }
             }
           }
@@ -292,6 +295,79 @@
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",
               "version": "[6.18.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.202\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "F:\\LAB\\BAGroup\\Infra_Persistence\\Infra_Persistence.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "F:\\LAB\\BAGroup\\Infra_Persistence\\Infra_Persistence.csproj",
+        "projectName": "Infra_Persistence",
+        "projectPath": "F:\\LAB\\BAGroup\\Infra_Persistence\\Infra_Persistence.csproj",
+        "packagesPath": "C:\\Users\\minhpv\\.nuget\\packages\\",
+        "outputPath": "F:\\LAB\\BAGroup\\Infra_Persistence\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\minhpv\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "F:\\LAB\\BAGroup\\Application\\Application.csproj": {
+                "projectPath": "F:\\LAB\\BAGroup\\Application\\Application.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "AutoMapper": {
+              "target": "Package",
+              "version": "[11.0.0, )"
+            },
+            "AutoMapper.Extensions.Microsoft.DependencyInjection": {
+              "target": "Package",
+              "version": "[11.0.0, )"
+            },
+            "Microsoft.AspNetCore.Authorization": {
+              "target": "Package",
+              "version": "[6.0.1, )"
             }
           },
           "imports": [
