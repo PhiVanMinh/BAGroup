@@ -13,7 +13,6 @@ namespace Infrastructure.Persistence
         }
         #endregion
         #region DbSet
-        public DbSet<AppSetting> AppSettings { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }

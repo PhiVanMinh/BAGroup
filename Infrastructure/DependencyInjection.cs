@@ -6,6 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure
 {
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    8/11/2023   created
+    /// </Modified>
     public static class DependencyInjection
     {
         public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)

@@ -6,8 +6,8 @@ namespace Application.IService
 {
     public interface IUserService
     {
-        public Task<ResponDto<PagedResultDto>> GetAll(GetAllUserInput input);
-        public Task<ResponDto<bool>> CreateOrEditUser (CreateOrEditUserDto user);
-        public Task<ResponDto<bool>> DeleteUser (DeletedUserInput input);
+        public Task<PagedResultDto> GetAll(GetAllUserInput input);
+        public Task<string> CreateOrEditUser (CreateOrEditUserDto user);
+        public Task<string> DeleteUser (DeletedUserInput input);
     }
 }

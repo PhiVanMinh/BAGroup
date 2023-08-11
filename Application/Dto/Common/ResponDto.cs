@@ -6,13 +6,23 @@ using System.Threading.Tasks;
 
 namespace Application.Dto.Common
 {
-    // Dữ liệu phản hồi
+    /// <summary>
+    ///   <para>Dữ liệu phản hồi</para>
+    /// </summary>
+    /// <typeparam name="T">
+    ///   <para>Kiểu dữ liệu của kết quả cần trả về</para>
+    /// </typeparam>
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    8/10/2023   created
+    /// </Modified>
     public class ResponDto<T>
     {
-        // Trạng thái code
+        /// <summary>Trạng thái phản hồi</summary>
         public int? StatusCode { get; set; }
-        // Thông báo
+        /// <summary>Thông báo phản hồi</summary>
         public string? Message { get; set; }
+        /// <summary>Kết quả trả về</summary>
         public virtual T Result { get; set; }
 
     }

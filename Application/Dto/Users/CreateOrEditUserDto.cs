@@ -4,42 +4,48 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Application.Dto.Users
 {
+    /// <summary>Thông tin người dùng cần thêm, sửa</summary>
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    8/11/2023   created
+    /// </Modified>
     public class CreateOrEditUserDto
     {
         public Guid? UserId { get; set; }
 
-        // Tên đăng nhập
+        /// <summary>Tên đăng nhập</summary>
         [StringLength(50)]
         public string? UserName { get; set; }
 
-        // Mật khẩu
+        /// <summary>Mật khẩu</summary>
         [StringLength(100)]
         public string? Password { get; set; }
-        [StringLength(500)]
 
+        /// <summary>Email</summary>
+        [StringLength(500)]
         public string? Email { get; set; }
 
-        // Tên người dùng
+        /// <summary>Tên người dùng</summary>
         [StringLength(200)]
         public string? EmpName { get; set; }
 
-        // Ngày sinh
+        /// <summary>Ngày sinh</summary>
         public DateTime? BirthDay { get; set; }
 
-        // Người tạo
+        /// <summary>Người tạo</summary>
         public Guid? CreatorUserId { get; set; }
 
-        // Giới tính
+        /// <summary>Giới tính</summary>
         public byte? Gender { get; set; }
 
-        // Số điện thoại
+        /// <summary>Số điện thoại</summary>
         [StringLength(10)]
         public string? PhoneNumber { get; set; }
 
-        // Id người đang đăng nhập
+        /// <summary>Id người đăng nhập</summary>
         public Guid? CurrentUserId { get; set; }
 
-        // Quyền
+        /// <summary>Loại người dùng</summary>
         public byte? UserType { get; set; }
     }
 }

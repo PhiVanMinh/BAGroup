@@ -1,27 +1,35 @@
 ﻿
 namespace Application.Dto.Users
 {
-     public class GetAllUserDto
+    /// <summary>Danh sách người dùng</summary>
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    8/11/2023   created
+    /// </Modified>
+    public class GetAllUserDto
     {
+        /// <summary>Id người dùng</summary>
         public Guid UserId { get; set; }
 
-        // Tên đăng nhập
+        /// <summary>Tên đăng nhập</summary>
         public string? UserName { get; set; }
 
+        /// <summary>Email</summary>
         public string? Email { get; set; }
 
-        // Tên người dùng
+        /// <summary>Tên người dùng</summary>
         public string? EmpName { get; set; }
 
-        // Ngày sinh
+        /// <summary>Ngày sinh</summary>
         public DateTime? BirthDay { get; set; }
 
-        // Giới tính
+        /// <summary>Giới tính</summary>
         public byte? Gender { get; set; }
 
-        // Số điện thoại
+        /// <summary>Số điện thoại</summary>
         public string? PhoneNumber { get; set; }
-        // Loại tài khoản
+
+        /// <summary>Loại người dùng</summary>
         public byte? UserType { get; set; }
     }
 }

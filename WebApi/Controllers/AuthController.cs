@@ -10,6 +10,11 @@ using System.Text;
 
 namespace WebApi.Controllers
 {
+    /// <summary>Api cho chức năng đăng nhập</summary>
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    8/10/2023   created
+    /// </Modified>
     [ApiController]
     [Route("[controller]")]
     public class AuthController : ControllerBase
@@ -34,6 +39,15 @@ namespace WebApi.Controllers
             _config = config;
         }
 
+        /// <summary>Api đăng nhập</summary>
+        /// <param name="userForLoginDto">Thông tin đăng nhập </param>
+        /// <returns>
+        ///   <br />
+        /// </returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    8/10/2023   created
+        /// </Modified>
         [HttpPost("login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
@@ -61,7 +75,7 @@ namespace WebApi.Controllers
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Auth0:SecretKey"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            //Create a List of Claims, Keep claims name short    
+            // Khởi tạo danh sách Claims 
             var permClaims = new List<Claim>();
             permClaims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
             foreach (var role in userFromRepo.Roles)
@@ -69,7 +83,7 @@ namespace WebApi.Controllers
                 permClaims.Add(new Claim(ClaimTypes.Role, role));
             }
 
-            //Create Security Token object by giving required parameters    
+            //Tạo Token dựa trên các tham số 
             var token = new JwtSecurityToken(
                             issuer: _config["Auth0:Issuer"],
                             audience: _config["Auth0:Audience"],

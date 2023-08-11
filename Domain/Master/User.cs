@@ -5,62 +5,70 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Master
 {
+    /// <summary>Bảng thông tin người dùng</summary>
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    8/11/2023   created
+    /// </Modified>
     public class User
     {
+        /// <summary>Mã người dùng</summary>
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid UserId { get; set; }
-        // Tên đăng nhập
+
+        /// <summary>Tên đăng nhập</summary>
         [StringLength(50)]
         public string? UserName { get; set; }
 
-        // Email
+        /// <summary>Email</summary>
         [StringLength(500)]
         public string? Email { get; set; }
 
-        // Tên người dùng
+        /// <summary>Tên người dùng</summary>
         [StringLength(200)]
         public string? EmpName { get; set; }
 
-        // Ngày sinh
+        /// <summary>Ngày sinh</summary>
         [Column(TypeName = "datetime2")]
         public DateTime? BirthDay { get; set; }
 
-        // Giới tính
+        /// <summary>Giới tính</summary>
         public byte? Gender { get; set; }
 
-        // Số điện thoại
+        /// <summary>Số điện thoại</summary>
         [StringLength(10)]
         public string? PhoneNumber { get; set; }
 
-        // Password mã hóa
+        /// <summary>Mật khẩu đã mã hóa</summary>
         public string? PasswordHash { get; set; }
 
         public byte[]? PasswordSalt { get; set; }
 
-        // Quyền
+        /// <summary>Loại người dùng</summary>
         public byte? UserType { get; set; }
 
-        // Người tạo
+        /// <summary>Người tạo</summary>
         public string? CreatorUserId { get; set; }
 
-        // Người sửa cuối cùng
+        /// <summary>Người sửa cuối cùng</summary>
         public string? LastModifyUserId { get; set; }
-        [Column(TypeName = "datetime2")]
 
-        // Ngày tạo
+        /// <summary>Ngày tạo</summary>
+        [Column(TypeName = "datetime2")]
         public DateTime? CreateDate { get; set; }
-        [Column(TypeName = "datetime2")]
 
-        // Ngày sửa cuối cùng
+
+        /// <summary>Ngày sửa cuối cùng</summary>
+        [Column(TypeName = "datetime2")]
         public DateTime? LastModifyDate { get; set; }
 
-        // Xóa
+        /// <summary>Cờ xóa</summary>
         public bool IsDeleted { get; set; }
 
-        // Người xóa
+        /// <summary>Người xóa</summary>
         public string? DeletedUserId { get; set; }
 
-        // Ngày xóa
+        /// <summary>Ngày xóa</summary>
         [Column(TypeName = "datetime2")]
         public DateTime? DeletedDate { get; set; }
 

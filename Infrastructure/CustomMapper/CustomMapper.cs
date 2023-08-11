@@ -4,6 +4,11 @@ using Domain.Master;
 
 namespace Infrastructure.CustomMapper
 {
+    /// <summary>Ánh xạ dữ liệu giữa 2 thực thể</summary>
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    8/11/2023   created
+    /// </Modified>
     public class CustomMapper: Profile
     {
 

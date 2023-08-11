@@ -5,6 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repository
 {
+    /// <summary>Repository đăng nhập</summary>
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    8/11/2023   created
+    /// </Modified>
     public class AuthRepository : IAuthRepository
     {
         private readonly ApplicationDBContext _context;
@@ -15,7 +20,14 @@ namespace Infrastructure.Repository
         }
 
         #region -- Đăng nhập
-        // Tìm kiếm thông tin user theo thông tin đầu vào , xác minh thông tin đăng nhập
+        /// <summary>Tìm kiếm thông tin user theo thông tin đầu vào , xác minh thông tin đăng nhập</summary>
+        /// <param name="username">Tên đăng nhập</param>
+        /// <param name="password">Mật khẩu</param>
+        /// <returns>Thông tin người dùng</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    8/11/2023   created
+        /// </Modified>
         public async Task<User> Login(string username, string password)
         {
             var user = new User();
@@ -29,7 +41,13 @@ namespace Infrastructure.Repository
             return user;
         }
 
-        // Xác minh mật khẩu
+        /// <summary>Xác minh mật khẩu</summary>
+        /// <param name="password">mật khẩu</param>
+        /// <param name="passwordHash">Mật khẩu đã mã hóa băm</param>
+        /// <param name="passwordSalt">Mật khẩu mã hóa trộn</param>
+        /// <returns>
+        ///   <para>bool</para>
+        /// </returns>
         private bool VerifyPasswordHash(string password, string passwordHash, byte[] passwordSalt)
         {
             using (var hmac = new System.Security.Cryptography.HMACSHA512(passwordSalt))

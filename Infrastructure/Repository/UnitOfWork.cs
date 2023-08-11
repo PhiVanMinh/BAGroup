@@ -9,6 +9,10 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Repository
 {
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    8/11/2023   created
+    /// </Modified>
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDBContext _dbContext;

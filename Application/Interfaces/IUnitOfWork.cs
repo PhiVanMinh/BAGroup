@@ -2,6 +2,10 @@
 
 namespace Application.Interfaces
 {
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    8/11/2023   created
+    /// </Modified>
     public interface IUnitOfWork 
     {
         IUserRepository UserRepository { get; }

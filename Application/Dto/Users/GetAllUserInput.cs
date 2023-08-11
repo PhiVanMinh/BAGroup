@@ -3,27 +3,32 @@ using Application.Enum;
 
 namespace Application.Dto.Users
 {
+    /// <summary>Thông tin tìm kiếm</summary>
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    8/11/2023   created
+    /// </Modified>
     public class GetAllUserInput
     {
-        // Giá trị tìm kiếm
+        /// <summary>Giá trị tìm kiếm</summary>
         public string? ValueFilter { get; set; }
 
-        // Loại tìm kiếm 
+        /// <summary>Loại tìm kiếm</summary>
         public FilterType? TypeFilter { get; set; }
 
-        // Giới tính
+        /// <summary>Giới tính</summary>
         public byte? Gender { get; set; }
 
-        // Ngày sinh từ ngày
+        /// <summary>Từ ngày</summary>
         public DateTime? FromDate { get; set; }
 
-        // Ngày sinh đến ngày
+        /// <summary>Đến ngày</summary>
         public DateTime? ToDate { get; set; }
 
-        // Số trang
+        /// <summary>Số trang</summary>
         public int Page { get; set;}
 
-        // Kích thước trang
+        /// <summary>Kích thước trang</summary>
         public int PageSize { get; set; }
     }
 }
