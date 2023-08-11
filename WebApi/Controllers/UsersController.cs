@@ -1,10 +1,12 @@
 ﻿using Application.Dto.Common;
 using Application.Dto.Users;
 using Application.IService;
+using Domain.Master;
 using Infra_Persistence.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Drawing;
+using System.Text.Json;
 
 namespace WebApi.Controllers
 {
@@ -55,7 +57,9 @@ namespace WebApi.Controllers
             {
                 respon.StatusCode = 500;
                 respon.Message = ex.Message;
-                if (!string.IsNullOrEmpty(respon.Message)) _logger.LogInformation(respon.Message);
+                var inputToString = JsonSerializer.Serialize<GetAllUserInput>(input);
+                _logger.LogInformation($" InputValue: {inputToString}");
+                _logger.LogInformation(respon.Message, input);
                 respon.Result = new PagedResultDto
                 {
                     TotalCount = 0,
@@ -96,9 +100,12 @@ namespace WebApi.Controllers
                 }
             } catch (Exception ex)
             {
-                if (!string.IsNullOrEmpty(respon.Message)) _logger.LogInformation(ex.Message);
                 respon.StatusCode = 500;
                 respon.Message = ex.Message;
+                 _logger.LogInformation(ex.Message, user);
+                var inputToString = JsonSerializer.Serialize<CreateOrEditUserDto>(user);
+                _logger.LogInformation($" InputValue: {inputToString}");
+
             }
             return Ok(respon);
         }
@@ -136,9 +143,11 @@ namespace WebApi.Controllers
             }
             catch (Exception ex)
             {
-                if (!string.IsNullOrEmpty(respon.Message)) _logger.LogInformation(ex.Message);
                 respon.StatusCode = 500;
                 respon.Message = ex.Message;
+                _logger.LogInformation(ex.Message, input);
+                var inputToString = JsonSerializer.Serialize<DeletedUserInput>(input);
+                _logger.LogInformation($" InputValue: {inputToString}");
             }
             return Ok(respon);
         }
