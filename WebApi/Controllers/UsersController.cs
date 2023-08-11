@@ -83,13 +83,13 @@ namespace WebApi.Controllers
             {
                 return BadRequest("Mã người dùng đang đăng nhập không hợp lệ !");
             }
-            if(((user.Password ?? "").Length < 6 || (user.Password ?? "").Length > 100) && ( user.UserId == null || user.UserId == Guid.Empty)) return BadRequest("Mật Khẩu phải ít nhất 6 kí tự và nhiều nhất 100 kí tự !");
-            if(user.BirthDay == null || (user.BirthDay > DateTime.Now.AddYears(-18))) { return BadRequest("Người dùng chưa đủ 18 tuổi !"); }
+            if (((user.Password ?? "").Length < 6 || (user.Password ?? "").Length > 100) && (user.UserId == null || user.UserId == Guid.Empty)) return BadRequest("Mật Khẩu phải ít nhất 6 kí tự và nhiều nhất 100 kí tự !");
+            if (user.BirthDay == null || (user.BirthDay > DateTime.Now.AddYears(-18))) { return BadRequest("Người dùng chưa đủ 18 tuổi !"); }
 
             try
             {
                 var message = await _user.CreateOrEditUser(user);
-                if (string.IsNullOrEmpty(message)) 
+                if (!string.IsNullOrEmpty(message)) 
                 {
                     respon.Message = message;
                     respon.StatusCode = 400;
@@ -128,7 +128,7 @@ namespace WebApi.Controllers
             try
             {
                 var message = await _user.DeleteUser(input);
-                if (string.IsNullOrEmpty(message))
+                if (!string.IsNullOrEmpty(message))
                 {
                     respon.Message = message;
                     respon.StatusCode = 400;
