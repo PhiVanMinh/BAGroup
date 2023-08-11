@@ -38,6 +38,7 @@ builder.Services.AddCors();
 // Dependency Injection
 builder.Services.AddPersistence(builder.Configuration);
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddStackExchangeRedisCache(options => { options.Configuration = builder.Configuration["RedisCacheUrl"]; });
 
 // Authentication
 

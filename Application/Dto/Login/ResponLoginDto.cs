@@ -16,6 +16,7 @@ namespace Application.Dto.Login
     {
         /// <summary>Thông tin người dùng</summary>
         public User? User { get; set; }
+
         /// <summary>Thông tin các quyền của người dùng</summary>
         public List<string> Roles { get; set; }
     }

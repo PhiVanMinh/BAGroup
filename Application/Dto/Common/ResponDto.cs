@@ -20,8 +20,10 @@ namespace Application.Dto.Common
     {
         /// <summary>Trạng thái phản hồi</summary>
         public int? StatusCode { get; set; }
+
         /// <summary>Thông báo phản hồi</summary>
         public string? Message { get; set; }
+
         /// <summary>Kết quả trả về</summary>
         public virtual T Result { get; set; }
 

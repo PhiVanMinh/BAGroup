@@ -5,6 +5,7 @@ using Domain.Master;
 using Infra_Persistence.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using System.Drawing;
 using System.Text.Json;
 
@@ -21,15 +22,18 @@ namespace WebApi.Controllers
     {
         private readonly IUserService _user;
         private readonly ILogger<UsersController> _logger;
+        private readonly IDistributedCache _cache;
 
         public UsersController
             (
             IUserService user,
-            ILogger<UsersController> logger
+            ILogger<UsersController> logger,
+            IDistributedCache cache
             )
         {
             _user = user;
             _logger = logger;
+            _cache = cache;
         }
 
         #region -- Lấy danh sách user
@@ -58,8 +62,7 @@ namespace WebApi.Controllers
                 respon.StatusCode = 500;
                 respon.Message = ex.Message;
                 var inputToString = JsonSerializer.Serialize<GetAllUserInput>(input);
-                _logger.LogInformation($" InputValue: {inputToString}");
-                _logger.LogInformation(respon.Message, input);
+                _logger.LogInformation($" {respon.Message} InputValue: {inputToString}");
                 respon.Result = new PagedResultDto
                 {
                     TotalCount = 0,
@@ -102,9 +105,8 @@ namespace WebApi.Controllers
             {
                 respon.StatusCode = 500;
                 respon.Message = ex.Message;
-                 _logger.LogInformation(ex.Message, user);
                 var inputToString = JsonSerializer.Serialize<CreateOrEditUserDto>(user);
-                _logger.LogInformation($" InputValue: {inputToString}");
+                _logger.LogInformation($" {respon.Message} InputValue: {inputToString}");
 
             }
             return Ok(respon);
@@ -145,9 +147,8 @@ namespace WebApi.Controllers
             {
                 respon.StatusCode = 500;
                 respon.Message = ex.Message;
-                _logger.LogInformation(ex.Message, input);
                 var inputToString = JsonSerializer.Serialize<DeletedUserInput>(input);
-                _logger.LogInformation($" InputValue: {inputToString}");
+                _logger.LogInformation($" {respon.Message} InputValue: {inputToString}");
             }
             return Ok(respon);
         }

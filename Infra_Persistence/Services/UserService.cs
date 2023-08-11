@@ -6,6 +6,7 @@ using Application.IService;
 using Domain.Master;
 using Infra_Persistence.Authorization;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 
 namespace Infra_Persistence.Services
 {
@@ -17,12 +18,17 @@ namespace Infra_Persistence.Services
     public class UserService : IUserService
     {
         public IUnitOfWork _unitOfWork;
-        public UserService(IUnitOfWork unitOfWork)
+        private readonly ILogger<UserService> _logger;
+
+        public UserService(
+            IUnitOfWork unitOfWork,
+            ILogger<UserService> logger
+            )
         {
             _unitOfWork = unitOfWork;
+            _logger = logger;
         }
 
-        #region -- Xóa thông tin user
         /// <summary>Kiểm tra thông tin user có hợp lệ không nếu không đưa ra thông báo. Ngược lại cập nhật thông tin xóa của bản ghi</summary>
         /// <param name="input">Thông tin cần xóa</param>
         /// <returns>Thông báo</returns>
@@ -32,35 +38,39 @@ namespace Infra_Persistence.Services
         /// </Modified>
         public Task<string> DeleteUser(DeletedUserInput input)
         {
-            var message = "";
-            var users = _unitOfWork.UserRepository.GetAll().Where(e => input.ListId.Contains(e.UserId)).ToList();
-            if (users.Count() == 0)
+            try
             {
-                message = "Can not find user !";
-                return Task.FromResult(message);
-            }
-            else
-            {
-                if (input.ListId.Any(e => e == input.CurrentUserId))
+                var message = "";
+                var users = _unitOfWork.UserRepository.GetAll().Where(e => input.ListId.Contains(e.UserId)).ToList();
+                if (users.Count() == 0)
                 {
-                    message = $" Không thể xóa nhân viên {input.CurrentEmpName} !";
+                    message = "Can not find user !";
                     return Task.FromResult(message);
-            }
-                users.ForEach(e =>
+                }
+                else
                 {
-                    e.IsDeleted = true;
-                    e.DeletedUserId = input.CurrentUserId.ToString();
-                    e.DeletedDate = DateTime.Now;
-                });
-                _unitOfWork.UserRepository.UpdateRange(users);
-                _unitOfWork.SaveAsync();
+                    if (input.ListId.Any(e => e == input.CurrentUserId))
+                    {
+                        message = $" Không thể xóa nhân viên {input.CurrentEmpName} !";
+                        return Task.FromResult(message);
+                    }
+                    users.ForEach(e =>
+                    {
+                        e.IsDeleted = true;
+                        e.DeletedUserId = input.CurrentUserId.ToString();
+                        e.DeletedDate = DateTime.Now;
+                    });
+                    _unitOfWork.UserRepository.UpdateRange(users);
+                    _unitOfWork.SaveAsync();
+                }
+                return Task.FromResult(message);
+            } catch (Exception ex)
+            {
+                return Task.FromResult(ex.Message);
             }
-            return Task.FromResult(message);
 
         }
-        #endregion
 
-        #region -- Lấy danh sách thông tin user 
         /// <summary>Lấy danh sách nhân viên theo giá trị lọc </summary>
         /// <param name="input">Giá trị tìm kiếm</param>
         /// <returns>Danh sách người dùng, thông báo</returns>
@@ -70,44 +80,50 @@ namespace Infra_Persistence.Services
         /// </Modified>
         public Task<PagedResultDto> GetAll(GetAllUserInput input)
         {
-            var result = from user in _unitOfWork.UserRepository.GetAll()
-                                .Where(e =>
-                                            string.IsNullOrWhiteSpace(input.ValueFilter) ? true
-                                                : input.TypeFilter == FilterType.UserName ? (e.UserName ?? "").ToLower().Contains(input.ValueFilter.ToLower())
-                                                    : (input.TypeFilter == FilterType.FullName ? (e.EmpName ?? "").ToLower().Contains(input.ValueFilter.ToLower())
-                                                        : (input.TypeFilter == FilterType.Email ? (e.Email ?? "").ToLower().Contains(input.ValueFilter.ToLower())
-                                                            : (e.PhoneNumber ?? "").ToLower().Contains(input.ValueFilter.ToLower())
-                                                    ))
-                                            && input.Gender > 0 ? input.Gender == e.Gender : true
-                                            && e.IsDeleted == false
-                                            && input.FromDate != null ? e.BirthDay >= input.FromDate : true
-                                            && input.ToDate != null ? e.BirthDay < input.ToDate.Value.AddDays(1) : true
-                                )
-                            orderby user.UserId
-                            select new GetAllUserDto
-                            {
-                                UserId = user.UserId,
-                                BirthDay = user.BirthDay,
-                                PhoneNumber = user.PhoneNumber,
-                                EmpName = user.EmpName,
-                                UserName = user.UserName,
-                                Email = user.Email,
-                                Gender = user.Gender,
-                                UserType = user.UserType,
-                            };
-            var totalCount = result.Count();
-            var pageAndFilterResult = result.Skip((input.Page - 1) * input.PageSize).Take(input.PageSize);
-            return Task.FromResult(
-                    new PagedResultDto
-                    {
-                        TotalCount = totalCount,
-                        Result = pageAndFilterResult.ToList()
-                    }
-                );
-        }
-        #endregion
+            try
+            {
+                var result = from user in _unitOfWork.UserRepository.GetAll()
+                                    .Where(e =>
+                                                string.IsNullOrWhiteSpace(input.ValueFilter) ? true
+                                                    : input.TypeFilter == FilterType.UserName ? (e.UserName ?? "").ToLower().Contains(input.ValueFilter.ToLower())
+                                                        : (input.TypeFilter == FilterType.FullName ? (e.EmpName ?? "").ToLower().Contains(input.ValueFilter.ToLower())
+                                                            : (input.TypeFilter == FilterType.Email ? (e.Email ?? "").ToLower().Contains(input.ValueFilter.ToLower())
+                                                                : (e.PhoneNumber ?? "").ToLower().Contains(input.ValueFilter.ToLower())
+                                                        ))
+                                                && input.Gender > 0 ? input.Gender == e.Gender : true
+                                                && e.IsDeleted == false
+                                                && input.FromDate != null ? e.BirthDay >= input.FromDate : true
+                                                && input.ToDate != null ? e.BirthDay < input.ToDate.Value.AddDays(1) : true
+                                    )
+                             orderby user.UserId
+                             select new GetAllUserDto
+                             {
+                                 UserId = user.UserId,
+                                 BirthDay = user.BirthDay,
+                                 PhoneNumber = user.PhoneNumber,
+                                 EmpName = user.EmpName,
+                                 UserName = user.UserName,
+                                 Email = user.Email,
+                                 Gender = user.Gender,
+                                 UserType = user.UserType,
+                             };
+                var totalCount = result.Count();
+                var pageAndFilterResult = result.Skip((input.Page - 1) * input.PageSize).Take(input.PageSize);
+                return Task.FromResult(
+                        new PagedResultDto
+                        {
+                            TotalCount = totalCount,
+                            Result = pageAndFilterResult.ToList()
+                        }
+                    );
+            } catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                var valueDefault = new PagedResultDto();
+                return Task.FromResult( valueDefault );
+            }
+}
 
-        #region -- Thêm hoặc cập nhật thông tin user
         /// <summary>Thêm hoặc cập nhật thông tin người dùng</summary>
         /// <param name="user">The user.</param>
         /// <returns> Thông báo </returns>
@@ -117,10 +133,17 @@ namespace Infra_Persistence.Services
         /// </Modified>
         public async Task<string> CreateOrEditUser(CreateOrEditUserDto user)
         {
-            var message = "";
-            if (user.UserId != null && user.UserId != Guid.Empty) message = await UpdateUser(user);
-            else message = await CreateUser(user);
-            return message;
+            try
+            {
+                var message = "";
+                if (user.UserId != null && user.UserId != Guid.Empty) message = await UpdateUser(user);
+                else message = await CreateUser(user);
+                return message;
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
         }
 
         /// <summary>
@@ -221,8 +244,6 @@ namespace Infra_Persistence.Services
                 passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             }
         }
-
-        #endregion
 
     }
 }
