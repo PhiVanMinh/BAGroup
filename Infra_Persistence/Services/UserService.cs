@@ -82,31 +82,29 @@ namespace Infra_Persistence.Services
         {
             try
             {
-                var result = from user in _unitOfWork.UserRepository.GetAll()
-                                    .Where(e =>
-                                                string.IsNullOrWhiteSpace(input.ValueFilter) ? true
-                                                    : input.TypeFilter == FilterType.UserName ? (e.UserName ?? "").ToLower().Contains(input.ValueFilter.ToLower())
-                                                        : (input.TypeFilter == FilterType.FullName ? (e.EmpName ?? "").ToLower().Contains(input.ValueFilter.ToLower())
-                                                            : (input.TypeFilter == FilterType.Email ? (e.Email ?? "").ToLower().Contains(input.ValueFilter.ToLower())
-                                                                : (e.PhoneNumber ?? "").ToLower().Contains(input.ValueFilter.ToLower())
-                                                        ))
+                var result = _unitOfWork.UserRepository.GetAll().Where(e =>
+                                                e.IsDeleted == false
                                                 && input.Gender > 0 ? input.Gender == e.Gender : true
-                                                && e.IsDeleted == false
                                                 && input.FromDate != null ? e.BirthDay >= input.FromDate : true
                                                 && input.ToDate != null ? e.BirthDay < input.ToDate.Value.AddDays(1) : true
-                                    )
-                             orderby user.UserId
-                             select new GetAllUserDto
-                             {
-                                 UserId = user.UserId,
-                                 BirthDay = user.BirthDay,
-                                 PhoneNumber = user.PhoneNumber,
-                                 EmpName = user.EmpName,
-                                 UserName = user.UserName,
-                                 Email = user.Email,
-                                 Gender = user.Gender,
-                                 UserType = user.UserType,
-                             };
+                                                && ( string.IsNullOrWhiteSpace(input.ValueFilter) ? true
+                                                    : input.TypeFilter == FilterType.UserName ? (e.UserName ?? "").Contains(input.ValueFilter)
+                                                        : (input.TypeFilter == FilterType.FullName ? (e.EmpName ?? "").Contains(input.ValueFilter)
+                                                            : (input.TypeFilter == FilterType.Email ? (e.Email ?? "").Contains(input.ValueFilter)
+                                                                : (e.PhoneNumber ?? "").Contains(input.ValueFilter)
+                                                        )))
+                                                ).OrderBy(e => e.CreateDate)
+                                                .Select(user => new GetAllUserDto
+                                                        {
+                                                            UserId = user.UserId,
+                                                            BirthDay = user.BirthDay,
+                                                            PhoneNumber = user.PhoneNumber,
+                                                            EmpName = user.EmpName,
+                                                            UserName = user.UserName,
+                                                            Email = user.Email,
+                                                            Gender = user.Gender,
+                                                            UserType = user.UserType,
+                                                        });
                 var totalCount = result.Count();
                 var pageAndFilterResult = result.Skip((input.Page - 1) * input.PageSize).Take(input.PageSize);
                 return Task.FromResult(
