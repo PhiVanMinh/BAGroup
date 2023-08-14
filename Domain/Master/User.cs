@@ -12,9 +12,6 @@ namespace Domain.Master
     /// </Modified>
     public class User
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Num { get; set; }
-
         /// <summary>Mã người dùng</summary>
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid UserId { get; set; }

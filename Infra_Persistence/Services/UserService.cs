@@ -93,7 +93,7 @@ namespace Infra_Persistence.Services
                                                             : (input.TypeFilter == FilterType.Email ? (e.Email ?? "").Contains(input.ValueFilter)
                                                                 : (e.PhoneNumber ?? "").Contains(input.ValueFilter)
                                                         )))
-                                                ).OrderBy(e => e.Num)
+                                                ).OrderBy(e => e.CreateDate)
                                                 .Select(user => new GetAllUserDto
                                                         {
                                                             UserId = user.UserId,
