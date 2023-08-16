@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Drawing;
+using System.Text;
 using System.Text.Json;
 
 namespace WebApi.Controllers
@@ -45,23 +46,47 @@ namespace WebApi.Controllers
         /// minhpv    8/10/2023   created
         /// </Modified>
         [HttpPost("employees")]
-        [Authorize(Policy = Policies.UserView)]
+        //[Authorize(Policy = Policies.UserView)]
         public async Task<IActionResult> GetAll(GetAllUserInput input)
         {
             var respon = new ResponDto<PagedResultDto>();
+            var inputToString = JsonSerializer.Serialize<GetAllUserInput>(input);
+
             if (input.Page == 0 || input.PageSize == 0)
             {
                 return BadRequest("Vui lóng nhập đủ số trang và kích thước trang! ");
             }
             try
             {
-                var userList = await _user.GetAll(input);
-                respon.Result = userList;
+                string cacheKey = $"{DateTime.Now.ToString("dd_MM_yyyy_hh")} {inputToString}";
+
+                byte[] cachedData = await _cache.GetAsync(cacheKey);
+                if (cachedData != null)
+                {
+                    var cachedDataString = Encoding.UTF8.GetString(cachedData);
+                    respon.Result = JsonSerializer.Deserialize<PagedResultDto>(cachedDataString);
+                }
+                else
+                {
+                    var userList = await _user.GetAll(input);
+                    respon.Result = userList;
+
+                    // Serializing the data
+                    string cachedDataString = JsonSerializer.Serialize(userList);
+                    var dataToCache = Encoding.UTF8.GetBytes(cachedDataString);
+
+                    // Setting up the cache options
+                    DistributedCacheEntryOptions options = new DistributedCacheEntryOptions()
+                        .SetAbsoluteExpiration(DateTime.Now.AddMinutes(5))
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(3));
+
+                    // Add the data into the cache
+                    await _cache.SetAsync(cacheKey, dataToCache, options);
+                }
             } catch (Exception ex)
             {
                 respon.StatusCode = 500;
                 respon.Message = ex.Message;
-                var inputToString = JsonSerializer.Serialize<GetAllUserInput>(input);
                 _logger.LogInformation($" {respon.Message} InputValue: {inputToString}");
                 respon.Result = new PagedResultDto
                 {
@@ -86,7 +111,7 @@ namespace WebApi.Controllers
         public async Task<IActionResult> CreateOrEditUsers([FromBody] CreateOrEditUserDto user)
         {
             var respon = new ResponDto<bool>();
-            if (user.CurrentUserId == null)
+            if (user.CurrentUserId == null || user.CurrentUserId == Guid.Empty)
             {
                 return BadRequest("Mã người dùng đang đăng nhập không hợp lệ !");
             }

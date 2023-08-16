@@ -1,6 +1,7 @@
 ﻿using Application.Common.Interfaces;
 using Domain.Master;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Metadata;
 
 namespace Infrastructure.Persistence
 {
@@ -16,6 +17,13 @@ namespace Infrastructure.Persistence
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>()
+                .Property(b => b.CreateDate)
+                .HasDefaultValueSql("getdate()");
+        }
         #endregion
         #region Methods
         public Task<int> SaveChangesAsync()

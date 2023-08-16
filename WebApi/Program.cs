@@ -9,6 +9,7 @@ using Infrastructure.CustomMapper;
 using Serilog;
 using Infra_Persistence.Services;
 using Infra_Persistence.Authorization;
+using Infrastructure.Contexts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,8 @@ var logger = new LoggerConfiguration().ReadFrom
     .CreateLogger();
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
+
+builder.Services.AddSingleton<DapperContext>();
 
 // Add services to the container.
 builder.Services.AddControllers();

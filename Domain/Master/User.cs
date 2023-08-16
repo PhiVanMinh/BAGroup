@@ -29,7 +29,7 @@ namespace Domain.Master
         public string? EmpName { get; set; }
 
         /// <summary>Ngày sinh</summary>
-        [Column(TypeName = "datetime2")]
+        [Column(TypeName = "datetime")]
         public DateTime? BirthDay { get; set; }
 
         /// <summary>Giới tính</summary>
@@ -54,12 +54,12 @@ namespace Domain.Master
         public string? LastModifyUserId { get; set; }
 
         /// <summary>Ngày tạo</summary>
-        [Column(TypeName = "datetime2")]
-        public DateTime? CreateDate { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime CreateDate { get; set; }
 
 
         /// <summary>Ngày sửa cuối cùng</summary>
-        [Column(TypeName = "datetime2")]
+        [Column(TypeName = "datetime")]
         public DateTime? LastModifyDate { get; set; }
 
         /// <summary>Cờ xóa</summary>
@@ -69,7 +69,7 @@ namespace Domain.Master
         public string? DeletedUserId { get; set; }
 
         /// <summary>Ngày xóa</summary>
-        [Column(TypeName = "datetime2")]
+        [Column(TypeName = "datetime")]
         public DateTime? DeletedDate { get; set; }
 
     }

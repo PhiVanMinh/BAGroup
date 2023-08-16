@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Infrastructure.Contexts;
 using Infrastructure.Persistence;
 using Persistence.Repository;
 using System;
@@ -16,6 +17,7 @@ namespace Infrastructure.Repository
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDBContext _dbContext;
+        private readonly DapperContext _dapperContext;
         private IUserRepository _userRepository;
         private IAuthRepository _authRepository;
         private IRoleRepository _roleRepository;
@@ -23,16 +25,18 @@ namespace Infrastructure.Repository
 
 
         public UnitOfWork(
-            ApplicationDBContext dbContext
+            ApplicationDBContext dbContext,
+            DapperContext dapperContext
             )
         {
             _dbContext = dbContext;
+            _dapperContext = dapperContext;
         }
 
 
         public IUserRepository UserRepository
         {
-            get { return _userRepository = _userRepository ?? new UserRepository(_dbContext); }
+            get { return _userRepository = _userRepository ?? new UserRepository(_dbContext, _dapperContext); }
         }
 
         public IAuthRepository AuthRepository

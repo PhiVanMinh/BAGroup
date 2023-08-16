@@ -84,9 +84,9 @@ namespace Infra_Persistence.Services
             {
                 var result = _unitOfWork.UserRepository.GetAll().Where(e =>
                                                 e.IsDeleted == false
-                                                && input.Gender > 0 ? input.Gender == e.Gender : true
-                                                && input.FromDate != null ? e.BirthDay >= input.FromDate : true
-                                                && input.ToDate != null ? e.BirthDay < input.ToDate.Value.AddDays(1) : true
+                                                && ( input.Gender > 0 ? input.Gender == e.Gender : true )
+                                                && ( input.FromDate != null ? e.BirthDay >= input.FromDate : true )
+                                                && ( input.ToDate != null ? e.BirthDay < input.ToDate.Value.AddDays(1) : true )
                                                 && ( string.IsNullOrWhiteSpace(input.ValueFilter) ? true
                                                     : input.TypeFilter == FilterType.UserName ? (e.UserName ?? "").Contains(input.ValueFilter)
                                                         : (input.TypeFilter == FilterType.FullName ? (e.EmpName ?? "").Contains(input.ValueFilter)
