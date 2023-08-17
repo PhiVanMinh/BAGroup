@@ -31,5 +31,8 @@ namespace Application.Dto.Users
 
         /// <summary>Loại người dùng</summary>
         public byte? UserType { get; set; }
+
+        /// <summary>Tổng số bản ghi</summary>
+        public int TotalCount { get; set; }
     }
 }

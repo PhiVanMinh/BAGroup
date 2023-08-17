@@ -9,5 +9,6 @@ namespace Application.IService
         public Task<PagedResultDto> GetAll(GetAllUserInput input);
         public Task<string> CreateOrEditUser (CreateOrEditUserDto user);
         public Task<string> DeleteUser (DeletedUserInput input);
+        public Task<List<GetAllUserDto>> GetDataToExportExcel(GetAllUserInput input);
     }
 }

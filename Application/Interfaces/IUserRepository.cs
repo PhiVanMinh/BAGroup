@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces;
+using Application.Dto.Users;
 using Domain.Master;
 
 namespace Application.Interfaces
@@ -9,5 +10,6 @@ namespace Application.Interfaces
     /// </Modified>
     public interface IUserRepository : IRepository<User>
     {
+        Task<List<GetAllUserDto>> GetAllUsers(GetAllUserInput input);
     }
 }

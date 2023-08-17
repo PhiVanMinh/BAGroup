@@ -10,6 +10,7 @@ namespace Application.Dto.Users
     /// </Modified>
     public class GetAllUserInput
     {
+
         /// <summary>Giá trị tìm kiếm</summary>
         public string? ValueFilter { get; set; }
 

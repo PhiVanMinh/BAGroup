@@ -80,14 +80,34 @@ namespace Infra_Persistence.Services
         /// </Modified>
         public Task<PagedResultDto> GetAll(GetAllUserInput input)
         {
+            //try
+            //{
+            //    var result = await _unitOfWork.UserRepository.GetAllUsers(input);
+            //    var pageAndFilterResult = result != null ? result.ToList() : new List<GetAllUserDto>();
+            //    var totalCount = (pageAndFilterResult.Count() > 0) ? pageAndFilterResult[0].TotalCount : 0;
+
+            //    return
+            //    new PagedResultDto
+            //    {
+            //        TotalCount = totalCount,
+            //        Result = pageAndFilterResult
+            //    };
+            //}
+            //catch (Exception ex)
+            //{
+            //    _logger.LogInformation(ex.Message);
+            //    var valueDefault = new PagedResultDto();
+            //    return valueDefault;
+            //}
+
             try
             {
                 var result = _unitOfWork.UserRepository.GetAll().Where(e =>
                                                 e.IsDeleted == false
-                                                && ( input.Gender > 0 ? input.Gender == e.Gender : true )
-                                                && ( input.FromDate != null ? e.BirthDay >= input.FromDate : true )
-                                                && ( input.ToDate != null ? e.BirthDay < input.ToDate.Value.AddDays(1) : true )
-                                                && ( string.IsNullOrWhiteSpace(input.ValueFilter) ? true
+                                                && (input.Gender > 0 ? input.Gender == e.Gender : true)
+                                                && (input.FromDate != null ? e.BirthDay >= input.FromDate : true)
+                                                && (input.ToDate != null ? e.BirthDay < input.ToDate.Value.AddDays(1) : true)
+                                                && (string.IsNullOrWhiteSpace(input.ValueFilter) ? true
                                                     : input.TypeFilter == FilterType.UserName ? (e.UserName ?? "").Contains(input.ValueFilter)
                                                         : (input.TypeFilter == FilterType.FullName ? (e.EmpName ?? "").Contains(input.ValueFilter)
                                                             : (input.TypeFilter == FilterType.Email ? (e.Email ?? "").Contains(input.ValueFilter)
@@ -95,32 +115,34 @@ namespace Infra_Persistence.Services
                                                         )))
                                                 ).OrderBy(e => e.CreateDate)
                                                 .Select(user => new GetAllUserDto
-                                                        {
-                                                            UserId = user.UserId,
-                                                            BirthDay = user.BirthDay,
-                                                            PhoneNumber = user.PhoneNumber,
-                                                            EmpName = user.EmpName,
-                                                            UserName = user.UserName,
-                                                            Email = user.Email,
-                                                            Gender = user.Gender,
-                                                            UserType = user.UserType,
-                                                        });
+                                                {
+                                                    UserId = user.UserId,
+                                                    BirthDay = user.BirthDay,
+                                                    PhoneNumber = user.PhoneNumber,
+                                                    EmpName = user.EmpName,
+                                                    UserName = user.UserName,
+                                                    Email = user.Email,
+                                                    Gender = user.Gender,
+                                                    UserType = user.UserType,
+                                                });
                 var totalCount = result.Count();
                 var pageAndFilterResult = result.Skip((input.Page - 1) * input.PageSize).Take(input.PageSize);
+
                 return Task.FromResult(
-                        new PagedResultDto
-                        {
-                            TotalCount = totalCount,
-                            Result = pageAndFilterResult.ToList()
-                        }
-                    );
-            } catch (Exception ex)
+                            new PagedResultDto
+                            {
+                                TotalCount = totalCount,
+                                Result = pageAndFilterResult.ToList()
+                            }
+                        );
+            }
+            catch (Exception ex)
             {
                 _logger.LogInformation(ex.Message);
                 var valueDefault = new PagedResultDto();
-                return Task.FromResult( valueDefault );
+                return Task.FromResult(valueDefault);
             }
-}
+        }
 
         /// <summary>Thêm hoặc cập nhật thông tin người dùng</summary>
         /// <param name="user">The user.</param>
@@ -240,6 +262,52 @@ namespace Infra_Persistence.Services
             {
                 passwordSalt = hmac.Key;
                 passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            }
+        }
+
+        /// <summary>Lấy dữ liệu để xuất excel</summary>
+        /// <param name="input">Điều kiện lọc</param>
+        /// <returns>Danh sách người dùng</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    8/17/2023   created
+        /// </Modified>
+        public Task<List<GetAllUserDto>> GetDataToExportExcel(GetAllUserInput input)
+        {
+            try
+            {
+                var result = _unitOfWork.UserRepository.GetAll().Where(e =>
+                                                e.IsDeleted == false
+                                                && (input.Gender > 0 ? input.Gender == e.Gender : true)
+                                                && (input.FromDate != null ? e.BirthDay >= input.FromDate : true)
+                                                && (input.ToDate != null ? e.BirthDay < input.ToDate.Value.AddDays(1) : true)
+                                                && (string.IsNullOrWhiteSpace(input.ValueFilter) ? true
+                                                    : input.TypeFilter == FilterType.UserName ? (e.UserName ?? "").Contains(input.ValueFilter)
+                                                        : (input.TypeFilter == FilterType.FullName ? (e.EmpName ?? "").Contains(input.ValueFilter)
+                                                            : (input.TypeFilter == FilterType.Email ? (e.Email ?? "").Contains(input.ValueFilter)
+                                                                : (e.PhoneNumber ?? "").Contains(input.ValueFilter)
+                                                        )))
+                                                ).OrderBy(e => e.CreateDate)
+                                                .Select(user => new GetAllUserDto
+                                                {
+                                                    UserId = user.UserId,
+                                                    BirthDay = user.BirthDay,
+                                                    PhoneNumber = user.PhoneNumber,
+                                                    EmpName = user.EmpName,
+                                                    UserName = user.UserName,
+                                                    Email = user.Email,
+                                                    Gender = user.Gender,
+                                                    UserType = user.UserType,
+                                                });
+                var pageAndFilterResult = result;
+
+                return Task.FromResult(pageAndFilterResult.ToList());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                var valueDefault = new List<GetAllUserDto>();
+                return Task.FromResult(valueDefault);
             }
         }
 

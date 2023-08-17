@@ -1,6 +1,7 @@
 ﻿using Application.Dto.Common;
 using Application.Dto.Users;
 using Application.IService;
+using ClosedXML.Excel;
 using Domain.Master;
 using Infra_Persistence.Authorization;
 using Microsoft.AspNetCore.Authorization;
@@ -176,6 +177,77 @@ namespace WebApi.Controllers
                 _logger.LogInformation($" {respon.Message} InputValue: {inputToString}");
             }
             return Ok(respon);
+        }
+        #endregion
+
+        #region -- Export excel
+        /// <summary>Xuất báo cáo excel</summary>
+        /// <param name="input">Điều kiện lọc</param>
+        /// <returns>File excel</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    8/17/2023   created
+        /// </Modified>
+        [HttpPost("export-excel")]
+        public async Task<ActionResult> ExportToExcel(GetAllUserInput input)
+        {
+            using (var workbook = new XLWorkbook())
+            {
+                var fileName = $"List_User_{DateTime.Now.ToString("dd_MM_yyyy_hh_mm_ss")}";
+
+                var worksheet = workbook.Worksheets.Add("Users");
+                var currentRow = 1;
+                worksheet.Cell(currentRow, 1).Value = "STT";
+                worksheet.Cell(currentRow, 2).Value = "FullName";
+                worksheet.Cell(currentRow, 3).Value = "UserName";
+                worksheet.Cell(currentRow, 4).Value = "BirthDay";
+                worksheet.Cell(currentRow, 5).Value = "Gender";
+                worksheet.Cell(currentRow, 6).Value = "PhoneNumber";
+                worksheet.Cell(currentRow, 7).Value = "Email";
+
+                var users = await _user.GetDataToExportExcel(input);
+
+                worksheet.Columns("A").Width = 5;
+                worksheet.Columns("B").Width = 35;
+                worksheet.Columns("C").Width = 20;
+                worksheet.Columns("D").Width = 15;
+                worksheet.Columns("E").Width = 10;
+                worksheet.Columns("F").Width = 20;
+                worksheet.Columns("G").Width = 40;
+
+                worksheet.Range($"A1:G1").Style.Fill.BackgroundColor = XLColor.Gray;
+
+                worksheet.Range($"A1:G{users.Count() + 1}").Style
+                .Border.SetTopBorder(XLBorderStyleValues.Thin)
+                .Border.SetRightBorder(XLBorderStyleValues.Thin)
+                .Border.SetBottomBorder(XLBorderStyleValues.Thin)
+                .Border.SetLeftBorder(XLBorderStyleValues.Thin);
+
+                var count = 1;
+                foreach (var user in users)
+                {
+                    currentRow++;
+                    worksheet.Cell(currentRow, 1).Value = count;
+                    worksheet.Cell(currentRow, 2).Value = user.EmpName;
+                    worksheet.Cell(currentRow, 3).Value = user.UserName;
+                    worksheet.Cell(currentRow, 4).Value = (user.BirthDay ?? DateTime.MinValue).ToString("dd/MM/yyyy");
+                    worksheet.Cell(currentRow, 5).Value = user.Gender == 1 ? "Nam" : (user.Gender == 2 ? "Nữ" : "Khác");
+                    worksheet.Cell(currentRow, 6).Value = user.PhoneNumber;
+                    worksheet.Cell(currentRow, 7).Value = user.Email;
+                    count++;
+                }
+
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    var content = stream.ToArray();
+
+                    return File(
+                        content,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        fileName + ".xlsx");
+                }
+            }
         }
         #endregion
     }
