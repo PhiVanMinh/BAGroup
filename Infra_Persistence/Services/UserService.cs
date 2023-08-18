@@ -80,6 +80,9 @@ namespace Infra_Persistence.Services
         /// </Modified>
         public Task<PagedResultDto> GetAll(GetAllUserInput input)
         {
+
+            // Query using stored procedure
+
             //try
             //{
             //    var result = await _unitOfWork.UserRepository.GetAllUsers(input);
@@ -100,6 +103,7 @@ namespace Infra_Persistence.Services
             //    return valueDefault;
             //}
 
+            // Query ussing linq
             try
             {
                 var result = _unitOfWork.UserRepository.GetAll().Where(e =>
