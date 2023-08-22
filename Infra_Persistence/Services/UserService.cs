@@ -3,10 +3,18 @@ using Application.Dto.Users;
 using Application.Enum;
 using Application.Interfaces;
 using Application.IService;
+using CachingFramework.Redis;
+using CachingFramework.Redis.Contracts;
+using CachingFramework.Redis.Contracts.RedisObjects;
 using Domain.Master;
 using Infra_Persistence.Authorization;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
+using System.Text;
+using System.Text.Json;
 
 namespace Infra_Persistence.Services
 {
@@ -17,16 +25,23 @@ namespace Infra_Persistence.Services
     [Authorize]
     public class UserService : IUserService
     {
+        private readonly IConfiguration _configuration;
         public IUnitOfWork _unitOfWork;
         private readonly ILogger<UserService> _logger;
+        private readonly IDatabase _cache;
 
         public UserService(
             IUnitOfWork unitOfWork,
-            ILogger<UserService> logger
+            ILogger<UserService> logger,
+            IConfiguration configuration
             )
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
+            _configuration = configuration;
+
+            var redis = ConnectionMultiplexer.Connect(_configuration["RedisCacheUrl"]);
+            _cache = redis.GetDatabase();
         }
 
         /// <summary>Kiểm tra thông tin user có hợp lệ không nếu không đưa ra thông báo. Ngược lại cập nhật thông tin xóa của bản ghi</summary>
@@ -78,74 +93,112 @@ namespace Infra_Persistence.Services
         /// Name       Date       Comments
         /// minhpv    8/10/2023   created
         /// </Modified>
-        public Task<PagedResultDto> GetAll(GetAllUserInput input)
+        public async Task<PagedResultDto> GetAll(GetAllUserInput input)
         {
+            //var inputToString = JsonSerializer.Serialize<GetAllUserInput>(input);
+            string cacheKey = $"{DateTime.Now.ToString("dd_MM_yyyy_hh")} {input.Gender}_{input.FromDate}_{input.ToDate}_{input.TypeFilter}_{input.ValueFilter}";
 
-            // Query using stored procedure
-
-            //try
-            //{
-            //    var result = await _unitOfWork.UserRepository.GetAllUsers(input);
-            //    var pageAndFilterResult = result != null ? result.ToList() : new List<GetAllUserDto>();
-            //    var totalCount = (pageAndFilterResult.Count() > 0) ? pageAndFilterResult[0].TotalCount : 0;
-
-            //    return
-            //    new PagedResultDto
-            //    {
-            //        TotalCount = totalCount,
-            //        Result = pageAndFilterResult
-            //    };
-            //}
-            //catch (Exception ex)
-            //{
-            //    _logger.LogInformation(ex.Message);
-            //    var valueDefault = new PagedResultDto();
-            //    return valueDefault;
-            //}
-
-            // Query ussing linq
             try
             {
-                var result = _unitOfWork.UserRepository.GetAll().Where(e =>
-                                                e.IsDeleted == false
-                                                && (input.Gender > 0 ? input.Gender == e.Gender : true)
-                                                && (input.FromDate != null ? e.BirthDay >= input.FromDate : true)
-                                                && (input.ToDate != null ? e.BirthDay < input.ToDate.Value.AddDays(1) : true)
-                                                && (string.IsNullOrWhiteSpace(input.ValueFilter) ? true
-                                                    : input.TypeFilter == FilterType.UserName ? (e.UserName ?? "").Contains(input.ValueFilter)
-                                                        : (input.TypeFilter == FilterType.FullName ? (e.EmpName ?? "").Contains(input.ValueFilter)
-                                                            : (input.TypeFilter == FilterType.Email ? (e.Email ?? "").Contains(input.ValueFilter)
-                                                                : (e.PhoneNumber ?? "").Contains(input.ValueFilter)
-                                                        )))
-                                                ).OrderBy(e => e.CreateDate)
-                                                .Select(user => new GetAllUserDto
-                                                {
-                                                    UserId = user.UserId,
-                                                    BirthDay = user.BirthDay,
-                                                    PhoneNumber = user.PhoneNumber,
-                                                    EmpName = user.EmpName,
-                                                    UserName = user.UserName,
-                                                    Email = user.Email,
-                                                    Gender = user.Gender,
-                                                    UserType = user.UserType,
-                                                });
-                var totalCount = result.Count();
-                var pageAndFilterResult = result.Skip((input.Page - 1) * input.PageSize).Take(input.PageSize);
+                List<GetAllUserDto> result = new List<GetAllUserDto>();
+                var totalCount = 0;
 
-                return Task.FromResult(
-                            new PagedResultDto
-                            {
-                                TotalCount = totalCount,
-                                Result = pageAndFilterResult.ToList()
-                            }
-                        );
+                var cachedData =  _cache.KeyExists(cacheKey);
+                if (cachedData)
+                {
+                    totalCount = (int)_cache.SortedSetLength($"{cacheKey}");
+                    var redisData = _cache.SortedSetRangeByScore(cacheKey, (input.Page - 1) * input.PageSize, (input.Page) * input.PageSize - (input.Page == 1 ? 0 : 1));
+                    result = redisData.Select(d => JsonSerializer.Deserialize<GetAllUserDto>(d)).ToList();
+                }
+                else
+                {
+                    var userList = await GetUserList(input);
+
+                    totalCount = userList.Count();
+                    result = userList.Skip((input.Page - 1) * input.PageSize).Take(input.PageSize).ToList();
+
+                    //for (int i = 1; i <= totalCount; i++)
+                    //{
+                    //    _cache2.SortedSetAdd(cacheKey, JsonSerializer.Serialize(userList[i - 1]), i);
+                    //    _cache2.KeyExpire(cacheKey, DateTime.Now.AddMinutes(5));
+                    //}
+                    AddEnumerableToSortedSet(cacheKey, userList);
+                    _cache.KeyExpire(cacheKey, DateTime.Now.AddMinutes(5));
+                }
+
+                return new PagedResultDto
+                {
+                    TotalCount = totalCount,
+                    Result = result
+                };
+
             }
+
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.Message);
                 var valueDefault = new PagedResultDto();
-                return Task.FromResult(valueDefault);
+                return valueDefault;
             }
+
+        }
+
+        /// <summary>Thêm dữ liệu và redis cache</summary>
+        /// <typeparam name="T">Kiểu dữ liệu</typeparam>
+        /// <param name="key">Key cache để sau tìm kiếm</param>
+        /// <param name="data">Danh sách dữ liệu cần lưu redis</param>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    8/22/2023   created
+        /// </Modified>
+        public void AddEnumerableToSortedSet<T>(string key, IEnumerable<T> data)
+        {
+                int i = 1;
+                var context = new RedisContext(_configuration["RedisCacheUrl"]);
+                IRedisSortedSet<T> sortedSet = context.Collections.GetRedisSortedSet<T>(key);
+                sortedSet.AddRange(data.Select((m) => new SortedMember<T>(i, m)
+                {
+                    Value = m,
+                    Score = i++
+                }));
+                context.Dispose();
+        }
+
+        private Task<List<GetAllUserDto>> GetUserList(GetAllUserInput input)
+        {
+            // Query using stored procedure
+
+            //var result = await _unitOfWork.UserRepository.GetAllUsers(input);
+            //return result;
+
+
+            // Query ussing linq
+            var result = _unitOfWork.UserRepository.GetAll().Where(e =>
+                                            e.IsDeleted == false
+                                            && (input.Gender > 0 ? input.Gender == e.Gender : true)
+                                            && (input.FromDate != null ? e.BirthDay >= input.FromDate : true)
+                                            && (input.ToDate != null ? e.BirthDay < input.ToDate.Value.AddDays(1) : true)
+                                            && (string.IsNullOrWhiteSpace(input.ValueFilter) ? true
+                                                : input.TypeFilter == FilterType.UserName ? (e.UserName ?? "").Contains(input.ValueFilter)
+                                                    : (input.TypeFilter == FilterType.FullName ? (e.EmpName ?? "").Contains(input.ValueFilter)
+                                                        : (input.TypeFilter == FilterType.Email ? (e.Email ?? "").Contains(input.ValueFilter)
+                                                            : (e.PhoneNumber ?? "").Contains(input.ValueFilter)
+                                                    )))
+                                            ).OrderBy(e => e.CreateDate)
+                                            .Select(user => new GetAllUserDto
+                                            {
+                                                UserId = user.UserId,
+                                                BirthDay = user.BirthDay,
+                                                PhoneNumber = user.PhoneNumber,
+                                                EmpName = user.EmpName,
+                                                UserName = user.UserName,
+                                                Email = user.Email,
+                                                Gender = user.Gender,
+                                                UserType = user.UserType,
+                                            });
+
+            return Task.FromResult(result.ToList());
+
         }
 
         /// <summary>Thêm hoặc cập nhật thông tin người dùng</summary>

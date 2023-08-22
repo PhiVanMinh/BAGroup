@@ -59,31 +59,31 @@ namespace WebApi.Controllers
             }
             try
             {
-                string cacheKey = $"{DateTime.Now.ToString("dd_MM_yyyy_hh")} {inputToString}";
+                //string cacheKey = $"{DateTime.Now.ToString("dd_MM_yyyy_hh")} {input.Gender} {input.FromDate} {input.ToDate} {input.TypeFilter} {input.ValueFilter}";
 
-                byte[] cachedData = await _cache.GetAsync(cacheKey);
-                if (cachedData != null)
-                {
-                    var cachedDataString = Encoding.UTF8.GetString(cachedData);
-                    respon.Result = JsonSerializer.Deserialize<PagedResultDto>(cachedDataString);
-                }
-                else
-                {
+                //byte[] cachedData = await _cache.GetAsync(cacheKey);
+                //if (cachedData != null)
+                //{
+                //    var cachedDataString = Encoding.UTF8.GetString(cachedData);
+                //    respon.Result = JsonSerializer.Deserialize<PagedResultDto>(cachedDataString);
+                //}
+                //else
+                //{
                     var userList = await _user.GetAll(input);
                     respon.Result = userList;
 
-                    // Serializing the data
-                    string cachedDataString = JsonSerializer.Serialize(userList);
-                    var dataToCache = Encoding.UTF8.GetBytes(cachedDataString);
+                //    // Serializing the data
+                //    string cachedDataString = JsonSerializer.Serialize(userList);
+                //    var dataToCache = Encoding.UTF8.GetBytes(cachedDataString);
 
-                    // Setting up the cache options
-                    DistributedCacheEntryOptions options = new DistributedCacheEntryOptions()
-                        .SetAbsoluteExpiration(DateTime.Now.AddMinutes(5))
-                        .SetSlidingExpiration(TimeSpan.FromMinutes(3));
+                //    // Setting up the cache options
+                //    DistributedCacheEntryOptions options = new DistributedCacheEntryOptions()
+                //        .SetAbsoluteExpiration(DateTime.Now.AddMinutes(5))
+                //        .SetSlidingExpiration(TimeSpan.FromMinutes(3));
 
-                    // Add the data into the cache
-                    await _cache.SetAsync(cacheKey, dataToCache, options);
-                }
+                //    // Add the data into the cache
+                //    await _cache.SetAsync(cacheKey, dataToCache, options);
+                //}
             } catch (Exception ex)
             {
                 respon.StatusCode = 500;
