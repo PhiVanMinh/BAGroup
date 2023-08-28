@@ -40,7 +40,7 @@ namespace Infra_Persistence.Services
             _logger = logger;
             _configuration = configuration;
 
-            var redis = ConnectionMultiplexer.Connect(_configuration["RedisCacheUrl"]);
+            var redis = ConnectionMultiplexer.Connect($"{_configuration["RedisCacheUrl"]},abortConnect=False");
             _cache = redis.GetDatabase();
         }
 
@@ -116,12 +116,6 @@ namespace Infra_Persistence.Services
 
                     totalCount = userList.Count();
                     result = userList.Skip((input.Page - 1) * input.PageSize).Take(input.PageSize).ToList();
-
-                    //for (int i = 1; i <= totalCount; i++)
-                    //{
-                    //    _cache2.SortedSetAdd(cacheKey, JsonSerializer.Serialize(userList[i - 1]), i);
-                    //    _cache2.KeyExpire(cacheKey, DateTime.Now.AddMinutes(5));
-                    //}
                     AddEnumerableToSortedSet(cacheKey, userList);
                     _cache.KeyExpire(cacheKey, DateTime.Now.AddMinutes(5));
                 }
@@ -176,8 +170,8 @@ namespace Infra_Persistence.Services
             var result = _unitOfWork.UserRepository.GetAll().Where(e =>
                                             e.IsDeleted == false
                                             && (input.Gender > 0 ? input.Gender == e.Gender : true)
-                                            && (input.FromDate != null ? e.BirthDay >= input.FromDate : true)
-                                            && (input.ToDate != null ? e.BirthDay < input.ToDate.Value.AddDays(1) : true)
+                                            && (input.FromDate != null ? e.CreateDate >= input.FromDate : true)
+                                            && (input.ToDate != null ? e.CreateDate < input.ToDate.Value.AddDays(1) : true)
                                             && (string.IsNullOrWhiteSpace(input.ValueFilter) ? true
                                                 : input.TypeFilter == FilterType.UserName ? (e.UserName ?? "").Contains(input.ValueFilter)
                                                     : (input.TypeFilter == FilterType.FullName ? (e.EmpName ?? "").Contains(input.ValueFilter)
@@ -329,42 +323,59 @@ namespace Infra_Persistence.Services
         /// Name       Date       Comments
         /// minhpv    8/17/2023   created
         /// </Modified>
-        public Task<List<GetAllUserDto>> GetDataToExportExcel(GetAllUserInput input)
+        public async Task<List<GetAllUserDto>> GetDataToExportExcel(GetAllUserInput input)
         {
             try
             {
-                var result = _unitOfWork.UserRepository.GetAll().Where(e =>
-                                                e.IsDeleted == false
-                                                && (input.Gender > 0 ? input.Gender == e.Gender : true)
-                                                && (input.FromDate != null ? e.BirthDay >= input.FromDate : true)
-                                                && (input.ToDate != null ? e.BirthDay < input.ToDate.Value.AddDays(1) : true)
-                                                && (string.IsNullOrWhiteSpace(input.ValueFilter) ? true
-                                                    : input.TypeFilter == FilterType.UserName ? (e.UserName ?? "").Contains(input.ValueFilter)
-                                                        : (input.TypeFilter == FilterType.FullName ? (e.EmpName ?? "").Contains(input.ValueFilter)
-                                                            : (input.TypeFilter == FilterType.Email ? (e.Email ?? "").Contains(input.ValueFilter)
-                                                                : (e.PhoneNumber ?? "").Contains(input.ValueFilter)
-                                                        )))
-                                                ).OrderBy(e => e.CreateDate)
-                                                .Select(user => new GetAllUserDto
-                                                {
-                                                    UserId = user.UserId,
-                                                    BirthDay = user.BirthDay,
-                                                    PhoneNumber = user.PhoneNumber,
-                                                    EmpName = user.EmpName,
-                                                    UserName = user.UserName,
-                                                    Email = user.Email,
-                                                    Gender = user.Gender,
-                                                    UserType = user.UserType,
-                                                });
-                var pageAndFilterResult = result;
+                string cacheKey = $"{DateTime.Now.ToString("dd_MM_yyyy_hh")} {input.Gender}_{input.FromDate}_{input.ToDate}_{input.TypeFilter}_{input.ValueFilter}";
+                List<GetAllUserDto> result = new List<GetAllUserDto>();
+                var totalCount = 0;
 
-                return Task.FromResult(pageAndFilterResult.ToList());
+                var cachedData = _cache.KeyExists(cacheKey);
+                if (cachedData)
+                {
+                    totalCount = (int)_cache.SortedSetLength($"{cacheKey}");
+                    var redisData = _cache.SortedSetRangeByScore(cacheKey);
+                    result = redisData.Select(d => JsonSerializer.Deserialize<GetAllUserDto>(d)).ToList();
+                }
+                else
+                {
+                    //  var resultQuery = _unitOfWork.UserRepository.GetAll().Where(e =>
+                    //                              e.IsDeleted == false
+                    //                              && (input.Gender > 0 ? input.Gender == e.Gender : true)
+                    //                              && (input.FromDate != null ? e.CreateDate >= input.FromDate : true)
+                    //                              && (input.ToDate != null ? e.CreateDate < input.ToDate.Value.AddDays(1) : true)
+                    //                              && (string.IsNullOrWhiteSpace(input.ValueFilter) ? true
+                    //                                  : input.TypeFilter == FilterType.UserName ? (e.UserName ?? "").Contains(input.ValueFilter)
+                    //                                      : (input.TypeFilter == FilterType.FullName ? (e.EmpName ?? "").Contains(input.ValueFilter)
+                    //                                          : (input.TypeFilter == FilterType.Email ? (e.Email ?? "").Contains(input.ValueFilter)
+                    //                                              : (e.PhoneNumber ?? "").Contains(input.ValueFilter)
+                    //                                      )))
+                    //                              ).OrderBy(e => e.CreateDate)
+                    //                              .Select(user => new GetAllUserDto
+                    //                              {
+                    //                                  UserId = user.UserId,
+                    //                                  BirthDay = user.BirthDay,
+                    //                                  PhoneNumber = user.PhoneNumber,
+                    //                                  EmpName = user.EmpName,
+                    //                                  UserName = user.UserName,
+                    //                                  Email = user.Email,
+                    //                                  Gender = user.Gender,
+                    //                                  UserType = user.UserType,
+                    //                              });
+                    //result = resultQuery.ToList();
+
+                     result = await _unitOfWork.UserRepository.GetAllUsers(input);
+
+                }
+
+                return result;
             }
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.Message);
                 var valueDefault = new List<GetAllUserDto>();
-                return Task.FromResult(valueDefault);
+                return valueDefault;
             }
         }
 

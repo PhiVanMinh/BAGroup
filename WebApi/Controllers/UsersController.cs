@@ -2,11 +2,13 @@
 using Application.Dto.Users;
 using Application.IService;
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Domain.Master;
 using Infra_Persistence.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
+using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Text.Json;
@@ -59,31 +61,9 @@ namespace WebApi.Controllers
             }
             try
             {
-                //string cacheKey = $"{DateTime.Now.ToString("dd_MM_yyyy_hh")} {input.Gender} {input.FromDate} {input.ToDate} {input.TypeFilter} {input.ValueFilter}";
+                var userList = await _user.GetAll(input);
+                respon.Result = userList;
 
-                //byte[] cachedData = await _cache.GetAsync(cacheKey);
-                //if (cachedData != null)
-                //{
-                //    var cachedDataString = Encoding.UTF8.GetString(cachedData);
-                //    respon.Result = JsonSerializer.Deserialize<PagedResultDto>(cachedDataString);
-                //}
-                //else
-                //{
-                    var userList = await _user.GetAll(input);
-                    respon.Result = userList;
-
-                //    // Serializing the data
-                //    string cachedDataString = JsonSerializer.Serialize(userList);
-                //    var dataToCache = Encoding.UTF8.GetBytes(cachedDataString);
-
-                //    // Setting up the cache options
-                //    DistributedCacheEntryOptions options = new DistributedCacheEntryOptions()
-                //        .SetAbsoluteExpiration(DateTime.Now.AddMinutes(5))
-                //        .SetSlidingExpiration(TimeSpan.FromMinutes(3));
-
-                //    // Add the data into the cache
-                //    await _cache.SetAsync(cacheKey, dataToCache, options);
-                //}
             } catch (Exception ex)
             {
                 respon.StatusCode = 500;
@@ -191,63 +171,71 @@ namespace WebApi.Controllers
         [HttpPost("export-excel")]
         public async Task<ActionResult> ExportToExcel(GetAllUserInput input)
         {
-            using (var workbook = new XLWorkbook())
+            try
             {
-                var fileName = $"List_User_{DateTime.Now.ToString("dd_MM_yyyy_hh_mm_ss")}";
-
-                var worksheet = workbook.Worksheets.Add("Users");
-                var currentRow = 1;
-                worksheet.Cell(currentRow, 1).Value = "STT";
-                worksheet.Cell(currentRow, 2).Value = "FullName";
-                worksheet.Cell(currentRow, 3).Value = "UserName";
-                worksheet.Cell(currentRow, 4).Value = "BirthDay";
-                worksheet.Cell(currentRow, 5).Value = "Gender";
-                worksheet.Cell(currentRow, 6).Value = "PhoneNumber";
-                worksheet.Cell(currentRow, 7).Value = "Email";
-
-                var users = await _user.GetDataToExportExcel(input);
-
-                worksheet.Columns("A").Width = 5;
-                worksheet.Columns("B").Width = 35;
-                worksheet.Columns("C").Width = 20;
-                worksheet.Columns("D").Width = 15;
-                worksheet.Columns("E").Width = 10;
-                worksheet.Columns("F").Width = 20;
-                worksheet.Columns("G").Width = 40;
-
-                worksheet.Range($"A1:G1").Style.Fill.BackgroundColor = XLColor.Gray;
-
-                worksheet.Range($"A1:G{users.Count() + 1}").Style
-                .Border.SetTopBorder(XLBorderStyleValues.Thin)
-                .Border.SetRightBorder(XLBorderStyleValues.Thin)
-                .Border.SetBottomBorder(XLBorderStyleValues.Thin)
-                .Border.SetLeftBorder(XLBorderStyleValues.Thin);
-
-                var count = 1;
-                foreach (var user in users)
+                using (var workbook = new XLWorkbook())
                 {
-                    currentRow++;
-                    worksheet.Cell(currentRow, 1).Value = count;
-                    worksheet.Cell(currentRow, 2).Value = user.EmpName;
-                    worksheet.Cell(currentRow, 3).Value = user.UserName;
-                    worksheet.Cell(currentRow, 4).Value = (user.BirthDay ?? DateTime.MinValue).ToString("dd/MM/yyyy");
-                    worksheet.Cell(currentRow, 5).Value = user.Gender == 1 ? "Nam" : (user.Gender == 2 ? "Nữ" : "Khác");
-                    worksheet.Cell(currentRow, 6).Value = user.PhoneNumber;
-                    worksheet.Cell(currentRow, 7).Value = user.Email;
-                    count++;
-                }
+                    var fileName = $"List_User_{DateTime.Now.ToString("dd_MM_yyyy_hh_mm_ss")}";
 
-                using (var stream = new MemoryStream())
-                {
-                    workbook.SaveAs(stream);
-                    var content = stream.ToArray();
+                    var users = await _user.GetDataToExportExcel(input);
 
-                    return File(
-                        content,
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        fileName + ".xlsx");
+                    var dataTable = GetTable("Users", users);
+
+                    var worksheet = workbook.Worksheets.Add(dataTable);
+                    worksheet.Columns("A").Width = 10;
+                    worksheet.Columns("B").Width = 35;
+                    worksheet.Columns("C").Width = 20;
+                    worksheet.Columns("D").Width = 15;
+                    worksheet.Columns("E").Width = 10;
+                    worksheet.Columns("F").Width = 20;
+                    worksheet.Columns("G").Width = 40;
+
+                    worksheet.Range($"A1:G1").Style.Fill.BackgroundColor = XLColor.Gray;
+
+                    worksheet.Range($"A1:G{users.Count() + 1}").Style
+                    .Border.SetTopBorder(XLBorderStyleValues.Thin)
+                    .Border.SetRightBorder(XLBorderStyleValues.Thin)
+                    .Border.SetBottomBorder(XLBorderStyleValues.Thin)
+                    .Border.SetLeftBorder(XLBorderStyleValues.Thin);
+
+                    using (var stream = new MemoryStream())
+                    {
+                        workbook.SaveAs(stream);
+                        var content = stream.ToArray();
+
+                        return File(
+                            content,
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            fileName + ".xlsx");
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($" {ex.Message}");
+                return BadRequest(ex.Message);
+            }
+        }
+
+        private DataTable GetTable(String tableName, List<GetAllUserDto> userList)
+        {
+            DataTable table = new DataTable();
+            table.TableName = tableName;
+            table.Columns.Add("STT", typeof(int));
+            table.Columns.Add("FullName", typeof(string));
+            table.Columns.Add("UserName", typeof(string));
+            table.Columns.Add("BirthDay", typeof(DateTime));
+            table.Columns.Add("Gender", typeof(string));
+            table.Columns.Add("PhoneNumber", typeof(string));
+            table.Columns.Add("Email", typeof(string));
+
+            var count = 1;
+            foreach (var user in userList)
+            {
+                table.Rows.Add(count, user.EmpName, user.UserName, user.BirthDay, user.Gender == 1 ? "Nam" : (user.Gender == 2 ? "Nữ" : "Khác"), user.PhoneNumber, user.Email);
+                count++;
+            }
+            return table;
         }
         #endregion
     }
