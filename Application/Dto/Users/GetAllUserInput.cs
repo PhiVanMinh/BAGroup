@@ -7,16 +7,10 @@ namespace Application.Dto.Users
     /// <Modified>
     /// Name       Date       Comments
     /// minhpv    8/11/2023   created
+    /// minhpv    28/8/2023   modified
     /// </Modified>
     public class GetAllUserInput
     {
-
-        /// <summary>Giá trị tìm kiếm</summary>
-        public string? ValueFilter { get; set; }
-
-        /// <summary>Loại tìm kiếm</summary>
-        public FilterType? TypeFilter { get; set; }
-
         /// <summary>Giới tính</summary>
         public byte? Gender { get; set; }
 
@@ -31,5 +25,17 @@ namespace Application.Dto.Users
 
         /// <summary>Kích thước trang</summary>
         public int PageSize { get; set; }
+
+        /// <summary>Tài khoản</summary>
+        public string? UserName { get; set; }
+
+        /// <summary>Tên người dùng</summary>
+        public string? FullName { get; set; }
+
+        /// <summary>Email</summary>
+        public string? Email { get; set; }
+
+        /// <summary>Số điện thoại</summary>
+        public string? PhoneNumber { get; set; }
     }
 }

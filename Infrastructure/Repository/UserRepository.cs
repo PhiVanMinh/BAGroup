@@ -39,10 +39,10 @@ namespace Infrastructure.Repository
                     Gender = input.Gender > 0 ? input.Gender : null,
                     input.FromDate,
                     input.ToDate,
-                    UserName = !string.IsNullOrWhiteSpace(input.ValueFilter) && input.TypeFilter == FilterType.UserName ? input.ValueFilter : null,
-                    FullName = !string.IsNullOrWhiteSpace(input.ValueFilter) && input.TypeFilter == FilterType.FullName ? input.ValueFilter : null,
-                    Email = !string.IsNullOrWhiteSpace(input.ValueFilter) && input.TypeFilter == FilterType.Email ? input.ValueFilter : null,
-                    PhoneNumber = !string.IsNullOrWhiteSpace(input.ValueFilter) && input.TypeFilter == FilterType.PhoneNumber ? input.ValueFilter : null,
+                    UserName = !string.IsNullOrWhiteSpace(input.UserName) ? input.UserName : null,
+                    FullName = !string.IsNullOrWhiteSpace(input.FullName) ? input.FullName : null,
+                    Email = !string.IsNullOrWhiteSpace(input.Email) ? input.Email : null,
+                    PhoneNumber = !string.IsNullOrWhiteSpace(input.PhoneNumber) ? input.PhoneNumber : null,
                 });
                 return userList.ToList();
             }

@@ -95,8 +95,7 @@ namespace Infra_Persistence.Services
         /// </Modified>
         public async Task<PagedResultDto> GetAll(GetAllUserInput input)
         {
-            //var inputToString = JsonSerializer.Serialize<GetAllUserInput>(input);
-            string cacheKey = $"{DateTime.Now.ToString("dd_MM_yyyy_hh")} {input.Gender}_{input.FromDate}_{input.ToDate}_{input.TypeFilter}_{input.ValueFilter}";
+            string cacheKey = $"{DateTime.Now.ToString("dd_MM_yyyy_hh")} {input.Gender}_{input.FromDate}_{input.ToDate}_{input.UserName}_{input.FullName}_{input.Email}_{input.PhoneNumber}";
 
             try
             {
@@ -165,19 +164,16 @@ namespace Infra_Persistence.Services
             //var result = await _unitOfWork.UserRepository.GetAllUsers(input);
             //return result;
 
-
-            // Query ussing linq
+            // Query using linq
             var result = _unitOfWork.UserRepository.GetAll().Where(e =>
                                             e.IsDeleted == false
                                             && (input.Gender > 0 ? input.Gender == e.Gender : true)
                                             && (input.FromDate != null ? e.CreateDate >= input.FromDate : true)
                                             && (input.ToDate != null ? e.CreateDate < input.ToDate.Value.AddDays(1) : true)
-                                            && (string.IsNullOrWhiteSpace(input.ValueFilter) ? true
-                                                : input.TypeFilter == FilterType.UserName ? (e.UserName ?? "").Contains(input.ValueFilter)
-                                                    : (input.TypeFilter == FilterType.FullName ? (e.EmpName ?? "").Contains(input.ValueFilter)
-                                                        : (input.TypeFilter == FilterType.Email ? (e.Email ?? "").Contains(input.ValueFilter)
-                                                            : (e.PhoneNumber ?? "").Contains(input.ValueFilter)
-                                                    )))
+                                            && (string.IsNullOrWhiteSpace(input.UserName) || (e.UserName ?? "").StartsWith(input.UserName))
+                                            && (string.IsNullOrWhiteSpace(input.FullName) || (e.EmpName ?? "").StartsWith(input.FullName))
+                                            && (string.IsNullOrWhiteSpace(input.Email) || (e.Email ?? "").StartsWith(input.Email))
+                                            && (string.IsNullOrWhiteSpace(input.PhoneNumber) || (e.PhoneNumber ?? "").StartsWith(input.PhoneNumber))
                                             ).OrderBy(e => e.CreateDate)
                                             .Select(user => new GetAllUserDto
                                             {
@@ -327,7 +323,7 @@ namespace Infra_Persistence.Services
         {
             try
             {
-                string cacheKey = $"{DateTime.Now.ToString("dd_MM_yyyy_hh")} {input.Gender}_{input.FromDate}_{input.ToDate}_{input.TypeFilter}_{input.ValueFilter}";
+                string cacheKey = $"{DateTime.Now.ToString("dd_MM_yyyy_hh")} {input.Gender}_{input.FromDate}_{input.ToDate}_{input.UserName}_{input.FullName}_{input.Email}_{input.PhoneNumber}";
                 List<GetAllUserDto> result = new List<GetAllUserDto>();
                 var totalCount = 0;
 
@@ -340,32 +336,30 @@ namespace Infra_Persistence.Services
                 }
                 else
                 {
-                    //  var resultQuery = _unitOfWork.UserRepository.GetAll().Where(e =>
-                    //                              e.IsDeleted == false
-                    //                              && (input.Gender > 0 ? input.Gender == e.Gender : true)
-                    //                              && (input.FromDate != null ? e.CreateDate >= input.FromDate : true)
-                    //                              && (input.ToDate != null ? e.CreateDate < input.ToDate.Value.AddDays(1) : true)
-                    //                              && (string.IsNullOrWhiteSpace(input.ValueFilter) ? true
-                    //                                  : input.TypeFilter == FilterType.UserName ? (e.UserName ?? "").Contains(input.ValueFilter)
-                    //                                      : (input.TypeFilter == FilterType.FullName ? (e.EmpName ?? "").Contains(input.ValueFilter)
-                    //                                          : (input.TypeFilter == FilterType.Email ? (e.Email ?? "").Contains(input.ValueFilter)
-                    //                                              : (e.PhoneNumber ?? "").Contains(input.ValueFilter)
-                    //                                      )))
-                    //                              ).OrderBy(e => e.CreateDate)
-                    //                              .Select(user => new GetAllUserDto
-                    //                              {
-                    //                                  UserId = user.UserId,
-                    //                                  BirthDay = user.BirthDay,
-                    //                                  PhoneNumber = user.PhoneNumber,
-                    //                                  EmpName = user.EmpName,
-                    //                                  UserName = user.UserName,
-                    //                                  Email = user.Email,
-                    //                                  Gender = user.Gender,
-                    //                                  UserType = user.UserType,
-                    //                              });
-                    //result = resultQuery.ToList();
+                    var resultQuery = _unitOfWork.UserRepository.GetAll().Where(e =>
+                                                e.IsDeleted == false
+                                                && (input.Gender > 0 ? input.Gender == e.Gender : true)
+                                                && (input.FromDate != null ? e.CreateDate >= input.FromDate : true)
+                                                && (input.ToDate != null ? e.CreateDate < input.ToDate.Value.AddDays(1) : true)
+                                                && (string.IsNullOrWhiteSpace(input.UserName) || (e.UserName ?? "").Contains(input.UserName))
+                                                && (string.IsNullOrWhiteSpace(input.FullName) || (e.EmpName ?? "").Contains(input.FullName))
+                                                && (string.IsNullOrWhiteSpace(input.Email) || (e.Email ?? "").Contains(input.Email))
+                                                && (string.IsNullOrWhiteSpace(input.PhoneNumber) || (e.PhoneNumber ?? "").Contains(input.PhoneNumber))
+                                                ).OrderBy(e => e.CreateDate)
+                                                .Select(user => new GetAllUserDto
+                                                {
+                                                    UserId = user.UserId,
+                                                    BirthDay = user.BirthDay,
+                                                    PhoneNumber = user.PhoneNumber,
+                                                    EmpName = user.EmpName,
+                                                    UserName = user.UserName,
+                                                    Email = user.Email,
+                                                    Gender = user.Gender,
+                                                    UserType = user.UserType,
+                                                });
+                    result = resultQuery.ToList();
 
-                     result = await _unitOfWork.UserRepository.GetAllUsers(input);
+                    //result = await _unitOfWork.UserRepository.GetAllUsers(input);
 
                 }
 
