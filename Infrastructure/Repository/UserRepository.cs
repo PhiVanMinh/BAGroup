@@ -26,9 +26,23 @@ namespace Infrastructure.Repository
 
         public async Task<List<GetAllUserDto>> GetAllUsers(GetAllUserInput input)
         {
-            var query = @"EXEC sp_get_all_users @sp_page = @Page, @sp_pageSize = @PageSize ,
-                        @sp_userName = @UserName,  @sp_fullName = @FullName, @sp_email = @Email, @sp_phoneNumber = @PhoneNumber, 
-                        @sp_gender = @Gender, @sp_fromDate = @FromDate, @sp_toDate = @ToDate";
+            //var query = @"EXEC sp_get_all_users @sp_page = @Page, @sp_pageSize = @PageSize ,
+            //            @sp_userName = @UserName,  @sp_fullName = @FullName, @sp_email = @Email, @sp_phoneNumber = @PhoneNumber, 
+            //            @sp_gender = @Gender, @sp_fromDate = @FromDate, @sp_toDate = @ToDate";
+
+            var query = @"
+                        SELECT UserId, UserName, BirthDay, EmpName, PhoneNumber, Email, Gender, UserType 
+		                FROM Users WITH(NOLOCK)
+		                WHERE 
+		                IsDeleted = 0
+		                and (@Gender is null or @Gender = Gender)
+		                and (@FromDate is null or CreateDate >= @FromDate)
+		                and (@ToDate is null or CreateDate < DATEADD(day, 1, @ToDate))
+		                and (@UserName is null or UserName LIKE  '%'+ @UserName +'%')
+		                and (@FullName is null or EmpName LIKE  '%'+ @FullName +'%')
+		                and (@Email is null or Email LIKE  '%'+ @Email +'%')
+		                and (@PhoneNumber is null or PhoneNumber LIKE  '%'+ @PhoneNumber +'%')
+		                ORDER BY CreateDate";
 
             using (var connection = _dapperContext.CreateConnection())
             {

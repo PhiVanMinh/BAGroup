@@ -165,6 +165,7 @@ namespace Infra_Persistence.Services
             //return result;
 
             // Query using linq
+
             var result = _unitOfWork.UserRepository.GetAll().Where(e =>
                                             e.IsDeleted == false
                                             && (input.Gender > 0 ? input.Gender == e.Gender : true)
