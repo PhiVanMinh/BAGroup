@@ -360,8 +360,8 @@ namespace Infra_Persistence.Services
                                                 });
                     result = resultQuery.ToList();
 
+                    // Query using stored procedure
                     //result = await _unitOfWork.UserRepository.GetAllUsers(input);
-
                 }
 
                 return result;

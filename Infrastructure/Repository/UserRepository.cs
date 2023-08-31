@@ -26,6 +26,7 @@ namespace Infrastructure.Repository
 
         public async Task<List<GetAllUserDto>> GetAllUsers(GetAllUserInput input)
         {
+            // Store procedure
             //var query = @"EXEC sp_get_all_users @sp_page = @Page, @sp_pageSize = @PageSize ,
             //            @sp_userName = @UserName,  @sp_fullName = @FullName, @sp_email = @Email, @sp_phoneNumber = @PhoneNumber, 
             //            @sp_gender = @Gender, @sp_fromDate = @FromDate, @sp_toDate = @ToDate";

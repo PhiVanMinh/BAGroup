@@ -49,7 +49,7 @@ namespace WebApi.Controllers
         /// minhpv    8/10/2023   created
         /// </Modified>
         [HttpPost("employees")]
-        //[Authorize(Policy = Policies.UserView)]
+        [Authorize(Policy = Policies.UserView)]
         public async Task<IActionResult> GetAll(GetAllUserInput input)
         {
             var respon = new ResponDto<PagedResultDto>();
@@ -217,6 +217,14 @@ namespace WebApi.Controllers
             }
         }
 
+        /// <summary>Insert data to table</summary>
+        /// <param name="tableName">Name of the table.</param>
+        /// <param name="userList">The user list.</param>
+        /// <returns>DataTable</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    8/31/2023   created
+        /// </Modified>
         private DataTable GetTable(String tableName, List<GetAllUserDto> userList)
         {
             DataTable table = new DataTable();
