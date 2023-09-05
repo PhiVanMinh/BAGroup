@@ -22,6 +22,7 @@ namespace Infrastructure.Repository
         private IAuthRepository _authRepository;
         private IRoleRepository _roleRepository;
         private IUserRoleRepository _userRoleRepository;
+        private ISpeedViolationRepository _speedViolationRepository;
 
 
         public UnitOfWork(
@@ -53,7 +54,10 @@ namespace Infrastructure.Repository
         {
             get { return _userRoleRepository = _userRoleRepository ?? new UserRoleRepository(_dbContext); }
         }
-
+        public ISpeedViolationRepository SpeedViolationRepository
+        {
+            get { return _speedViolationRepository = _speedViolationRepository ?? new SpeedViolationRepository(_dapperContext); }
+        }
 
 
         public void Save()

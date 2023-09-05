@@ -45,7 +45,7 @@ namespace Infrastructure.Repository
 		                and (@PhoneNumber is null or PhoneNumber LIKE  '%'+ @PhoneNumber +'%')
 		                ORDER BY CreateDate";
 
-            using (var connection = _dapperContext.CreateConnection())
+            using (var connection = _dapperContext.CreateConnection("Default"))
             {
                 var userList = await connection.QueryAsync<GetAllUserDto>(query, new
                 {

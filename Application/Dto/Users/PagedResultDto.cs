@@ -1,4 +1,6 @@
 ﻿
+using Application.Dto.SpeedViolation;
+
 namespace Application.Dto.Users
 {
     /// <summary>Thông tin phân trang</summary>
@@ -13,5 +15,7 @@ namespace Application.Dto.Users
 
         /// <summary>Danh sách dữ liệu</summary>
         public List<GetAllUserDto> Result { get; set; }
+        /// <summary>Danh sách dữ liệu</summary>
+        public List<GetAllSpeedViolationVehicleDto> ListVehicle { get; set; }
     }
 }

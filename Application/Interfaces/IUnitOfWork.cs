@@ -12,6 +12,7 @@ namespace Application.Interfaces
         IAuthRepository AuthRepository { get; }
         IRoleRepository RoleRepository { get; }
         IUserRoleRepository UserRoleRepository { get; }
+        ISpeedViolationRepository SpeedViolationRepository { get; }
         void Save();
         void RollBack();
         Task SaveAsync();

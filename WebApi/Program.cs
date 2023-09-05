@@ -35,6 +35,7 @@ builder.Services.AddAutoMapper(typeof(CustomMapper));
 // Service
 builder.Services.AddTransient(typeof(IUserService), typeof(UserService));
 builder.Services.AddTransient(typeof(IAuthService), typeof(AuthService));
+builder.Services.AddTransient(typeof(ISpeedViolationService), typeof(SpeedViolationService));
 
 builder.Services.AddCors();
 

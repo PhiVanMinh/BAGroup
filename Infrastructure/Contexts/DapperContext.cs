@@ -12,13 +12,14 @@ namespace Infrastructure.Contexts
     public class DapperContext
     {
         private readonly IConfiguration _configuration;
-        private readonly string _connectionString;
         public DapperContext(IConfiguration configuration)
         {
             _configuration = configuration;
-            _connectionString = _configuration.GetConnectionString("Default");
         }
-        public IDbConnection CreateConnection()
-            => new SqlConnection(_connectionString);
+        public IDbConnection CreateConnection(string input)
+        {
+            var connectionString = _configuration.GetConnectionString(input);
+            return new SqlConnection(connectionString);
+        }
     }
 }
