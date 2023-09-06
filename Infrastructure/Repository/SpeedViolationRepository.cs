@@ -1,19 +1,13 @@
 ﻿using Application.Dto.SpeedViolation;
-using Application.Dto.Users;
 using Application.Interfaces;
 using Dapper;
 using Infrastructure.Contexts;
-using Infrastructure.Persistence;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace Infrastructure.Repository
 {
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    9/6/2023   created
+    /// </Modified>
     public class SpeedViolationRepository : ISpeedViolationRepository
     {
         private readonly DapperContext _dapperContext;
@@ -23,7 +17,16 @@ namespace Infrastructure.Repository
             _dapperContext = dapperContext;
         }
 
-		public async Task<List<GetVehicleListDto>> GetVehicleByCompanyId(int input)
+        /// <summary>Lấy danh sách các xe theo công ty</summary>
+        /// <param name="input">Mã công ty</param>
+        /// <returns>
+        ///   Danh sách các xe của công ty
+        /// </returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/6/2023   created
+        /// </Modified>
+        public async Task<List<GetVehicleListDto>> GetVehicleByCompanyId(int input)
 		{
             using (var connection = _dapperContext.CreateConnection("ServerLab3"))
             {
@@ -38,6 +41,13 @@ namespace Infrastructure.Repository
             }
         }
 
+        /// <summary>Lấy danh sách các xe vi phạm tốc độ</summary>
+        /// <param name="input">Điều kiện lọc</param>
+        /// <returns>Danh sách xe vi phạm theo điều kiện lọc</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/6/2023   created
+        /// </Modified>
         public async Task<List<GetAllSpeedViolationVehicleDto>> GetAllSpeedViolationVehicle(SpeedViolationVehicleInput input)
         {
             var query = @"
@@ -53,10 +63,11 @@ namespace Infrastructure.Repository
 							CASE WHEN (atvs.TotalKm is not null AND atvs.TotalKm > 1000) THEN spo.TotalSpeedVio * 1000/ atvs.TotalKm ELSE spo.TotalSpeedVio END RatioSpeedVio,
 							spo.TotalKmVio,
 							atvs.TotalKm,
-							TotalKmVio * 100/ NULLIF(atvs.TotalKm, 0) as RatioKmVio,
+							--TotalKmVio * 100/ NULLIF(atvs.TotalKm, 0) as RatioKmVio,
 							spo.TotalTimeVio,
 							atvs.TotalTime,
-							TotalTimeVio * 100/ NULLIF(atvs.TotalTime, 0)  as RatioTimeVio
+							--TotalTimeVio * 100/ NULLIF(atvs.TotalTime, 0)  as RatioTimeVio,
+							vhcInfo.VehiclePlate
 						FROM 
 							(
 							SELECT
@@ -69,15 +80,16 @@ namespace Infrastructure.Repository
 								SUM(DATEDIFF(minute, StartTime, EndTime)) TotalTimeVio,
 								FK_VehicleID
 							FROM [BGT.SpeedOvers] WITH(NOLOCK)
-							WHERE CreatedDate BETWEEN @FromDate AND @ToDate
+							WHERE CreatedDate BETWEEN @FromDate AND @ToDate 
+								  AND VelocityAllow + 5 <= VelocityGps
 							GROUP BY FK_VehicleID
 							) spo
 						INNER JOIN (
-							SELECT vhc.PK_VehicleID, vhc.FK_CompanyID, vhc.PrivateCode, tpType.DisplayName
+							SELECT vhc.PK_VehicleID, vhc.FK_CompanyID, vhc.PrivateCode, tpType.DisplayName, vhc.VehiclePlate
 							FROM [Vehicle.Vehicles] vhc WITH(NOLOCK)
 							INNER JOIN [BGT.VehicleTransportTypes] vhcType WITH(NOLOCK) ON vhc.PK_VehicleID = vhcType.FK_VehicleID
 							LEFT JOIN [BGT.TranportTypes] tpType WITH(NOLOCK) ON vhcType.FK_TransportTypeID = tpType.PK_TransportTypeID
-							WHERE vhc.IsDeleted = 0 AND  vhc.FK_CompanyID = 15076 
+							WHERE vhc.IsDeleted = 0 AND  vhc.FK_CompanyID = 15076
 								  AND ( @Count = 0 OR vhcType.FK_VehicleID in @ListVhcId)
 						) vhcInfo ON spo.FK_VehicleID = vhcInfo.PK_VehicleID
 						LEFT JOIN (
@@ -87,6 +99,7 @@ namespace Infrastructure.Repository
 								SUM(TotalKmGps) TotalKm,
 								SUM(ActivityTime) TotalTime
 							FROM [Report.ActivitySummaries] WITH(NOLOCK)
+							WHERE FK_Date BETWEEN @FromDate AND @ToDate
 							GROUP BY FK_VehicleID, FK_CompanyID
 						) atvs ON vhcInfo.PK_VehicleID = atvs.FK_VehicleID AND vhcInfo.FK_CompanyID = atvs.FK_CompanyID
 						";

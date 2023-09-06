@@ -11,10 +11,10 @@ using System.Text.Json;
 
 namespace WebApi.Controllers
 {
-        /// <summary>Các API cho chức năng quản lý người dùng</summary>
+        /// <summary>Các API cho chức năng báo cáo vi phạm tốc độ</summary>
         /// <Modified>
         /// Name        Date        Comments
-        /// minhpv    8/10/2023     created
+        /// minhpv    9/05/2023     created
         /// </Modified>
         [ApiController]
         [Route("[controller]")]
@@ -42,10 +42,10 @@ namespace WebApi.Controllers
         /// <returns>Thông báo, trạng thái, danh sách xe theo công ty</returns>
         /// <Modified>
         /// Name       Date       Comments
-        /// minhpv    8/10/2023   created
+        /// minhpv    9/05/2023     created
         /// </Modified>
         [HttpPost("list-vehicle")]
-        //[Authorize(Policy = Policies.UserView)]
+        [Authorize(Policy = Policies.UserView)]
         public async Task<IActionResult> GetVehicleByCompanyId(int input)
         {
             List<GetVehicleListDto> result = new List<GetVehicleListDto> ();
@@ -69,13 +69,13 @@ namespace WebApi.Controllers
         /// <returns>Thông báo, trạng thái, danh sách  xe vi phạm tốc độ</returns>
         /// <Modified>
         /// Name       Date       Comments
-        /// minhpv    8/10/2023   created
+        /// minhpv    9/05/2023     created
         /// </Modified>
         [HttpPost("speed-violation")]
-            //[Authorize(Policy = Policies.UserView)]
-            public async Task<IActionResult> GetSpeedViolationVehicleList(SpeedViolationVehicleInput input)
+        [Authorize(Policy = Policies.UserView)]
+        public async Task<IActionResult> GetSpeedViolationVehicleList(SpeedViolationVehicleInput input)
             {
-                var respon = new ResponDto<PagedResultDto>();
+                var respon = new ResponDto<PagedResultDto<GetAllSpeedViolationVehicleDto>>();
                 var inputToString = JsonSerializer.Serialize<SpeedViolationVehicleInput>(input);
 
                 if (input.Page == 0 || input.PageSize == 0)
@@ -93,10 +93,10 @@ namespace WebApi.Controllers
                     respon.StatusCode = 500;
                     respon.Message = ex.Message;
                     _logger.LogInformation($" {respon.Message} InputValue: {inputToString}");
-                    respon.Result = new PagedResultDto
+                    respon.Result = new PagedResultDto<GetAllSpeedViolationVehicleDto>
                     {
                         TotalCount = 0,
-                        Result = new List<GetAllUserDto>()
+                        Result = new List<GetAllSpeedViolationVehicleDto>()
                     };
                 }
                 return Ok(respon);

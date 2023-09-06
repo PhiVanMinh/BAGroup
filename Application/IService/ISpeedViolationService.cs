@@ -10,7 +10,7 @@ namespace Application.IService
 {
     public interface ISpeedViolationService
     {
-        public Task<PagedResultDto> GetAllSpeedViolationVehicle(SpeedViolationVehicleInput input);
+        public Task<PagedResultDto<GetAllSpeedViolationVehicleDto>> GetAllSpeedViolationVehicle(SpeedViolationVehicleInput input);
         public Task<List<GetVehicleListDto>> GetVehicleByCompanyId(int input);
     }
 }

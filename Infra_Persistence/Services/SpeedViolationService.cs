@@ -8,15 +8,14 @@ using CachingFramework.Redis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Infra_Persistence.Services
 {
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    9/6/2023   created
+    /// </Modified>
     public class SpeedViolationService : ISpeedViolationService
     {
         private readonly IConfiguration _configuration;
@@ -38,13 +37,27 @@ namespace Infra_Persistence.Services
             _cache = redis.GetDatabase();
         }
 
+        /// <summary>Lấy dánh sách các xe theo thông tin công ty</summary>
+        /// <param name="input">Mã công ty</param>
+        /// <returns>Danh sách các xe theo công ty</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/6/2023   created
+        /// </Modified>
         public async Task<List<GetVehicleListDto>> GetVehicleByCompanyId(int input)
         {
             var result = await _unitOfWork.SpeedViolationRepository.GetVehicleByCompanyId(input);
             return result;
         }
 
-        public async Task<PagedResultDto> GetAllSpeedViolationVehicle(SpeedViolationVehicleInput input)
+        /// <summary>Lấy danh sách các xe vi phạm tốc độ</summary>
+        /// <param name="input">Điều kiện lọc</param>
+        /// <returns>Danh sách xe vi phạm theo điều kiện lọc</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/6/2023   created
+        /// </Modified>
+        public async Task<PagedResultDto<GetAllSpeedViolationVehicleDto>> GetAllSpeedViolationVehicle(SpeedViolationVehicleInput input)
         {
             string cacheKey = $"{DateTime.Now.ToString("dd_MM_yyyy_hh")} {input.FromDate}_{input.ToDate}_{string.Join("_",input.ListVhcId)}";
 
@@ -62,7 +75,8 @@ namespace Infra_Persistence.Services
                 }
                 else
                 {
-                    var vhcList = await GetSpeedViolationVehicle(input);
+                    //input.ToDate = input.FromDate.Value.AddDays(60);
+                    var vhcList = await _unitOfWork.SpeedViolationRepository.GetAllSpeedViolationVehicle(input);
 
                     totalCount = vhcList.Count();
                     result = vhcList.Skip((input.Page - 1) * input.PageSize).Take(input.PageSize).ToList();
@@ -70,10 +84,10 @@ namespace Infra_Persistence.Services
                     _cache.KeyExpire(cacheKey, DateTime.Now.AddMinutes(5));
                 }
 
-                return new PagedResultDto
+                return new PagedResultDto<GetAllSpeedViolationVehicleDto>
                 {
                     TotalCount = totalCount,
-                    ListVehicle = result
+                    Result = result
                 };
 
             }
@@ -81,7 +95,7 @@ namespace Infra_Persistence.Services
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.Message);
-                var valueDefault = new PagedResultDto();
+                var valueDefault = new PagedResultDto<GetAllSpeedViolationVehicleDto>();
                 return valueDefault;
             }
         }
@@ -105,14 +119,6 @@ namespace Infra_Persistence.Services
                 Score = i++
             }));
             context.Dispose();
-        }
-
-
-        private async Task<List<GetAllSpeedViolationVehicleDto>> GetSpeedViolationVehicle(SpeedViolationVehicleInput input)
-        {
-            var result = await _unitOfWork.SpeedViolationRepository.GetAllSpeedViolationVehicle(input);
-            return result;
-
         }
     }
 }

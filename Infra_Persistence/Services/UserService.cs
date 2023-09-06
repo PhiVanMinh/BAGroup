@@ -93,7 +93,7 @@ namespace Infra_Persistence.Services
         /// Name       Date       Comments
         /// minhpv    8/10/2023   created
         /// </Modified>
-        public async Task<PagedResultDto> GetAll(GetAllUserInput input)
+        public async Task<PagedResultDto<GetAllUserDto>> GetAll(GetAllUserInput input)
         {
             string cacheKey = $"{DateTime.Now.ToString("dd_MM_yyyy_hh")} {input.Gender}_{input.FromDate}_{input.ToDate}_{input.UserName}_{input.FullName}_{input.Email}_{input.PhoneNumber}";
 
@@ -119,7 +119,7 @@ namespace Infra_Persistence.Services
                     _cache.KeyExpire(cacheKey, DateTime.Now.AddMinutes(5));
                 }
 
-                return new PagedResultDto
+                return new PagedResultDto<GetAllUserDto>
                 {
                     TotalCount = totalCount,
                     Result = result
@@ -130,7 +130,7 @@ namespace Infra_Persistence.Services
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.Message);
-                var valueDefault = new PagedResultDto();
+                var valueDefault = new PagedResultDto<GetAllUserDto>();
                 return valueDefault;
             }
 

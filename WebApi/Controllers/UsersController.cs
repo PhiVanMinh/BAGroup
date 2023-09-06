@@ -2,15 +2,11 @@
 using Application.Dto.Users;
 using Application.IService;
 using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
-using Domain.Master;
 using Infra_Persistence.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Text.Json;
 
 namespace WebApi.Controllers
@@ -52,7 +48,7 @@ namespace WebApi.Controllers
         [Authorize(Policy = Policies.UserView)]
         public async Task<IActionResult> GetAll(GetAllUserInput input)
         {
-            var respon = new ResponDto<PagedResultDto>();
+            var respon = new ResponDto<PagedResultDto<GetAllUserDto>>();
             var inputToString = JsonSerializer.Serialize<GetAllUserInput>(input);
 
             if (input.Page == 0 || input.PageSize == 0)
@@ -69,7 +65,7 @@ namespace WebApi.Controllers
                 respon.StatusCode = 500;
                 respon.Message = ex.Message;
                 _logger.LogInformation($" {respon.Message} InputValue: {inputToString}");
-                respon.Result = new PagedResultDto
+                respon.Result = new PagedResultDto<GetAllUserDto>
                 {
                     TotalCount = 0,
                     Result = new List<GetAllUserDto>()
