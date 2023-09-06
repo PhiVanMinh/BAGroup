@@ -46,8 +46,17 @@ namespace Infra_Persistence.Services
         /// </Modified>
         public async Task<List<GetVehicleListDto>> GetVehicleByCompanyId(int input)
         {
-            var result = await _unitOfWork.SpeedViolationRepository.GetVehicleByCompanyId(input);
-            return result;
+            try
+            {
+                var result = await _unitOfWork.SpeedViolationRepository.GetVehicleByCompanyId(input);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                var valueDefault = new List<GetVehicleListDto>();
+                return valueDefault;
+            }
         }
 
         /// <summary>Lấy danh sách các xe vi phạm tốc độ</summary>

@@ -27,5 +27,8 @@ namespace Application.Dto.SpeedViolation
 
         /// <summary>Kích thước trang</summary>
         public int PageSize { get; set; }
+
+        /// <summary>Mã công ty</summary>
+        public int CompanyId { get; set; }
     }
 }

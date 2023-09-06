@@ -37,7 +37,7 @@ namespace WebApi_Test
             //arrange
             var input = new GetAllUserInput();
 
-            var result = new PagedResultDto
+            var result = new PagedResultDto<GetAllUserDto>
             {
                 TotalCount = 1,
                 Result = new List<GetAllUserDto>{
@@ -55,9 +55,9 @@ namespace WebApi_Test
                 }
             };
 
-            var respon1 = new ResponDto<PagedResultDto>();
+            var respon1 = new ResponDto<PagedResultDto<GetAllUserDto>>();
 
-            var userList = new PagedResultDto();
+            var userList = new PagedResultDto<GetAllUserDto>();
                 userService.Setup(x => x.GetAll(input))
                 .Returns(Task.FromResult(result));
             var userController = new UsersController(userService.Object, _logger, _cache);
@@ -66,12 +66,12 @@ namespace WebApi_Test
             IActionResult response = await userController.GetAll(input);
 
             ObjectResult objectResponse = Assert.IsType<OkObjectResult>(response);
-            ResponDto<PagedResultDto>? userResult = objectResponse != null ? (ResponDto<PagedResultDto>?)objectResponse.Value : new ResponDto<PagedResultDto>();
+            ResponDto<PagedResultDto<GetAllUserDto>>? userResult = objectResponse != null ? (ResponDto<PagedResultDto<GetAllUserDto>>?)objectResponse.Value : new ResponDto<PagedResultDto<GetAllUserDto>>();
 
             //assert
             Assert.NotNull(userResult);
-            Assert.True(result.TotalCount.Equals((userResult ?? new ResponDto<PagedResultDto>()).Result.TotalCount));
-            Assert.True(result.Result.Equals((userResult ?? new ResponDto<PagedResultDto>()).Result.Result));
+            Assert.True(result.TotalCount.Equals((userResult ?? new ResponDto<PagedResultDto<GetAllUserDto>>()).Result.TotalCount));
+            Assert.True(result.Result.Equals((userResult ?? new ResponDto<PagedResultDto<GetAllUserDto>>()).Result.Result));
         }
 
     }

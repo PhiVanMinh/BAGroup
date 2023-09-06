@@ -24,5 +24,8 @@ namespace Application.Dto.Users
 
         /// <summary>Loại người dùng</summary>
         public byte? UserType { get; set; }
+
+        /// <summary>Mã công ty</summary>
+        public int? CompanyId { get; set; }
     }
 }

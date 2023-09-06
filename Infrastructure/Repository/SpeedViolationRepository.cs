@@ -2,6 +2,8 @@
 using Application.Interfaces;
 using Dapper;
 using Infrastructure.Contexts;
+using System.ComponentModel.Design;
+
 namespace Infrastructure.Repository
 {
     /// <Modified>
@@ -89,7 +91,7 @@ namespace Infrastructure.Repository
 							FROM [Vehicle.Vehicles] vhc WITH(NOLOCK)
 							INNER JOIN [BGT.VehicleTransportTypes] vhcType WITH(NOLOCK) ON vhc.PK_VehicleID = vhcType.FK_VehicleID
 							LEFT JOIN [BGT.TranportTypes] tpType WITH(NOLOCK) ON vhcType.FK_TransportTypeID = tpType.PK_TransportTypeID
-							WHERE vhc.IsDeleted = 0 AND  vhc.FK_CompanyID = 15076
+							WHERE vhc.IsDeleted = 0 AND  vhc.FK_CompanyID = @CompanyID
 								  AND ( @Count = 0 OR vhcType.FK_VehicleID in @ListVhcId)
 						) vhcInfo ON spo.FK_VehicleID = vhcInfo.PK_VehicleID
 						LEFT JOIN (
@@ -99,7 +101,7 @@ namespace Infrastructure.Repository
 								SUM(TotalKmGps) TotalKm,
 								SUM(ActivityTime) TotalTime
 							FROM [Report.ActivitySummaries] WITH(NOLOCK)
-							WHERE FK_Date BETWEEN @FromDate AND @ToDate
+							--WHERE FK_Date BETWEEN @FromDate AND @ToDate
 							GROUP BY FK_VehicleID, FK_CompanyID
 						) atvs ON vhcInfo.PK_VehicleID = atvs.FK_VehicleID AND vhcInfo.FK_CompanyID = atvs.FK_CompanyID
 						";
@@ -111,7 +113,8 @@ namespace Infrastructure.Repository
                     input.FromDate,
                     input.ToDate,
                     input.ListVhcId,
-					Count = input.ListVhcId.Count()
+					Count = input.ListVhcId.Count(),
+                    CompanyID = input.CompanyId
                 });
                 return result.ToList();
             }
