@@ -71,7 +71,6 @@ namespace Infra_Persistence.Services
         public async Task<PagedResultDto<GetAllSpeedViolationVehicleDto>> GetAllSpeedViolationVehicle(SpeedViolationVehicleInput input)
         {
             string cacheKey = $"{DateTime.Now.ToString("dd_MM_yyyy_hh")} {input.FromDate}_{input.ToDate}_{string.Join("_",input.ListVhcId)}";
-
             try
             {
                 List<GetAllSpeedViolationVehicleDto> result = new List<GetAllSpeedViolationVehicleDto>();
@@ -87,14 +86,13 @@ namespace Infra_Persistence.Services
                 else
                 {
                     //input.ToDate = input.FromDate.Value.AddDays(60);
-                    var vhcList = await GetSpeedViolationVehicle(input); //await _unitOfWork.SpeedViolationRepository.GetAllSpeedViolationVehicle(input);
+                    var vhcList = await GetSpeedViolationVehicle(input);
 
                     totalCount = vhcList.Count();
                     result = vhcList.Skip((input.Page - 1) * input.PageSize).Take(input.PageSize).ToList();
                     AddEnumerableToSortedSet(cacheKey, vhcList);
                     _cache.KeyExpire(cacheKey, DateTime.Now.AddMinutes(5));
                 }
-
                 return new PagedResultDto<GetAllSpeedViolationVehicleDto>
                 {
                     TotalCount = totalCount,
@@ -102,7 +100,6 @@ namespace Infra_Persistence.Services
                 };
 
             }
-
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.Message);
@@ -268,5 +265,44 @@ namespace Infra_Persistence.Services
                 return valueDefault;
             }
         }
+
+        /// <summary>Lấy dữ liệu để xuất excel</summary>
+        /// <param name="input">Điều kiện lọc</param>
+        /// <returns>Danh sách người dùng</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    8/17/2023   created
+        /// </Modified>
+        public async Task<List<GetAllSpeedViolationVehicleDto>> GetDataToExportExcel(SpeedViolationVehicleInput input)
+        {
+            try
+            {
+                string cacheKey = $"{DateTime.Now.ToString("dd_MM_yyyy_hh")} {input.FromDate}_{input.ToDate}_{string.Join("_", input.ListVhcId)}";
+                List<GetAllSpeedViolationVehicleDto> result = new List<GetAllSpeedViolationVehicleDto>();
+                var totalCount = 0;
+
+                var cachedData = _cache.KeyExists(cacheKey);
+                if (cachedData)
+                {
+                    totalCount = (int)_cache.SortedSetLength($"{cacheKey}");
+                    var redisData = _cache.SortedSetRangeByScore(cacheKey);
+                    result = redisData.Select(d => JsonSerializer.Deserialize<GetAllSpeedViolationVehicleDto>(d)).ToList();
+                }
+                else
+                {
+                    var resultQuery = await GetSpeedViolationVehicle(input);
+                    result = resultQuery.ToList();
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+                var valueDefault = new List<GetAllSpeedViolationVehicleDto>();
+                return valueDefault;
+            }
+        }
+
     }
 }
