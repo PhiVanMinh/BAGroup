@@ -24,6 +24,11 @@ namespace Infrastructure.Repository
         private IRoleRepository _roleRepository;
         private IUserRoleRepository _userRoleRepository;
         private ISpeedViolationRepository _speedViolationRepository;
+        private IVehicleTransportTypesRepository _vehicleTransportTypesRepository;
+        private ITranportTypesRepository _tranportTypesRepository;
+        private ISpeedOversRepository _speedOversRepository;
+        private IVehiclesRepository _vehiclesRepository;
+        private IActivitySummariesRepository _activitySummariesRepository;
 
 
         public UnitOfWork(
@@ -55,11 +60,35 @@ namespace Infrastructure.Repository
         {
             get { return _userRoleRepository = _userRoleRepository ?? new UserRoleRepository(_dbContext); }
         }
+
         public ISpeedViolationRepository SpeedViolationRepository
         {
             get { return _speedViolationRepository = _speedViolationRepository ?? new SpeedViolationRepository(_dapperContext); }
         }
 
+        public IVehicleTransportTypesRepository VehicleTransportTypesRepository
+        {
+            get { return _vehicleTransportTypesRepository = _vehicleTransportTypesRepository ?? new VehicleTransportTypesRepository(_dapperContext); }
+        }
+
+        public ITranportTypesRepository TranportTypesRepository
+        {
+            get { return _tranportTypesRepository = _tranportTypesRepository ?? new TranportTypesRepository(_dapperContext); }
+        }
+        public ISpeedOversRepository SpeedOversRepository
+        {
+            get { return _speedOversRepository = _speedOversRepository ?? new SpeedOversRepository(_dapperContext); }
+        }
+
+        public IVehiclesRepository VehiclesRepository
+        {
+            get { return _vehiclesRepository = _vehiclesRepository ?? new VehiclesRepository(_dapperContext); }
+        }
+
+        public IActivitySummariesRepository ActivitySummariesRepository
+        {
+            get { return _activitySummariesRepository = _activitySummariesRepository ?? new ActivitySummariesRepository(_dapperContext); }
+        }
 
         public void Save()
             => _dbContext.SaveChanges();

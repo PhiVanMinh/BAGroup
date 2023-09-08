@@ -82,7 +82,7 @@ namespace Infrastructure.Repository
 								SUM(DATEDIFF(minute, StartTime, EndTime)) TotalTimeVio,
 								FK_VehicleID
 							FROM [BGT.SpeedOvers] WITH(NOLOCK)
-							WHERE CreatedDate BETWEEN @FromDate AND @ToDate 
+							WHERE StartTime BETWEEN @FromDate AND @ToDate 
 								  AND VelocityAllow + 5 <= VelocityGps
 							GROUP BY FK_VehicleID
 							) spo
@@ -92,7 +92,7 @@ namespace Infrastructure.Repository
 							INNER JOIN [BGT.VehicleTransportTypes] vhcType WITH(NOLOCK) ON vhc.PK_VehicleID = vhcType.FK_VehicleID
 							LEFT JOIN [BGT.TranportTypes] tpType WITH(NOLOCK) ON vhcType.FK_TransportTypeID = tpType.PK_TransportTypeID
 							WHERE vhc.IsDeleted = 0 AND  vhc.FK_CompanyID = @CompanyID
-								  AND ( @Count = 0 OR vhcType.FK_VehicleID in @ListVhcId)
+								  AND ( @Count = 0 OR vhc.PK_VehicleID in @ListVhcId)
 						) vhcInfo ON spo.FK_VehicleID = vhcInfo.PK_VehicleID
 						LEFT JOIN (
 							SELECT
@@ -104,6 +104,7 @@ namespace Infrastructure.Repository
 							--WHERE FK_Date BETWEEN @FromDate AND @ToDate
 							GROUP BY FK_VehicleID, FK_CompanyID
 						) atvs ON vhcInfo.PK_VehicleID = atvs.FK_VehicleID AND vhcInfo.FK_CompanyID = atvs.FK_CompanyID
+						ORDER BY vhcInfo.PK_VehicleID
 						";
 
             using (var connection = _dapperContext.CreateConnection("ServerLab3"))
