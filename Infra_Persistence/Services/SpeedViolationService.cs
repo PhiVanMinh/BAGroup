@@ -11,9 +11,11 @@ using StackExchange.Redis;
 using System.Text.Json;
 using System.ComponentModel.Design;
 using Application.Model;
+using Infra_Persistence.Helper;
 
 namespace Infra_Persistence.Services
 {
+    /// <summary>Báo cáo vi phạm tốc độ</summary>
     /// <Modified>
     /// Name       Date       Comments
     /// minhpv    9/6/2023   created
@@ -21,6 +23,7 @@ namespace Infra_Persistence.Services
     public class SpeedViolationService : ISpeedViolationService
     {
         private readonly IConfiguration _configuration;
+        private readonly IRedisCacheHelper _cacheHelper;
         public IUnitOfWork _unitOfWork;
         private readonly ILogger<SpeedViolationService> _logger;
         private readonly IDatabase _cache;
@@ -28,13 +31,14 @@ namespace Infra_Persistence.Services
         public SpeedViolationService(
             IUnitOfWork unitOfWork,
             ILogger<SpeedViolationService> logger,
-            IConfiguration configuration
+            IConfiguration configuration,
+            IRedisCacheHelper cacheHelper
             )
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
             _configuration = configuration;
-
+            _cacheHelper = cacheHelper;
             var redis = ConnectionMultiplexer.Connect($"{_configuration["RedisCacheUrl"]},abortConnect=False");
             _cache = redis.GetDatabase();
         }
@@ -70,6 +74,7 @@ namespace Infra_Persistence.Services
         /// </Modified>
         public async Task<PagedResultDto<GetAllSpeedViolationVehicleDto>> GetAllSpeedViolationVehicle(SpeedViolationVehicleInput input)
         {
+            var valueReport = new PagedResultDto<GetAllSpeedViolationVehicleDto>();
             string cacheKey = $"{DateTime.Now.ToString("dd_MM_yyyy_hh")} {input.FromDate}_{input.ToDate}_{string.Join("_",input.ListVhcId)}";
             try
             {
@@ -81,7 +86,7 @@ namespace Infra_Persistence.Services
                 {
                     totalCount = (int)_cache.SortedSetLength($"{cacheKey}");
                     var redisData = _cache.SortedSetRangeByScore(cacheKey, (input.Page - 1) * input.PageSize, (input.Page) * input.PageSize - (input.Page == 1 ? 0 : 1));
-                    result = redisData.Select(d => JsonSerializer.Deserialize<GetAllSpeedViolationVehicleDto>(d)).ToList();
+                    result = redisData.Select(d => JsonSerializer.Deserialize<GetAllSpeedViolationVehicleDto>(d) ?? new GetAllSpeedViolationVehicleDto()).ToList();
                 }
                 else
                 {
@@ -90,43 +95,18 @@ namespace Infra_Persistence.Services
 
                     totalCount = vhcList.Count();
                     result = vhcList.Skip((input.Page - 1) * input.PageSize).Take(input.PageSize).ToList();
-                    AddEnumerableToSortedSet(cacheKey, vhcList);
+                    _cacheHelper.AddEnumerableToSortedSet(cacheKey, vhcList);
                     _cache.KeyExpire(cacheKey, DateTime.Now.AddMinutes(5));
                 }
-                return new PagedResultDto<GetAllSpeedViolationVehicleDto>
-                {
-                    TotalCount = totalCount,
-                    Result = result
-                };
-
+                valueReport.TotalCount = totalCount;
+                valueReport.Result = result;
             }
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.Message);
-                var valueDefault = new PagedResultDto<GetAllSpeedViolationVehicleDto>();
-                return valueDefault;
             }
-        }
+            return valueReport;
 
-        /// <summary>Thêm dữ liệu và redis cache</summary>
-        /// <typeparam name="T">Kiểu dữ liệu</typeparam>
-        /// <param name="key">Key cache để sau tìm kiếm</param>
-        /// <param name="data">Danh sách dữ liệu cần lưu redis</param>
-        /// <Modified>
-        /// Name       Date       Comments
-        /// minhpv    8/22/2023   created
-        /// </Modified>
-        public void AddEnumerableToSortedSet<T>(string key, IEnumerable<T> data)
-        {
-            int i = 1;
-            var context = new RedisContext(_configuration["RedisCacheUrl"]);
-            IRedisSortedSet<T> sortedSet = context.Collections.GetRedisSortedSet<T>(key);
-            sortedSet.AddRange(data.Select((m) => new SortedMember<T>(i, m)
-            {
-                Value = m,
-                Score = i++
-            }));
-            context.Dispose();
         }
 
         /// <summary>Lấy thông tin vi phạm của các xe</summary>
@@ -138,38 +118,42 @@ namespace Infra_Persistence.Services
         /// </Modified>
         private async Task<List<GetAllSpeedViolationVehicleDto>> GetSpeedViolationVehicle(SpeedViolationVehicleInput input)
         {
-            var vehicleInfo = await GetVehicleInfomation(input);
-            var activityGroup = await GetActivitySummaries(input);
-            var speedGroup = await GetSpeedOvers(input);
+            var result = new List<GetAllSpeedViolationVehicleDto>();
+            try
+            {
+                var vehicleInfo = await GetVehicleInfomation(input);
+                var activityGroup = await GetActivitySummaries(input);
+                var speedGroup = await GetSpeedOvers(input);
 
-            var test = from speed in speedGroup
-                       join vhc in vehicleInfo on speed.VehicleID equals vhc.VehicleID
-                       select speed;
+                result =  ( from speed in speedGroup
+                            join vhc in vehicleInfo on speed.VehicleID equals vhc.VehicleID
+                            join atv in activityGroup on vhc.VehicleID equals atv.VehicleID into activityGroupJoin
+                            from atv in activityGroupJoin.DefaultIfEmpty()
+                            orderby speed.VehicleID
+                            select new GetAllSpeedViolationVehicleDto
+                            {
+                                VehicleID = vhc.VehicleID,
+                                VehiclePlate = vhc.VehiclePlate,
+                                PrivateCode = vhc.PrivateCode,
+                                TransportType = vhc.TransportType,
+                                SpeedVioLevel1 = speed.SpeedVioLevel1,
+                                SpeedVioLevel2 = speed.SpeedVioLevel2,
+                                SpeedVioLevel3 = speed.SpeedVioLevel3,
+                                SpeedVioLevel4 = speed.SpeedVioLevel4,
+                                TotalSpeedVio = speed.TotalSpeedVio,
+                                RatioSpeedVio = (atv?.TotalKm != null && atv.TotalKm > 1000) ? (speed.TotalSpeedVio * 1000 / atv.TotalKm) : speed.TotalSpeedVio,
+                                TotalKmVio = speed.TotalKmVio,
+                                TotalKm = atv?.TotalKm,
+                                TotalTimeVio = speed.TotalTimeVio,
+                                TotalTime = atv?.TotalTime
+                            }).ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"GetSpeedViolationVehicle_{ex.Message}_{input.FromDate}_{input.ToDate}_{string.Join("_", input.ListVhcId)}");
+            }
+            return result;
 
-            var abc = test.Count();
-
-            var speedVioVehicles = from speed in speedGroup
-                                   join vhc in vehicleInfo on speed.VehicleID equals vhc.VehicleID
-                                   join atv in activityGroup on vhc.VehicleID equals atv.VehicleID into activityGroupJoin from atv in activityGroupJoin.DefaultIfEmpty()
-                                   orderby speed.VehicleID
-                                   select new GetAllSpeedViolationVehicleDto
-                                   {
-                                     VehicleID = vhc.VehicleID,
-                                     VehiclePlate = vhc.VehiclePlate,
-                                     PrivateCode = vhc.PrivateCode,
-                                     TransportType = vhc.TransportType,
-                                     SpeedVioLevel1 = speed.SpeedVioLevel1,
-                                     SpeedVioLevel2 = speed.SpeedVioLevel2,
-                                     SpeedVioLevel3 = speed.SpeedVioLevel3,
-                                     SpeedVioLevel4 = speed.SpeedVioLevel4,
-                                     TotalSpeedVio = speed.TotalSpeedVio,
-                                     RatioSpeedVio = (atv?.TotalKm != null && atv.TotalKm > 1000) ? (speed.TotalSpeedVio * 1000 / atv.TotalKm) : speed.TotalSpeedVio,
-                                     TotalKmVio = speed.TotalKmVio,
-                                     TotalKm = atv?.TotalKm,
-                                     TotalTimeVio = speed.TotalTimeVio,
-                                     TotalTime =  atv?.TotalTime
-                                   };
-            return speedVioVehicles.ToList();
         }
 
         /// <summary>Lấy thông tin các xe</summary>
@@ -181,32 +165,31 @@ namespace Infra_Persistence.Services
         /// </Modified>
         private async Task<IEnumerable<GetVehicleInfomationDto>> GetVehicleInfomation(SpeedViolationVehicleInput input)
         {
+            var result = new List<GetVehicleInfomationDto>();
             try
             {
                 var tranportTypes = await _unitOfWork.TranportTypesRepository.GetAll();
                 var vehicleTransportTypes = await _unitOfWork.VehicleTransportTypesRepository.GetAll();
-                var vehicles = await _unitOfWork.VehiclesRepository.GetAllByCompany(input);
+                var vehicles = await _unitOfWork.VehiclesRepository.GetAllByCompany(input.CompanyId);
 
-                IEnumerable<GetVehicleInfomationDto> result = from vhc in vehicles
-                                                              join vhcType in vehicleTransportTypes on vhc.PK_VehicleID equals vhcType.FK_VehicleID
-                                                              join type in tranportTypes on vhcType.FK_TransportTypeID equals type.PK_TransportTypeID
-                                                              where (input.ListVhcId.Count() == 0 || input.ListVhcId.Contains(vhc.PK_VehicleID))
-                                                              select new GetVehicleInfomationDto
-                                                              {
-                                                                  VehicleID = vhc.PK_VehicleID,
-                                                                  CompanyID = vhc.FK_CompanyID,
-                                                                  PrivateCode = vhc.PrivateCode,
-                                                                  TransportType = type.DisplayName,
-                                                                  VehiclePlate = vhc.VehiclePlate
-                                                              };
-                return result;
+                result = ( from vhc in vehicles
+                           join vhcType in vehicleTransportTypes on vhc.PK_VehicleID equals vhcType.FK_VehicleID
+                           join type in tranportTypes on vhcType.FK_TransportTypeID equals type.PK_TransportTypeID
+                           where (input.ListVhcId.Count() == 0 || input.ListVhcId.Contains(vhc.PK_VehicleID))
+                           select new GetVehicleInfomationDto
+                           {
+                                VehicleID = vhc.PK_VehicleID,
+                                CompanyID = vhc.FK_CompanyID,
+                                PrivateCode = vhc.PrivateCode,
+                                TransportType = type.DisplayName,
+                                VehiclePlate = vhc.VehiclePlate
+                           }).ToList();
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex.Message);
-                var valueDefault = new List<GetVehicleInfomationDto>();
-                return valueDefault;
+                _logger.LogInformation($"GetVehicleInfomation_{ex.Message}_{input.FromDate}_{input.ToDate}_{string.Join("_", input.ListVhcId)}");
             }
+            return result;
         }
 
         /// <summary>Lấy thông tin tổng hợp hoạt động của các xe</summary>
@@ -218,33 +201,34 @@ namespace Infra_Persistence.Services
         /// </Modified>
         private async Task<IEnumerable<GetActivitySummariesDto>> GetActivitySummaries(SpeedViolationVehicleInput input)
         {
+            var result = new List<GetActivitySummariesDto>();
             try
             {
-                var activitySummaries = await _unitOfWork.ActivitySummariesRepository.GetAll(input);
-                var result = activitySummaries.GroupBy(e => new { e.FK_VehicleID, e.FK_CompanyID })
+                var activitySummaries = await _unitOfWork.ActivitySummariesRepository.GetAllByCompany(input.CompanyId);
+                 result = activitySummaries.GroupBy(e => new { e.FK_VehicleID, e.FK_CompanyID })
                             .Select(e => new GetActivitySummariesDto
                             {
                                 CompanyId = e.Key.FK_CompanyID,
                                 VehicleID = e.Key.FK_VehicleID,
                                 TotalKm = e.Sum(a => a.TotalKmGps),
                                 TotalTime = e.Sum(a => a.ActivityTime)
-                            });
-                return result;
+                            }).ToList();
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex.Message);
-                var valueDefault = new List<GetActivitySummariesDto>();
-                return valueDefault;
+                _logger.LogInformation($"GetActivitySummaries_{ex.Message}_{input.FromDate}_{input.ToDate}_{string.Join("_", input.ListVhcId)}");
             }
-}
+            return result;
+
+        }
 
         private async Task<IEnumerable<GetSpeedOversDto>> GetSpeedOvers(SpeedViolationVehicleInput input)
         {
+            var result = new List<GetSpeedOversDto>();
             try 
             { 
-            var speedOvers = await _unitOfWork.SpeedOversRepository.GetAllByDate(input);
-            var result = speedOvers.Where(e => e.VelocityAllow + 5 <= e.VelocityGps).GroupBy(e => e.FK_VehicleID)
+            var speedOvers = await _unitOfWork.SpeedOversRepository.GetAllByDate(input.FromDate, input.ToDate);
+            result = speedOvers.Where(e => e.VelocityAllow + 5 <= e.VelocityGps).GroupBy(e => e.FK_VehicleID)
                         .Select(e => new GetSpeedOversDto
                         {
                            VehicleID = e.Key,
@@ -255,15 +239,14 @@ namespace Infra_Persistence.Services
                            TotalSpeedVio = e.Count(),
                            TotalKmVio = e.Sum(s => s.EndKm - s.StartKm),
                            TotalTimeVio = (int)Math.Round(e.Sum(s => (s.EndTime != null && s.StartTime != null) ? (s.EndTime - s.StartTime).Value.TotalMinutes : 0), 2)
-                        });
-            return result;
+                        }).ToList();
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex.Message);
-                var valueDefault = new List<GetSpeedOversDto>();
-                return valueDefault;
+                _logger.LogInformation($"GetSpeedOvers_{ex.Message}_{input.FromDate}_{input.ToDate}_{string.Join("_", input.ListVhcId)}");
             }
+            return result;
+
         }
 
         /// <summary>Lấy dữ liệu để xuất excel</summary>
@@ -286,7 +269,7 @@ namespace Infra_Persistence.Services
                 {
                     totalCount = (int)_cache.SortedSetLength($"{cacheKey}");
                     var redisData = _cache.SortedSetRangeByScore(cacheKey);
-                    result = redisData.Select(d => JsonSerializer.Deserialize<GetAllSpeedViolationVehicleDto>(d)).ToList();
+                    result = redisData.Select(d => JsonSerializer.Deserialize<GetAllSpeedViolationVehicleDto>(d) ?? new GetAllSpeedViolationVehicleDto()).ToList();
                 }
                 else
                 {

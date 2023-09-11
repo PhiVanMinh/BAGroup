@@ -31,7 +31,7 @@ namespace Infrastructure.Repository
         //    }
         //}
 
-        public async Task<IEnumerable<SpeedOvers>> GetAllByDate(SpeedViolationVehicleInput input)
+        public async Task<IEnumerable<SpeedOvers>> GetAllByDate(DateTime? fromDate, DateTime? toDate)
         {
             using (var connection = _dapperContext.CreateConnection("ServerLab3"))
             {
@@ -39,8 +39,8 @@ namespace Infrastructure.Repository
                               WHERE StartTime BETWEEN @FromDate AND @ToDate";
                 var result = await connection.QueryAsync<SpeedOvers>(query, new
                 {
-                    input.FromDate,
-                    input.ToDate,
+                   FromDate = fromDate,
+                   ToDate = toDate,
                 });
                 return result;
             }

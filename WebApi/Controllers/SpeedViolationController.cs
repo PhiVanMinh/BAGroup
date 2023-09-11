@@ -113,7 +113,7 @@ namespace WebApi.Controllers
         /// <returns>File excel</returns>
         /// <Modified>
         /// Name       Date       Comments
-        /// minhpv    8/17/2023   created
+        /// minhpv    9/08/2023   created
         /// </Modified>
         [HttpPost("report_speed_violation")]
         public async Task<ActionResult> ExportToExcel(SpeedViolationVehicleInput input)
@@ -121,14 +121,12 @@ namespace WebApi.Controllers
             try
             {
                 var xmlFile = Path.Combine(Environment.CurrentDirectory, @"ReportFile\report_speed_violation.xlsx");
-                //string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"report_speed_violation.xlsx");
                 using (var workBook = new XLWorkbook(xmlFile))
                 {
-                    var fileName = $"List_User_{DateTime.Now.ToString("dd_MM_yyyy_hh_mm_ss")}";
+                    var fileName = $"Speed_Violation_Report_{DateTime.Now.ToString("dd_MM_yyyy_hh_mm_ss")}";
 
-                    var users = await _speedViolation.GetDataToExportExcel(input);
+                    var data = await _speedViolation.GetDataToExportExcel(input);
 
-                    //var dataTable = GetTable("Users", users);
 
                     var workSheet = workBook.Worksheet(1);
                     var firstRowUsed = workSheet.FirstRowUsed();
@@ -137,10 +135,10 @@ namespace WebApi.Controllers
 
                     IXLCell cellForNewData = workSheet.Cell(workSheet.LastRowUsed().RowNumber() + 1, 1);
 
-                    var dt = ConvertListToDataTable(users);
+                    var dt = ConvertListToDataTable(data);
                     cellForNewData.InsertData(dt.Rows);
 
-                    workSheet.Range($"A1:G{users.Count() + 1}").Style
+                    workSheet.Range($"A1:P{data.Count() + 2}").Style
                     .Border.SetTopBorder(XLBorderStyleValues.Thin)
                     .Border.SetRightBorder(XLBorderStyleValues.Thin)
                     .Border.SetBottomBorder(XLBorderStyleValues.Thin)
@@ -166,14 +164,13 @@ namespace WebApi.Controllers
         }
 
         /// <summary>Insert data to table</summary>
-        /// <param name="tableName">Name of the table.</param>
-        /// <param name="userList">The user list.</param>
+        /// <param name="data"> Dữ liệu cần xuất excel</param>
         /// <returns>DataTable</returns>
         /// <Modified>
         /// Name       Date       Comments
-        /// minhpv    8/31/2023   created
+        /// minhpv    09/08/2023   created
         /// </Modified>
-        private static DataTable ConvertListToDataTable(List<GetAllSpeedViolationVehicleDto> userList)
+        private static DataTable ConvertListToDataTable(List<GetAllSpeedViolationVehicleDto> data)
         {
             var table = new DataTable("SpeedViolation");
             table.TableName = "SpeedViolation";
@@ -189,17 +186,36 @@ namespace WebApi.Controllers
             table.Columns.Add("RatioSpeedVio", typeof(float));
             table.Columns.Add("TotalKmVio", typeof(float));
             table.Columns.Add("TotalKm", typeof(string));
+            table.Columns.Add("RatioKmVio", typeof(float));
             table.Columns.Add("TotalTimeVio", typeof(string));
             table.Columns.Add("TotalTime", typeof(string));
+            table.Columns.Add("RatioTimeVio", typeof(float));
 
             var count = 1;
-            foreach (var user in userList)
+            foreach (var vehicle in data)
             {
-                table.Rows.Add(count, user.VehiclePlate, user.PrivateCode, user.TransportType, user.SpeedVioLevel1, user.SpeedVioLevel2,
-                    user.SpeedVioLevel3, user.SpeedVioLevel4, user.TotalSpeedVio, user.RatioSpeedVio, user.TotalKmVio, user.TotalKm, user.TotalTimeVio, user.TotalTime);
+                table.Rows.Add(count, vehicle.VehiclePlate, vehicle.PrivateCode, vehicle.TransportType, vehicle.SpeedVioLevel1, vehicle.SpeedVioLevel2,
+                    vehicle.SpeedVioLevel3, vehicle.SpeedVioLevel4, vehicle.TotalSpeedVio, vehicle.RatioSpeedVio, Math.Round((decimal)(vehicle.TotalKmVio ?? 0),2), Math.Round((decimal)(vehicle.TotalKm ?? 0), 2),
+                    vehicle.TotalKm != null ? Math.Round(((decimal)(vehicle.TotalKmVio ?? 0) * 100 / (decimal)vehicle.TotalKm), 2) : 0,
+                    formatMinuteToHourMinute(vehicle.TotalTimeVio ?? 0), formatMinuteToHourMinute(vehicle.TotalTime ?? 0),
+                    vehicle.TotalTime != null ? Math.Round((decimal)((decimal)(vehicle.TotalTimeVio ?? 0) * 100 / vehicle.TotalTime), 2) : 0);
                 count++;
             }
             return table;
+        }
+
+        /// <summary>Định dạng giá trị phút về hh:mm </summary>
+        /// <param name="input">tổng số phút</param>
+        /// <returns>Định dạng hh:mm </returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    09/11/2023   created
+        /// </Modified>
+        private static string formatMinuteToHourMinute(int input)
+        {
+            var hour = (input - (input % 60)) / 60;
+            var minute = input % 60;
+            return $"{(hour < 10 ? 0 : "")}{hour}:{(minute < 10 ? 0 : "")}{minute}";
         }
         #endregion
     }

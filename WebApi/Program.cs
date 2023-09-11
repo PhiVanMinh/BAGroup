@@ -10,6 +10,7 @@ using Serilog;
 using Infra_Persistence.Services;
 using Infra_Persistence.Authorization;
 using Infrastructure.Contexts;
+using Infra_Persistence.Helper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +37,8 @@ builder.Services.AddAutoMapper(typeof(CustomMapper));
 builder.Services.AddTransient(typeof(IUserService), typeof(UserService));
 builder.Services.AddTransient(typeof(IAuthService), typeof(AuthService));
 builder.Services.AddTransient(typeof(ISpeedViolationService), typeof(SpeedViolationService));
+
+builder.Services.AddTransient(typeof(IRedisCacheHelper), typeof(RedisCacheHelper));
 
 builder.Services.AddCors();
 

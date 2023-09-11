@@ -10,6 +10,6 @@ namespace Application.Interfaces
 {
     public interface IActivitySummariesRepository
     {
-        Task<IEnumerable<ActivitySummaries>> GetAll(SpeedViolationVehicleInput input);
+        Task<IEnumerable<ActivitySummaries>> GetAllByCompany(int input);
     }
 }

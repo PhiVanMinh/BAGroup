@@ -10,6 +10,6 @@ namespace Application.Interfaces
 {
     public interface IVehiclesRepository
     {
-        Task<IEnumerable<Vehicles>> GetAllByCompany(SpeedViolationVehicleInput input);
+        Task<IEnumerable<Vehicles>> GetAllByCompany(int input);
     }
 }

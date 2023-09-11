@@ -15,7 +15,7 @@ namespace Infrastructure.Repository
         {
             _dapperContext = dapperContext;
         }
-        public async Task<IEnumerable<ActivitySummaries>> GetAll(SpeedViolationVehicleInput input)
+        public async Task<IEnumerable<ActivitySummaries>> GetAllByCompany(int input)
         {
             using (var connection = _dapperContext.CreateConnection("ServerLab3"))
             {
@@ -23,7 +23,7 @@ namespace Infrastructure.Repository
                               WHERE FK_CompanyID = @CompanyID";
                 var result = await connection.QueryAsync<ActivitySummaries>(query, new
                 {
-                    CompanyID = input.CompanyId
+                    CompanyID = input
                 });
                 return result;
             }

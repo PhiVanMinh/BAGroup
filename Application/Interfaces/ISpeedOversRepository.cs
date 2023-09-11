@@ -11,6 +11,6 @@ namespace Application.Interfaces
     public interface ISpeedOversRepository
     {
         //Task<IEnumerable<SpeedOvers>> GetAll(SpeedViolationVehicleInput input);
-        Task<IEnumerable<SpeedOvers>> GetAllByDate(SpeedViolationVehicleInput input);
+        Task<IEnumerable<SpeedOvers>> GetAllByDate(DateTime? fromDate, DateTime? toDate);
     }
 }
