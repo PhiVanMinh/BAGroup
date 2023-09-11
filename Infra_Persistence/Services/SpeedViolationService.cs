@@ -24,17 +24,32 @@ namespace Infra_Persistence.Services
     {
         private readonly IConfiguration _configuration;
         private readonly IRedisCacheHelper _cacheHelper;
+        private readonly ITransportTypesService _transportType;
+        private readonly IActivitySummariesService _atvSum;
+        private readonly IVehicleTransportTypesService _vhcTransportType;
+        private readonly IVehiclesService _vehicle;
+        private readonly ISpeedOversService _speedOver;
         public IUnitOfWork _unitOfWork;
         private readonly ILogger<SpeedViolationService> _logger;
         private readonly IDatabase _cache;
 
         public SpeedViolationService(
+            ITransportTypesService transportType,
+            IActivitySummariesService atvSum,
+            IVehicleTransportTypesService vhcTransportType,
+            IVehiclesService vehicle,
+            ISpeedOversService speedOver,
             IUnitOfWork unitOfWork,
             ILogger<SpeedViolationService> logger,
             IConfiguration configuration,
             IRedisCacheHelper cacheHelper
             )
         {
+            _transportType = transportType;
+            _atvSum = atvSum;
+            _vhcTransportType = vhcTransportType;
+            _vehicle = vehicle;
+            _speedOver = speedOver;
             _unitOfWork = unitOfWork;
             _logger = logger;
             _configuration = configuration;
@@ -168,9 +183,9 @@ namespace Infra_Persistence.Services
             var result = new List<GetVehicleInfomationDto>();
             try
             {
-                var tranportTypes = await _unitOfWork.TranportTypesRepository.GetAll();
-                var vehicleTransportTypes = await _unitOfWork.VehicleTransportTypesRepository.GetAll();
-                var vehicles = await _unitOfWork.VehiclesRepository.GetAllByCompany(input.CompanyId);
+                var tranportTypes = await _transportType.GetAll();
+                var vehicleTransportTypes = await _vhcTransportType.GetAll();
+                var vehicles = await _vehicle.GetAllByCompany(input.CompanyId);
 
                 result = ( from vhc in vehicles
                            join vhcType in vehicleTransportTypes on vhc.PK_VehicleID equals vhcType.FK_VehicleID
@@ -204,7 +219,7 @@ namespace Infra_Persistence.Services
             var result = new List<GetActivitySummariesDto>();
             try
             {
-                var activitySummaries = await _unitOfWork.ActivitySummariesRepository.GetAllByCompany(input.CompanyId);
+                var activitySummaries = await _atvSum.GetAllByCompany(input.CompanyId);
                  result = activitySummaries.GroupBy(e => new { e.FK_VehicleID, e.FK_CompanyID })
                             .Select(e => new GetActivitySummariesDto
                             {
@@ -227,7 +242,7 @@ namespace Infra_Persistence.Services
             var result = new List<GetSpeedOversDto>();
             try 
             { 
-            var speedOvers = await _unitOfWork.SpeedOversRepository.GetAllByDate(input.FromDate, input.ToDate);
+            var speedOvers = await _speedOver.GetAllSpeedOversByDate(input.FromDate, input.ToDate);
             result = speedOvers.Where(e => e.VelocityAllow + 5 <= e.VelocityGps).GroupBy(e => e.FK_VehicleID)
                         .Select(e => new GetSpeedOversDto
                         {

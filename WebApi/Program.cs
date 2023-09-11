@@ -40,6 +40,12 @@ builder.Services.AddTransient(typeof(ISpeedViolationService), typeof(SpeedViolat
 
 builder.Services.AddTransient(typeof(IRedisCacheHelper), typeof(RedisCacheHelper));
 
+builder.Services.AddTransient(typeof(ITransportTypesService), typeof(TransportTypesService));
+builder.Services.AddTransient(typeof(IActivitySummariesService), typeof(ActivitySummariesService));
+builder.Services.AddTransient(typeof(IVehicleTransportTypesService), typeof(VehicleTransportTypesService));
+builder.Services.AddTransient(typeof(IVehiclesService), typeof(VehiclesService));
+builder.Services.AddTransient(typeof(ISpeedOversService), typeof(SpeedOversService));
+
 builder.Services.AddCors();
 
 // Dependency Injection

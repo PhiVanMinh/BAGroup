@@ -163,7 +163,7 @@ namespace WebApi.Controllers
             }
         }
 
-        /// <summary>Insert data to table</summary>
+        /// <summary>Thêm dữ liệu cho bảng</summary>
         /// <param name="data"> Dữ liệu cần xuất excel</param>
         /// <returns>DataTable</returns>
         /// <Modified>

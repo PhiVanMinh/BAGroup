@@ -7,6 +7,11 @@ using Infrastructure.Contexts;
 
 namespace Infrastructure.Repository
 {
+    /// <summary>Lây thông tin tổng hợp</summary>
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    9/11/2023   created
+    /// </Modified>
     public class ActivitySummariesRepository : IActivitySummariesRepository 
     {
         private readonly DapperContext _dapperContext;
@@ -15,6 +20,14 @@ namespace Infrastructure.Repository
         {
             _dapperContext = dapperContext;
         }
+
+        /// <summary>Lấy thông tin tổng hợp theo đơn vị vẫn tải</summary>
+        /// <param name="input">Mã đơn vị vận tải</param>
+        /// <returns>Thông tin tổng hợp</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/11/2023   created
+        /// </Modified>
         public async Task<IEnumerable<ActivitySummaries>> GetAllByCompany(int input)
         {
             using (var connection = _dapperContext.CreateConnection("ServerLab3"))
