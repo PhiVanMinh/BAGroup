@@ -23,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infra_Persistence", "..\Inf
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{BB2A78AE-8F2A-4616-92A6-9916FCACCDB6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi_Test", "..\WebApi_Test\WebApi_Test.csproj", "{3294DB29-F146-4B92-A14C-A78D61C4F72B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi_Test", "..\WebApi_Test\WebApi_Test.csproj", "{3294DB29-F146-4B92-A14C-A78D61C4F72B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VehicleInformation", "..\VehicleInformation\VehicleInformation.csproj", "{05DE9927-5A25-473E-9BD4-3B143E4FA0A1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,6 +61,10 @@ Global
 		{3294DB29-F146-4B92-A14C-A78D61C4F72B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3294DB29-F146-4B92-A14C-A78D61C4F72B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3294DB29-F146-4B92-A14C-A78D61C4F72B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05DE9927-5A25-473E-9BD4-3B143E4FA0A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05DE9927-5A25-473E-9BD4-3B143E4FA0A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05DE9927-5A25-473E-9BD4-3B143E4FA0A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05DE9927-5A25-473E-9BD4-3B143E4FA0A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
