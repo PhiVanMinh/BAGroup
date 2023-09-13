@@ -11,6 +11,11 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Repository
 {
+    /// <summary>Thông tin xe</summary>
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    9/11/2023   created
+    /// </Modified>
     public class VehiclesRepository : IVehiclesRepository
     {
         private readonly DapperContext _dapperContext;
@@ -19,6 +24,14 @@ namespace Infrastructure.Repository
         {
             _dapperContext = dapperContext;
         }
+
+        /// <summary>Lấy thông tin xe theo đơn vị vận tải</summary>
+        /// <param name="input">Mã đơn vị vận tải</param>
+        /// <returns>Thông tin các xe</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/11/2023   created
+        /// </Modified>
         public async Task<IEnumerable<Vehicles>> GetAllByCompany(int input)
         {
             using (var connection = _dapperContext.CreateConnection("ServerLab3"))

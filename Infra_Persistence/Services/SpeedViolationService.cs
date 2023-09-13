@@ -237,6 +237,13 @@ namespace Infra_Persistence.Services
 
         }
 
+        /// <summary>Thông tin quá tốc độ</summary>
+        /// <param name="input">Điều kiện lọc</param>
+        /// <returns>Thông tin quá tốc độ của phương tiện</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/13/2023   created
+        /// </Modified>
         private async Task<IEnumerable<GetSpeedOversDto>> GetSpeedOvers(SpeedViolationVehicleInput input)
         {
             var result = new List<GetSpeedOversDto>();

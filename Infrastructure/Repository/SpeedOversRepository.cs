@@ -12,6 +12,11 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Repository
 {
+    /// <summary>Thông tin vi phạm tốc độ</summary>
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    9/11/2023   created
+    /// </Modified>
     public class SpeedOversRepository : ISpeedOversRepository
     {
         private readonly DapperContext _dapperContext;
@@ -21,16 +26,14 @@ namespace Infrastructure.Repository
             _dapperContext = dapperContext;
         }
 
-        //public Task<IEnumerable<SpeedOvers>> GetAll(SpeedViolationVehicleInput input)
-        //{
-        //    using (var connection = _dapperContext.CreateConnection("ServerLab3"))
-        //    {
-        //        var query = @"SELECT * FROM [BGT.SpeedOvers] WITH(NOLOCK)";
-        //        var result = connection.QueryAsync<SpeedOvers>(query);
-        //        return result;
-        //    }
-        //}
-
+        /// <summary>Thông tin vi phạm tốc độ theo ngày</summary>
+        /// <param name="fromDate">Từ ngày</param>
+        /// <param name="toDate">Đến ngày</param>
+        /// <returns>Các thông tin vi phạm</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/11/2023   created
+        /// </Modified>
         public async Task<IEnumerable<SpeedOvers>> GetAllByDate(DateTime? fromDate, DateTime? toDate)
         {
             using (var connection = _dapperContext.CreateConnection("ServerLab3"))
