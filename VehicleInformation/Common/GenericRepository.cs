@@ -1,7 +1,5 @@
-﻿using Application.Common.Interfaces;
-using Dapper;
-using Infrastructure.Contexts;
-using Microsoft.Data.SqlClient;
+﻿using Dapper;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -11,20 +9,26 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using VehicleInformation.Common.Interfaces;
+using VehicleInformation.DbContext;
+using VehicleInformation.Services;
 
-namespace Infrastructure.Common
+namespace VehicleInformation.Common
 {
-    public class DapperGenericRepository<T> : IDapperGenericRepository<T> where T : class
+    public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         IDbConnection _connection;
 
         private readonly DapperContext _dapperContext;
+        private readonly ILogger<GenericRepository<T>> _logger;
 
-        public DapperGenericRepository(
-                DapperContext dapperContext
+        public GenericRepository(
+                DapperContext dapperContext,
+                ILogger<GenericRepository<T>> logger
             )
         {
             _dapperContext = dapperContext;
+            _logger = logger;
             _connection = _dapperContext.CreateConnection("ServerLab3");
         }
 
@@ -37,11 +41,14 @@ namespace Infrastructure.Common
                 string tableName = GetTableName();
                 string columns = GetColumns(excludeKey: true);
                 string properties = GetPropertyNames(excludeKey: true);
-                string query = $"INSERT INTO {tableName} ({columns}) VALUES ({properties})";
+                string query = $"INSERT INTO [{tableName}] ({columns}) VALUES ({properties})";
 
                 rowsEffected = _connection.Execute(query, entity);
             }
-            catch (Exception ex) { }
+            catch (Exception ex) 
+            {
+                _logger.LogInformation($"Insert_{GetTableName()}_{ex.Message}");
+            }
 
             return rowsEffected > 0 ? true : false;
         }
@@ -54,11 +61,14 @@ namespace Infrastructure.Common
                 string tableName = GetTableName();
                 string keyColumn = GetKeyColumnName();
                 string keyProperty = GetKeyPropertyName();
-                string query = $"DELETE FROM {tableName} WHERE {keyColumn} = @{keyProperty}";
+                string query = $"DELETE FROM [{tableName}] WHERE {keyColumn} = @{keyProperty}";
 
                 rowsEffected = _connection.Execute(query, entity);
             }
-            catch (Exception ex) { }
+            catch (Exception ex) 
+            {
+                _logger.LogInformation($"Deleted_{GetTableName()}_{ex.Message}");
+            }
 
             return rowsEffected > 0 ? true : false;
         }
@@ -69,41 +79,52 @@ namespace Infrastructure.Common
             try
             {
                 string tableName = GetTableName();
-                string query = $"SELECT * FROM {tableName}";
+                string query = $"SELECT * FROM [{tableName}]";
 
                 result = _connection.Query<T>(query);
             }
-            catch (Exception ex) { }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"GetAll_{GetTableName()}_{ex.Message}");
+            }
 
             return result;
         }
 
-        public IEnumerable<T> GetAllByDate(string columnName, DateTime fromDate, DateTime toDate)
+        public IEnumerable<T> GetAllByDate(string columnName, DateTime fromDate, DateTime toDate, bool hasIsDeleted)
         {
             IEnumerable<T> result = null;
             try
             {
                 string tableName = GetTableName();
-                string query = $"SELECT * FROM {tableName} WHERE {columnName} BETWEEN {fromDate} AND {toDate}";
+                string checkDeleted = hasIsDeleted ? "AND IsDeleted = 0" : "";
+                string query = $"SELECT * FROM [{tableName}] WHERE {columnName} BETWEEN '{fromDate}' AND '{toDate}' {checkDeleted}";
 
                 result = _connection.Query<T>(query);
             }
-            catch (Exception ex) { }
+            catch (Exception ex) 
+            {
+                _logger.LogInformation($"GetAllByDate_{GetTableName()}_{ex.Message}");
+            }
 
             return result;
         }
 
-        public IEnumerable<T> GetAllByColumnId(string columnName, int value)
+        public IEnumerable<T> GetAllByColumnId(string columnName, int value, bool hasIsDeleted)
         {
             IEnumerable<T> result = null;
             try
             {
                 string tableName = GetTableName();
-                string query = $"SELECT * FROM {tableName} WHERE {columnName} = {value}";
+                string checkDeleted = hasIsDeleted ? "AND IsDeleted = 0" : "";
+                string query = $"SELECT * FROM [{tableName}] WHERE {columnName} = {value}  {checkDeleted}";
 
                 result = _connection.Query<T>(query);
             }
-            catch (Exception ex) { }
+            catch (Exception ex) 
+            {
+                _logger.LogInformation($"GetAllByColumnId_{GetTableName()}_{columnName}_{ex.Message}");
+            }
 
             return result;
         }
@@ -115,11 +136,14 @@ namespace Infrastructure.Common
             {
                 string tableName = GetTableName();
                 string keyColumn = GetKeyColumnName();
-                string query = $"SELECT * FROM {tableName} WHERE {keyColumn} = '{Id}'";
+                string query = $"SELECT * FROM [{tableName}] WHERE {keyColumn} = '{Id}'";
 
                 result = _connection.Query<T>(query);
             }
-            catch (Exception ex) { }
+            catch (Exception ex) 
+            {
+                _logger.LogInformation($"GetById_{GetTableName()}_{ex.Message}");
+            }
 
             return result.FirstOrDefault();
         }
@@ -134,7 +158,7 @@ namespace Infrastructure.Common
                 string keyProperty = GetKeyPropertyName();
 
                 StringBuilder query = new StringBuilder();
-                query.Append($"UPDATE {tableName} SET ");
+                query.Append($"UPDATE [{tableName}] SET ");
 
                 foreach (var property in GetProperties(true))
                 {
@@ -152,7 +176,10 @@ namespace Infrastructure.Common
 
                 rowsEffected = _connection.Execute(query.ToString(), entity);
             }
-            catch (Exception ex) { }
+            catch (Exception ex) 
+            {
+                _logger.LogInformation($"Update_{GetTableName()}_{ex.Message}");
+            }
 
             return rowsEffected > 0 ? true : false;
         }
@@ -168,7 +195,7 @@ namespace Infrastructure.Common
                 return tableName;
             }
 
-            return type.Name + "s";
+            return type.Name.Replace("_", ".");
         }
 
         public static string GetKeyColumnName()
@@ -247,4 +274,5 @@ namespace Infrastructure.Common
             return "";
         }
     }
+
 }

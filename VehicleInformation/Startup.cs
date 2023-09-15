@@ -5,11 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.OpenApi.Models;
+using VehicleInformation.DbContext;
+using VehicleInformation.Interfaces.IRepository;
+using VehicleInformation.Interfaces.IService;
+using VehicleInformation.Repository;
+using VehicleInformation.Services;
 
 namespace VehicleInformation
 {
@@ -25,16 +26,36 @@ namespace VehicleInformation
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<DapperContext>();
+
+            services.AddScoped(typeof(ITransportTypesRepository), typeof(TransportTypesRepository));
+            services.AddScoped(typeof(IActivitySummariesRepository), typeof(ActivitySummariesRepository));
+            services.AddScoped(typeof(IVehicleTransportTypesRepository), typeof(VehicleTransportTypesRepository));
+            services.AddScoped(typeof(IVehiclesRepository), typeof(VehiclesRepository));
+            services.AddScoped(typeof(ISpeedOversRepository), typeof(SpeedOversRepository));
+
+            services.AddTransient(typeof(ITransportTypesService), typeof(TransportTypesService));
+            services.AddTransient(typeof(IActivitySummariesService), typeof(ActivitySummariesService));
+            services.AddTransient(typeof(IVehicleTransportTypesService), typeof(VehicleTransportTypesService));
+            services.AddTransient(typeof(IVehiclesService), typeof(VehiclesService));
+            services.AddTransient(typeof(ISpeedOversService), typeof(SpeedOversService));
+
             services.AddControllers();
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "Implement Swagger UI",
+                    Description = "A simple example to Implement Swagger UI",
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
 
             app.UseHttpsRedirection();
 
@@ -46,6 +67,14 @@ namespace VehicleInformation
             {
                 endpoints.MapControllers();
             });
+
+            if (env.IsDevelopment() || env.IsProduction())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI(c => {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Showing API V1");
+                });
+            }
         }
     }
 }
