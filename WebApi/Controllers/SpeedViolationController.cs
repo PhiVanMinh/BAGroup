@@ -76,7 +76,7 @@ namespace WebApi.Controllers
         /// minhpv    9/05/2023     created
         /// </Modified>
         [HttpPost("speed-violation")]
-        [Authorize(Policy = Policies.UserView)]
+        //[Authorize(Policy = Policies.UserView)]
         public async Task<IActionResult> GetSpeedViolationVehicleList(SpeedViolationVehicleInput input)
             {
                 var respon = new ResponDto<PagedResultDto<GetAllSpeedViolationVehicleDto>>();

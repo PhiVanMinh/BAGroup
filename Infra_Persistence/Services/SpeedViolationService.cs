@@ -12,6 +12,7 @@ using System.Text.Json;
 using System.ComponentModel.Design;
 using Application.Model;
 using Infra_Persistence.Helper;
+using Nest;
 
 namespace Infra_Persistence.Services
 {
@@ -171,6 +172,50 @@ namespace Infra_Persistence.Services
 
         }
 
+        /// <summary>Lấy dữ liệu từ bên service khác</summary>
+        /// <typeparam name="T">Kiểu dữ liệu cần trả</typeparam>
+        /// <param name="link">Link api</param>
+        /// <returns>Danh sách dữ liệu</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/18/2023   created
+        /// </Modified>
+        private async Task<IEnumerable<T>> GetDataFromOtherService<T>(string link)
+        {
+            var result = new List<T>();
+            try
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    string cacheKey = $"{DateTime.Now.ToString("dd_MM_yyyy_hh")} {link}";
+                    var cachedData = _cache.KeyExists(cacheKey);
+                    if (cachedData)
+                    {
+                        var redisData = _cache.SortedSetRangeByScore(cacheKey);
+                        result = redisData.Select(d => JsonSerializer.Deserialize<T>(d)).ToList();
+                    }
+                    else
+                    {
+                        var option = new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        };
+                        var response = await httpClient.PostAsync(link, null);
+                        string apiResponse = await response.Content.ReadAsStringAsync();
+                        result = JsonSerializer.Deserialize<List<T>>(apiResponse, option) ?? new List<T>();
+                        _cacheHelper.AddEnumerableToSortedSet(cacheKey, result);
+                        _cache.KeyExpire(cacheKey, DateTime.Now.AddMinutes(5));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"GetData_{link}_{ex.Message}");
+            }
+
+            return result;
+        }
+
         /// <summary>Lấy thông tin các xe</summary>
         /// <param name="input">Điều kiện lọc</param>
         /// <returns>Thông tin các xe</returns>
@@ -183,22 +228,23 @@ namespace Infra_Persistence.Services
             var result = new List<GetVehicleInfomationDto>();
             try
             {
-                var tranportTypes = await _transportType.GetAll();
-                var vehicleTransportTypes = await _vhcTransportType.GetAll();
-                var vehicles = await _vehicle.GetAllByCompany(input.CompanyId);
+                var tranportTypes = await GetDataFromOtherService<TranportTypes>("https://localhost:44333/Vehicles/transport-type");
+                var vehicleTransportTypes = await GetDataFromOtherService<VehicleTransportTypes>("https://localhost:44333/Vehicles/vehicle-type");
+                var vehicles = await GetDataFromOtherService<Vehicles>($"https://localhost:44333/Vehicles/vehicle?input={input.CompanyId}");
+
 
                 result = ( from vhc in vehicles
-                           join vhcType in vehicleTransportTypes on vhc.PK_VehicleID equals vhcType.FK_VehicleID
-                           join type in tranportTypes on vhcType.FK_TransportTypeID equals type.PK_TransportTypeID
-                           where (input.ListVhcId.Count() == 0 || input.ListVhcId.Contains(vhc.PK_VehicleID))
-                           select new GetVehicleInfomationDto
-                           {
-                                VehicleID = vhc.PK_VehicleID,
-                                CompanyID = vhc.FK_CompanyID,
-                                PrivateCode = vhc.PrivateCode,
-                                TransportType = type.DisplayName,
-                                VehiclePlate = vhc.VehiclePlate
-                           }).ToList();
+                                   join vhcType in vehicleTransportTypes on vhc.PK_VehicleID equals vhcType.FK_VehicleID
+                                   join type in tranportTypes on vhcType.FK_TransportTypeID equals type.PK_TransportTypeID
+                                   where (input.ListVhcId.Count() == 0 || input.ListVhcId.Contains(vhc.PK_VehicleID))
+                                   select new GetVehicleInfomationDto
+                                   {
+                                        VehicleID = vhc.PK_VehicleID,
+                                        CompanyID = vhc.FK_CompanyID,
+                                        PrivateCode = vhc.PrivateCode,
+                                        TransportType = type.DisplayName,
+                                        VehiclePlate = vhc.VehiclePlate
+                                   }).ToList();
             }
             catch (Exception ex)
             {
@@ -219,7 +265,8 @@ namespace Infra_Persistence.Services
             var result = new List<GetActivitySummariesDto>();
             try
             {
-                var activitySummaries = await _atvSum.GetAllByCompany(input.CompanyId);
+                var activitySummaries = await GetDataFromOtherService<ActivitySummaries>($"https://localhost:44333/Vehicles/activiti-summary?input={input.CompanyId}");
+
                  result = activitySummaries.GroupBy(e => new { e.FK_VehicleID, e.FK_CompanyID })
                             .Select(e => new GetActivitySummariesDto
                             {
@@ -248,9 +295,11 @@ namespace Infra_Persistence.Services
         {
             var result = new List<GetSpeedOversDto>();
             try 
-            { 
-            var speedOvers = await _speedOver.GetAllSpeedOversByDate(input.FromDate, input.ToDate);
-            result = speedOvers.Where(e => e.VelocityAllow + 5 <= e.VelocityGps).GroupBy(e => e.FK_VehicleID)
+            {
+                input.ToDate = input.FromDate!.Value.AddDays(60);
+                var speedOvers = await GetDataFromOtherService<SpeedOvers>($"https://localhost:44333/Vehicles/speedOver?fromDate={input.FromDate}&toDate={input.ToDate}");
+
+                result = speedOvers.Where(e => e.VelocityAllow + 5 <= e.VelocityGps).GroupBy(e => e.FK_VehicleID)
                         .Select(e => new GetSpeedOversDto
                         {
                            VehicleID = e.Key,
