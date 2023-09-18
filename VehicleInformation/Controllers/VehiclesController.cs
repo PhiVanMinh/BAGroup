@@ -13,6 +13,11 @@ using VehicleInformation.Models;
 
 namespace VehicleInformation.Controllers
 {
+    /// <summary>Các API lấy thông tin báo cáo xe vi phạm tốc độ</summary>
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    9/18/2023   created
+    /// </Modified>
     [ApiController]
     [Route("[controller]")]
     public class VehiclesController : ControllerBase

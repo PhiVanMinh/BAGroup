@@ -10,6 +10,11 @@ using VehicleInformation.Repository;
 
 namespace VehicleInformation.Services
 {
+    /// <summary>Thông tin vi phạm tốc độ</summary>
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    9/18/2023   created
+    /// </Modified>
     public class SpeedOversService: ISpeedOversService
     {
         private readonly ISpeedOversRepository _speedOversRepository;

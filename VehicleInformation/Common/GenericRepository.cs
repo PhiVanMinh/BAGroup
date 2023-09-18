@@ -15,6 +15,12 @@ using VehicleInformation.Services;
 
 namespace VehicleInformation.Common
 {
+    /// <summary>Repository chung</summary>
+    /// <typeparam name="T">Các model dapper</typeparam>
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    09/18/2023   created
+    /// </Modified>
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         IDbConnection _connection;
@@ -33,6 +39,12 @@ namespace VehicleInformation.Common
         }
 
 
+        /// <summary>Thêm thông tin bảng</summary>
+        /// <param name="entity">Kiểu dữ liệu</param>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/18/2023   created
+        /// </Modified>
         public bool Add(T entity)
         {
             int rowsEffected = 0;
@@ -53,6 +65,12 @@ namespace VehicleInformation.Common
             return rowsEffected > 0 ? true : false;
         }
 
+        /// <summary>Xóa thông tin</summary>
+        /// <param name="entity">Kiểu dữ liệu</param>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/18/2023   created
+        /// </Modified>
         public bool Delete(T entity)
         {
             int rowsEffected = 0;
@@ -73,6 +91,12 @@ namespace VehicleInformation.Common
             return rowsEffected > 0 ? true : false;
         }
 
+        /// <summary>Lấy tất cả thông tin</summary>
+        /// <returns>Tất cả thông tin theo kiểu model</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/18/2023   created
+        /// </Modified>
         public IEnumerable<T> GetAll()
         {
             IEnumerable<T> result = null;
@@ -91,6 +115,16 @@ namespace VehicleInformation.Common
             return result;
         }
 
+        /// <summary>Lấy tất cả thông tin theo ngày</summary>
+        /// <param name="columnName">Tên cột so sánh</param>
+        /// <param name="fromDate">Từ ngày</param>
+        /// <param name="toDate">Đến ngày</param>
+        /// <param name="hasIsDeleted">Điều kiện xóa</param>
+        /// <returns>Thông tin các bản ghi</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/18/2023   created
+        /// </Modified>
         public IEnumerable<T> GetAllByDate(string columnName, DateTime fromDate, DateTime toDate, bool hasIsDeleted)
         {
             IEnumerable<T> result = null;
@@ -110,6 +144,15 @@ namespace VehicleInformation.Common
             return result;
         }
 
+        /// <summary>Lấy tất cả thông tin theo điều kiện lọc</summary>
+        /// <param name="columnName">Tên cột</param>
+        /// <param name="value">Giá trị lọc</param>
+        /// <param name="hasIsDeleted">Điều kiện xóa</param>
+        /// <returns>Các thông tin cần tìm</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/18/2023   created
+        /// </Modified>
         public IEnumerable<T> GetAllByColumnId(string columnName, int value, bool hasIsDeleted)
         {
             IEnumerable<T> result = null;
@@ -129,6 +172,13 @@ namespace VehicleInformation.Common
             return result;
         }
 
+        /// <summary>Lấy thông tin bản ghi theo mã</summary>
+        /// <param name="Id">Mã bản ghi</param>
+        /// <returns>Thông tin bản ghi cần tìm</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/18/2023   created
+        /// </Modified>
         public T GetById(int Id)
         {
             IEnumerable<T> result = null;
@@ -148,6 +198,12 @@ namespace VehicleInformation.Common
             return result.FirstOrDefault();
         }
 
+        /// <summary>Cập nhật bản ghi</summary>
+        /// <param name="entity">Entity</param>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/18/2023   created
+        /// </Modified>
         public bool Update(T entity)
         {
             int rowsEffected = 0;
@@ -184,6 +240,12 @@ namespace VehicleInformation.Common
             return rowsEffected > 0 ? true : false;
         }
 
+        /// <summary>Lấy thông tin tên bảng</summary>
+        /// <returns>Tên bảng</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/18/2023   created
+        /// </Modified>
         private string GetTableName()
         {
             string tableName = "";
@@ -198,6 +260,11 @@ namespace VehicleInformation.Common
             return type.Name.Replace("_", ".");
         }
 
+        /// <summary>Lấy tên khóa trong bảng</summary>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/18/2023   created
+        /// </Modified>
         public static string GetKeyColumnName()
         {
             PropertyInfo[] properties = typeof(T).GetProperties();
@@ -226,6 +293,12 @@ namespace VehicleInformation.Common
         }
 
 
+        /// <summary>Lấy tên cột</summary>
+        /// <param name="excludeKey"></param>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/18/2023   created
+        /// </Modified>
         private string GetColumns(bool excludeKey = false)
         {
             var type = typeof(T);
@@ -240,6 +313,12 @@ namespace VehicleInformation.Common
             return columns;
         }
 
+        /// <summary>Lấy tên thuộc tính</summary>
+        /// <param name="excludeKey">if set to <c>true</c> [exclude key].</param>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/18/2023   created
+        /// </Modified>
         protected string GetPropertyNames(bool excludeKey = false)
         {
             var properties = typeof(T).GetProperties()
@@ -253,6 +332,12 @@ namespace VehicleInformation.Common
             return values;
         }
 
+        /// <summary>Lấy tất cả thuộc tính</summary>
+        /// <param name="excludeKey">if set to <c>true</c> [exclude key].</param>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/18/2023   created
+        /// </Modified>
         protected IEnumerable<PropertyInfo> GetProperties(bool excludeKey = false)
         {
             var properties = typeof(T).GetProperties()
@@ -261,6 +346,11 @@ namespace VehicleInformation.Common
             return properties;
         }
 
+        /// <summary>Lấy tên các thuộc tính</summary>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/18/2023   created
+        /// </Modified>
         protected string GetKeyPropertyName()
         {
             var properties = typeof(T).GetProperties()

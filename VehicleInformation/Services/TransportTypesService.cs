@@ -11,6 +11,11 @@ using VehicleInformation.Repository;
 
 namespace VehicleInformation.Services
 {
+    /// <summary>Thông tin loại hình vận chuyển</summary>
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    9/18/2023   created
+    /// </Modified>
     public class TransportTypesService: ITransportTypesService
     {
         private readonly ITransportTypesRepository _transportTypeRepo;

@@ -9,6 +9,11 @@ using VehicleInformation.Models;
 
 namespace VehicleInformation.Services
 {
+    /// <summary>Thông tin xe gắn với loại hình</summary>
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    9/18/2023   created
+    /// </Modified>
     public class VehicleTransportTypesService: IVehicleTransportTypesService
     {
         private readonly IVehicleTransportTypesRepository _vehicleTransportTypesRepository;

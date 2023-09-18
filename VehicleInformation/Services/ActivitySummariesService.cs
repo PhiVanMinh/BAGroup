@@ -9,6 +9,11 @@ using VehicleInformation.Models;
 
 namespace VehicleInformation.Services
 {
+    /// <summary>Thông tin tổng hợp</summary>
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    9/18/2023   created
+    /// </Modified>
     public class ActivitySummariesService: IActivitySummariesService
     {
         private readonly IActivitySummariesRepository _activitySummariesRepository;
