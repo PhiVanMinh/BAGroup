@@ -1,8 +1,8 @@
 {
   "Version": 1,
-  "Hash": "MNDwg81eW6x8pQ8O7JHfczEiK+zOeh13pFgk75TSrqU=",
-  "Source": "BA.Api",
-  "BasePath": "_content/BA.Api",
+  "Hash": "gpZS33dPADcBLh2L9vM237Z733gnw6BBlzu9PJIZC48=",
+  "Source": "BA.API",
+  "BasePath": "_content/BA.API",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
