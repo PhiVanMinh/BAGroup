@@ -408,3 +408,4 @@ F:\LAB\BAGroup\WebApi\bin\Debug\net6.0\CachingFramework.Redis.dll
 F:\LAB\BAGroup\WebApi\bin\Debug\net6.0\System.Text.Json.dll
 F:\LAB\BAGroup\WebApi\bin\Debug\net6.0\Elasticsearch.Net.dll
 F:\LAB\BAGroup\WebApi\bin\Debug\net6.0\Nest.dll
+F:\LAB\BAGroup\WebApi\bin\Debug\net6.0\Scrutor.dll

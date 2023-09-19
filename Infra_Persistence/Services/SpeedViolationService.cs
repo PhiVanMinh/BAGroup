@@ -2,17 +2,11 @@
 using Application.Dto.Users;
 using Application.Interfaces;
 using Application.IService;
-using CachingFramework.Redis.Contracts.RedisObjects;
-using CachingFramework.Redis.Contracts;
-using CachingFramework.Redis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System.Text.Json;
-using System.ComponentModel.Design;
 using Application.Model;
-using Infra_Persistence.Helper;
-using Nest;
 
 namespace Infra_Persistence.Services
 {
@@ -25,6 +19,7 @@ namespace Infra_Persistence.Services
     {
         private readonly IConfiguration _configuration;
         private readonly IRedisCacheHelper _cacheHelper;
+        private readonly IHttpRequestHelper _httpHelper;
         public IUnitOfWork _unitOfWork;
         private readonly ILogger<SpeedViolationService> _logger;
         private readonly IDatabase _cache;
@@ -33,13 +28,15 @@ namespace Infra_Persistence.Services
             IUnitOfWork unitOfWork,
             ILogger<SpeedViolationService> logger,
             IConfiguration configuration,
-            IRedisCacheHelper cacheHelper
+            IRedisCacheHelper cacheHelper,
+            IHttpRequestHelper httpHelper
             )
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
             _configuration = configuration;
             _cacheHelper = cacheHelper;
+            _httpHelper = httpHelper;
             var redis = ConnectionMultiplexer.Connect($"{_configuration["RedisCacheUrl"]},abortConnect=False");
             _cache = redis.GetDatabase();
         }
@@ -82,22 +79,14 @@ namespace Infra_Persistence.Services
                 List<GetAllSpeedViolationVehicleDto> result = new List<GetAllSpeedViolationVehicleDto>();
                 var totalCount = 0;
 
-                var cachedData = _cache.KeyExists(cacheKey);
-                if (cachedData)
+                result = await _cacheHelper.GetDataFromCache< GetAllSpeedViolationVehicleDto>(cacheKey, input.Page, input.PageSize);
+                if(result.Count() == 0)
                 {
-                    totalCount = (int)_cache.SortedSetLength($"{cacheKey}");
-                    var redisData = _cache.SortedSetRangeByScore(cacheKey, (input.Page - 1) * input.PageSize, (input.Page) * input.PageSize - (input.Page == 1 ? 0 : 1));
-                    result = redisData.Select(d => JsonSerializer.Deserialize<GetAllSpeedViolationVehicleDto>(d) ?? new GetAllSpeedViolationVehicleDto()).ToList();
-                }
-                else
-                {
-                    //input.ToDate = input.FromDate.Value.AddDays(60);
                     var vhcList = await GetSpeedViolationVehicle(input);
 
                     totalCount = vhcList.Count();
                     result = vhcList.Skip((input.Page - 1) * input.PageSize).Take(input.PageSize).ToList();
                     _cacheHelper.AddEnumerableToSortedSet(cacheKey, vhcList);
-                    _cache.KeyExpire(cacheKey, DateTime.Now.AddMinutes(5));
                 }
                 valueReport.TotalCount = totalCount;
                 valueReport.Result = result;
@@ -157,50 +146,6 @@ namespace Infra_Persistence.Services
 
         }
 
-        /// <summary>Lấy dữ liệu từ bên service khác</summary>
-        /// <typeparam name="T">Kiểu dữ liệu cần trả</typeparam>
-        /// <param name="link">Link api</param>
-        /// <returns>Danh sách dữ liệu</returns>
-        /// <Modified>
-        /// Name       Date       Comments
-        /// minhpv    9/18/2023   created
-        /// </Modified>
-        private async Task<IEnumerable<T>> GetDataFromOtherService<T>(string link)
-        {
-            var result = new List<T>();
-            try
-            {
-                using (var httpClient = new HttpClient())
-                {
-                    string cacheKey = $"{DateTime.Now.ToString("dd_MM_yyyy_hh")} {link}";
-                    var cachedData = _cache.KeyExists(cacheKey);
-                    if (cachedData)
-                    {
-                        var redisData = _cache.SortedSetRangeByScore(cacheKey);
-                        result = redisData.Select(d => JsonSerializer.Deserialize<T>(d)).ToList();
-                    }
-                    else
-                    {
-                        var option = new JsonSerializerOptions
-                        {
-                            PropertyNameCaseInsensitive = true
-                        };
-                        var response = await httpClient.PostAsync(link, null);
-                        string apiResponse = await response.Content.ReadAsStringAsync();
-                        result = JsonSerializer.Deserialize<List<T>>(apiResponse, option) ?? new List<T>();
-                        _cacheHelper.AddEnumerableToSortedSet(cacheKey, result);
-                        _cache.KeyExpire(cacheKey, DateTime.Now.AddMinutes(5));
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation($"GetData_{link}_{ex.Message}");
-            }
-
-            return result;
-        }
-
         /// <summary>Lấy thông tin các xe</summary>
         /// <param name="input">Điều kiện lọc</param>
         /// <returns>Thông tin các xe</returns>
@@ -213,23 +158,30 @@ namespace Infra_Persistence.Services
             var result = new List<GetVehicleInfomationDto>();
             try
             {
-                var tranportTypes = await GetDataFromOtherService<TranportTypes>("https://localhost:44333/Vehicles/transport-type");
-                var vehicleTransportTypes = await GetDataFromOtherService<VehicleTransportTypes>("https://localhost:44333/Vehicles/vehicle-type");
-                var vehicles = await GetDataFromOtherService<Vehicles>($"https://localhost:44333/Vehicles/vehicle?input={input.CompanyId}");
+                var tranportTypes = await GetDataReportSpeedOver<TranportTypes>("SpeedViolationService", "GetVehicleInfomation",
+                                                                    $"{_configuration["UrlBase"]}/Vehicles/transport-type");
 
+                var vehicleTransportTypes = await GetDataReportSpeedOver<VehicleTransportTypes>("SpeedViolationService", "GetVehicleInfomation",
+                                                                    $"{_configuration["UrlBase"]}/Vehicles/vehicle-type");
 
-                result = ( from vhc in vehicles
-                                   join vhcType in vehicleTransportTypes on vhc.PK_VehicleID equals vhcType.FK_VehicleID
-                                   join type in tranportTypes on vhcType.FK_TransportTypeID equals type.PK_TransportTypeID
-                                   where (input.ListVhcId.Count() == 0 || input.ListVhcId.Contains(vhc.PK_VehicleID))
-                                   select new GetVehicleInfomationDto
-                                   {
-                                        VehicleID = vhc.PK_VehicleID,
-                                        CompanyID = vhc.FK_CompanyID,
-                                        PrivateCode = vhc.PrivateCode,
-                                        TransportType = type.DisplayName,
-                                        VehiclePlate = vhc.VehiclePlate
-                                   }).ToList();
+                var vehicles = await GetDataReportSpeedOver<Vehicles>("SpeedViolationService", "GetVehicleInfomation",
+                                                                    $"{_configuration["UrlBase"]}/Vehicles/vehicle?input={input.CompanyId}");
+
+                if (tranportTypes.Any() && vehicleTransportTypes.Any() && vehicles.Any())
+                {
+                    result = (from vhc in vehicles
+                              join vhcType in vehicleTransportTypes on vhc.PK_VehicleID equals vhcType.FK_VehicleID
+                              join type in tranportTypes on vhcType.FK_TransportTypeID equals type.PK_TransportTypeID
+                              where (input.ListVhcId.Count() == 0 || input.ListVhcId.Contains(vhc.PK_VehicleID))
+                              select new GetVehicleInfomationDto
+                              {
+                                  VehicleID = vhc.PK_VehicleID,
+                                  CompanyID = vhc.FK_CompanyID,
+                                  PrivateCode = vhc.PrivateCode,
+                                  TransportType = type.DisplayName,
+                                  VehiclePlate = vhc.VehiclePlate
+                              }).ToList();
+                }
             }
             catch (Exception ex)
             {
@@ -250,16 +202,19 @@ namespace Infra_Persistence.Services
             var result = new List<GetActivitySummariesDto>();
             try
             {
-                var activitySummaries = await GetDataFromOtherService<ActivitySummaries>($"https://localhost:44333/Vehicles/activiti-summary?input={input.CompanyId}");
-
-                 result = activitySummaries.GroupBy(e => new { e.FK_VehicleID, e.FK_CompanyID })
-                            .Select(e => new GetActivitySummariesDto
-                            {
-                                CompanyId = e.Key.FK_CompanyID,
-                                VehicleID = e.Key.FK_VehicleID,
-                                TotalKm = e.Sum(a => a.TotalKmGps),
-                                TotalTime = e.Sum(a => a.ActivityTime)
-                            }).ToList();
+                var activitySummaries = await GetDataReportSpeedOver<ActivitySummaries>("SpeedViolationService", "GetActivitySummaries",
+                                                                                    $"{_configuration["UrlBase"]}/Vehicles/activiti-summary?input={input.CompanyId}");
+                if (activitySummaries.Any())
+                {
+                    result = activitySummaries.GroupBy(e => new { e.FK_VehicleID, e.FK_CompanyID })
+                               .Select(e => new GetActivitySummariesDto
+                               {
+                                   CompanyId = e.Key.FK_CompanyID,
+                                   VehicleID = e.Key.FK_VehicleID,
+                                   TotalKm = e.Sum(a => a.TotalKmGps),
+                                   TotalTime = e.Sum(a => a.ActivityTime)
+                               }).ToList();
+                }
             }
             catch (Exception ex)
             {
@@ -281,21 +236,25 @@ namespace Infra_Persistence.Services
             var result = new List<GetSpeedOversDto>();
             try 
             {
-                input.ToDate = input.FromDate!.Value.AddDays(60);
-                var speedOvers = await GetDataFromOtherService<SpeedOvers>($"https://localhost:44333/Vehicles/speedOver?fromDate={input.FromDate}&toDate={input.ToDate}");
+                //input.ToDate = input.FromDate!.Value.AddDays(60);
+                var speedOvers = await GetDataReportSpeedOver<SpeedOvers>("SpeedViolationService", "GetSpeedOvers",
+                                                                        $"{_configuration["UrlBase"]}/Vehicles/speedOver?fromDate={input.FromDate}&toDate={input.ToDate}");
 
-                result = speedOvers.Where(e => e.VelocityAllow + 5 <= e.VelocityGps).GroupBy(e => e.FK_VehicleID)
-                        .Select(e => new GetSpeedOversDto
-                        {
-                           VehicleID = e.Key,
-                           SpeedVioLevel1 = e.Count(s => s.VelocityAllow + 5 <= s.VelocityGps && s.VelocityGps < s.VelocityAllow + 10),
-                           SpeedVioLevel2 = e.Count(s => s.VelocityAllow + 10 <= s.VelocityGps && s.VelocityGps < s.VelocityAllow + 20),
-                           SpeedVioLevel3 = e.Count(s => s.VelocityAllow + 20 <= s.VelocityGps && s.VelocityGps <= s.VelocityAllow + 35),
-                           SpeedVioLevel4 = e.Count(s => s.VelocityAllow + 35 < s.VelocityGps),
-                           TotalSpeedVio = e.Count(),
-                           TotalKmVio = e.Sum(s => s.EndKm - s.StartKm),
-                           TotalTimeVio = (int)Math.Round(e.Sum(s => (s.EndTime != null && s.StartTime != null) ? (s.EndTime - s.StartTime).Value.TotalMinutes : 0), 2)
-                        }).ToList();
+                if (speedOvers.Any())
+                {
+                    result = speedOvers.Where(e => e.VelocityAllow + 5 <= e.VelocityGps).GroupBy(e => e.FK_VehicleID)
+                            .Select(e => new GetSpeedOversDto
+                            {
+                                VehicleID = e.Key,
+                                SpeedVioLevel1 = e.Count(s => s.VelocityAllow + 5 <= s.VelocityGps && s.VelocityGps < s.VelocityAllow + 10),
+                                SpeedVioLevel2 = e.Count(s => s.VelocityAllow + 10 <= s.VelocityGps && s.VelocityGps < s.VelocityAllow + 20),
+                                SpeedVioLevel3 = e.Count(s => s.VelocityAllow + 20 <= s.VelocityGps && s.VelocityGps <= s.VelocityAllow + 35),
+                                SpeedVioLevel4 = e.Count(s => s.VelocityAllow + 35 < s.VelocityGps),
+                                TotalSpeedVio = e.Count(),
+                                TotalKmVio = e.Sum(s => s.EndKm - s.StartKm),
+                                TotalTimeVio = (int)Math.Round(e.Sum(s => (s.EndTime != null && s.StartTime != null) ? (s.EndTime - s.StartTime).Value.TotalMinutes : 0), 2)
+                            }).ToList();
+                }
             }
             catch (Exception ex)
             {
@@ -314,10 +273,10 @@ namespace Infra_Persistence.Services
         /// </Modified>
         public async Task<List<GetAllSpeedViolationVehicleDto>> GetDataToExportExcel(SpeedViolationVehicleInput input)
         {
+            List<GetAllSpeedViolationVehicleDto> result = new List<GetAllSpeedViolationVehicleDto>();
             try
             {
                 string cacheKey = $"{DateTime.Now.ToString("dd_MM_yyyy_hh")} {input.FromDate}_{input.ToDate}_{string.Join("_", input.ListVhcId)}";
-                List<GetAllSpeedViolationVehicleDto> result = new List<GetAllSpeedViolationVehicleDto>();
                 var totalCount = 0;
 
                 var cachedData = _cache.KeyExists(cacheKey);
@@ -333,15 +292,43 @@ namespace Infra_Persistence.Services
                     result = resultQuery.ToList();
                 }
 
-                return result;
             }
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.Message);
-                var valueDefault = new List<GetAllSpeedViolationVehicleDto>();
-                return valueDefault;
             }
+            return result;
         }
 
+        /// <summary>Lấy thông tin báo cáo</summary>
+        /// <typeparam name="T">Loại dữ liệu</typeparam>
+        /// <param name="service">Tên service</param>
+        /// <param name="method">Tên phương thức</param>
+        /// <param name="link">URL</param>
+        /// <returns>Thông tin vi phạm</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/19/2023   created
+        /// </Modified>
+        private async Task<IEnumerable<T>> GetDataReportSpeedOver<T>(string service, string method, string link)
+        {
+            var result = new List<T>();
+            try
+            {
+                var cacheKey = $"{service}_{method}_{link}";
+                result = await _cacheHelper.GetDataFromCache<T>(cacheKey, 0, 0);
+                if (result.Count() == 0)
+                {
+                    var respon = await _httpHelper.GetDataFromOtherService<T>(link);
+                    result = respon.ToList();
+                    _cacheHelper.AddEnumerableToSortedSet(cacheKey, result);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex.Message);
+            }
+            return result;
+        }
     }
 }

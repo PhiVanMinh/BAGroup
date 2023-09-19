@@ -426,6 +426,10 @@
               "target": "Package",
               "version": "[6.18.0, )"
             },
+            "Scrutor": {
+              "target": "Package",
+              "version": "[4.2.0, )"
+            },
             "Serilog.AspNetCore": {
               "target": "Package",
               "version": "[6.1.0, )"

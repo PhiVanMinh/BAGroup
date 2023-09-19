@@ -41,6 +41,7 @@ builder.Services.AddTransient(typeof(IAuthService), typeof(AuthService));
 builder.Services.AddTransient(typeof(ISpeedViolationService), typeof(SpeedViolationService));
 
 builder.Services.AddTransient(typeof(IRedisCacheHelper), typeof(RedisCacheHelper));
+builder.Services.AddTransient(typeof(IHttpRequestHelper), typeof(HttpRequestHelper));
 
 builder.Services.AddCors();
 
