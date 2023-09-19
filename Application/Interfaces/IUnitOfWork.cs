@@ -13,11 +13,6 @@ namespace Application.Interfaces
         IRoleRepository RoleRepository { get; }
         IUserRoleRepository UserRoleRepository { get; }
         ISpeedViolationRepository SpeedViolationRepository { get; }
-        IVehicleTransportTypesRepository VehicleTransportTypesRepository { get; }
-        ITranportTypesRepository TranportTypesRepository { get; }
-        ISpeedOversRepository SpeedOversRepository { get; }
-        IVehiclesRepository VehiclesRepository { get; }
-        IActivitySummariesRepository ActivitySummariesRepository { get; }
         void Save();
         void RollBack();
         Task SaveAsync();

@@ -25,32 +25,17 @@ namespace Infra_Persistence.Services
     {
         private readonly IConfiguration _configuration;
         private readonly IRedisCacheHelper _cacheHelper;
-        private readonly ITransportTypesService _transportType;
-        private readonly IActivitySummariesService _atvSum;
-        private readonly IVehicleTransportTypesService _vhcTransportType;
-        private readonly IVehiclesService _vehicle;
-        private readonly ISpeedOversService _speedOver;
         public IUnitOfWork _unitOfWork;
         private readonly ILogger<SpeedViolationService> _logger;
         private readonly IDatabase _cache;
 
         public SpeedViolationService(
-            ITransportTypesService transportType,
-            IActivitySummariesService atvSum,
-            IVehicleTransportTypesService vhcTransportType,
-            IVehiclesService vehicle,
-            ISpeedOversService speedOver,
             IUnitOfWork unitOfWork,
             ILogger<SpeedViolationService> logger,
             IConfiguration configuration,
             IRedisCacheHelper cacheHelper
             )
         {
-            _transportType = transportType;
-            _atvSum = atvSum;
-            _vhcTransportType = vhcTransportType;
-            _vehicle = vehicle;
-            _speedOver = speedOver;
             _unitOfWork = unitOfWork;
             _logger = logger;
             _configuration = configuration;
