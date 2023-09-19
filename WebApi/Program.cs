@@ -11,6 +11,8 @@ using Infra_Persistence.Services;
 using Infra_Persistence.Authorization;
 using Infrastructure.Contexts;
 using Infra_Persistence.Helper;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,13 +40,13 @@ builder.Services.AddTransient(typeof(IUserService), typeof(UserService));
 builder.Services.AddTransient(typeof(IAuthService), typeof(AuthService));
 builder.Services.AddTransient(typeof(ISpeedViolationService), typeof(SpeedViolationService));
 
-builder.Services.AddTransient(typeof(IRedisCacheHelper), typeof(RedisCacheHelper));
-
 builder.Services.AddTransient(typeof(ITransportTypesService), typeof(TransportTypesService));
 builder.Services.AddTransient(typeof(IActivitySummariesService), typeof(ActivitySummariesService));
 builder.Services.AddTransient(typeof(IVehicleTransportTypesService), typeof(VehicleTransportTypesService));
 builder.Services.AddTransient(typeof(IVehiclesService), typeof(VehiclesService));
 builder.Services.AddTransient(typeof(ISpeedOversService), typeof(SpeedOversService));
+
+builder.Services.AddTransient(typeof(IRedisCacheHelper), typeof(RedisCacheHelper));
 
 builder.Services.AddCors();
 
