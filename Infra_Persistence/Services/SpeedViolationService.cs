@@ -202,6 +202,7 @@ namespace Infra_Persistence.Services
             var result = new List<GetActivitySummariesDto>();
             try
             {
+                input.ToDate = input.FromDate.Value.AddDays(60); // test performance
                 var activitySummaries = await GetDataReportSpeedOver<ActivitySummaries>("SpeedViolationService", "GetActivitySummaries",
                                                                                     $"{_configuration["UrlBase"]}/Vehicles/activiti-summary?input={input.CompanyId}");
                 if (activitySummaries.Any())
@@ -236,7 +237,7 @@ namespace Infra_Persistence.Services
             var result = new List<GetSpeedOversDto>();
             try 
             {
-                //input.ToDate = input.FromDate!.Value.AddDays(60);
+                input.ToDate = input.FromDate!.Value.AddDays(60);
                 var speedOvers = await GetDataReportSpeedOver<SpeedOvers>("SpeedViolationService", "GetSpeedOvers",
                                                                         $"{_configuration["UrlBase"]}/Vehicles/speedOver?fromDate={input.FromDate}&toDate={input.ToDate}");
 

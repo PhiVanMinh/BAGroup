@@ -11,6 +11,11 @@ using System.Text.Json;
 
 namespace Infra_Persistence.Helper
 {
+    /// <summary>Xử lý dữ liệu RedisCache</summary>
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    9/19/2023   created
+    /// </Modified>
     public class RedisCacheHelper : IRedisCacheHelper
     {
 
@@ -74,7 +79,7 @@ namespace Infra_Persistence.Helper
                     if (cachedData)
                     {
                         RedisValue[] redisData = { };
-                        if (page > 0  && pageSize > 0)
+                        if (page == 0  && pageSize == 0)
                         {
                              redisData = _cache.SortedSetRangeByScore(cacheKey);
                         } else

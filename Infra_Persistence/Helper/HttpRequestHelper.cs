@@ -10,6 +10,11 @@ using System.Threading.Tasks;
 
 namespace Infra_Persistence.Helper
 {
+    /// <summary>Lấy DL qua HTTP Client</summary>
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    9/19/2023   created
+    /// </Modified>
     public class HttpRequestHelper : IHttpRequestHelper
     {
         private readonly IConfiguration _configuration;
