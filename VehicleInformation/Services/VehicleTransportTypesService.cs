@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using ReportSpeedOver.API.Common.Interfaces.IHelper;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,14 +21,21 @@ namespace VehicleInformation.Services
     {
         private readonly IVehicleTransportTypesRepository _vehicleTransportTypesRepository;
         private readonly ILogger<VehicleTransportTypesService> _logger;
+        private readonly IRedisCacheHelper _cacheHelper;
+        private readonly IConfiguration _configuration;
+        private readonly IDatabase _cache;
 
         public VehicleTransportTypesService(
             IVehicleTransportTypesRepository vehicleTransportTypesRepository,
-            ILogger<VehicleTransportTypesService> logger
+            ILogger<VehicleTransportTypesService> logger,
+            IRedisCacheHelper cacheHelper
             )
         {
             _vehicleTransportTypesRepository = vehicleTransportTypesRepository;
             _logger = logger;
+            _cacheHelper = cacheHelper;
+            var redis = ConnectionMultiplexer.Connect($"{_configuration["RedisCacheUrl"]},abortConnect=False");
+            _cache = redis.GetDatabase();
         }
 
         /// <summary>Thông tin loại hình vận tải của phương tiện</summary>
@@ -34,19 +44,25 @@ namespace VehicleInformation.Services
         /// Name       Date       Comments
         /// minhpv    9/11/2023   created
         /// </Modified>
-        public Task<List<BGT_VehicleTransportTypes>> GetAll()
+        public async Task<List<BGT_VehicleTransportTypes>> GetAll()
         {
             var result = new List<BGT_VehicleTransportTypes>();
             try
             {
-                var vhcTypes = _vehicleTransportTypesRepository.GetAll();
-                result = vhcTypes.ToList();
+                var cacheKey = $"VehicleTransportTypesService_GetAll_BGT_VehicleTransportTypes";
+                result = await _cacheHelper.GetDataFromCache<BGT_VehicleTransportTypes>(cacheKey, 0, 0);
+                if (result.Count() == 0)
+                {
+                    var respon = _vehicleTransportTypesRepository.GetAll();
+                    result = respon.ToList();
+                    _cacheHelper.AddEnumerableToSortedSet(cacheKey, result);
+                }
             }
             catch (Exception ex)
             {
                 _logger.LogInformation($"GetVehicleTransportTypes_{ex.Message}");
             }
-            return Task.FromResult(result);
+            return result;
         }
     }
 }

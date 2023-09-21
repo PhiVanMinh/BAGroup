@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using ReportSpeedOver.API.Common.Interfaces.IHelper;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +9,7 @@ using System.Threading.Tasks;
 using VehicleInformation.Interfaces.IRepository;
 using VehicleInformation.Interfaces.IService;
 using VehicleInformation.Models;
+using VehicleInformation.Repository;
 
 namespace VehicleInformation.Services
 {
@@ -18,14 +22,21 @@ namespace VehicleInformation.Services
     {
         private readonly IActivitySummariesRepository _activitySummariesRepository;
         private readonly ILogger<ActivitySummariesService> _logger;
+        private readonly IRedisCacheHelper _cacheHelper;
+        private readonly IConfiguration _configuration;
+        private readonly IDatabase _cache;
 
         public ActivitySummariesService(
             IActivitySummariesRepository activitySummariesRepository,
-            ILogger<ActivitySummariesService> logger
+            ILogger<ActivitySummariesService> logger,
+            IRedisCacheHelper cacheHelper
             )
         {
             _activitySummariesRepository = activitySummariesRepository;
             _logger = logger;
+            _cacheHelper = cacheHelper;
+            var redis = ConnectionMultiplexer.Connect($"{_configuration["RedisCacheUrl"]},abortConnect=False");
+            _cache = redis.GetDatabase();
         }
 
         /// <summary>Lấy thông tin tổng hợp theo đơn vị vẫn tải</summary>
@@ -35,19 +46,25 @@ namespace VehicleInformation.Services
         /// Name       Date       Comments
         /// minhpv    9/11/2023   created
         /// </Modified>
-        public Task<List<Report_ActivitySummaries>> GetAllByCompany(int input)
+        public async Task<List<Report_ActivitySummaries>> GetAllByCompany(int input)
         {
             var result = new List<Report_ActivitySummaries>();
             try
             {
-                var summaries = _activitySummariesRepository.GetAllByColumnId("FK_CompanyID", input, false);
-                result = summaries.ToList();
+                var cacheKey = $"ActivitySummariesService_GetAllByCompany_Report_ActivitySummaries";
+                result = await _cacheHelper.GetDataFromCache<Report_ActivitySummaries>(cacheKey, 0, 0);
+                if (result.Count() == 0)
+                {
+                    var summaries = _activitySummariesRepository.GetAllByColumnId("FK_CompanyID", input, false);
+                    result = summaries.ToList();
+                    _cacheHelper.AddEnumerableToSortedSet(cacheKey, result);
+                }
             }
             catch (Exception ex)
             {
                 _logger.LogInformation($"GetActivitySummaries_{ex.Message}_{input}");
             }
-            return Task.FromResult(result);
+            return result;
         }
     }
 }

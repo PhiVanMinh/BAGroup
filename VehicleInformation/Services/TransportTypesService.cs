@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using ReportSpeedOver.API.Common.Interfaces.IHelper;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,13 +23,21 @@ namespace VehicleInformation.Services
     {
         private readonly ITransportTypesRepository _transportTypeRepo;
         private readonly ILogger<TransportTypesService> _logger;
+        private readonly IRedisCacheHelper _cacheHelper;
+        private readonly IConfiguration _configuration;
+        private readonly IDatabase _cache;
+
         public TransportTypesService(
             ITransportTypesRepository transportTypeRepo,
-            ILogger<TransportTypesService> logger
+            ILogger<TransportTypesService> logger,
+            IRedisCacheHelper cacheHelper
             )
         {
             _transportTypeRepo = transportTypeRepo;
             _logger = logger;
+            _cacheHelper = cacheHelper;
+            var redis = ConnectionMultiplexer.Connect($"{_configuration["RedisCacheUrl"]},abortConnect=False");
+            _cache = redis.GetDatabase();
         }
 
         /// <summary>Lấy các thông tin loại hình vận tải</summary>
@@ -35,19 +46,25 @@ namespace VehicleInformation.Services
         /// Name       Date       Comments
         /// minhpv    9/11/2023   created
         /// </Modified>
-        public Task<List<BGT_TranportTypes>> GetAll()
+        public async Task<List<BGT_TranportTypes>> GetAll()
         {
             var result = new List<BGT_TranportTypes>();
             try
             {
-                var types = _transportTypeRepo.GetAll();
-                result = types.ToList();
+                var cacheKey = $"TransportTypesService_GetAll_BGT_TranportTypes";
+                result = await _cacheHelper.GetDataFromCache<BGT_TranportTypes>(cacheKey, 0, 0);
+                if (result.Count() == 0)
+                {
+                    var types = _transportTypeRepo.GetAll();
+                    result = types.ToList();
+                    _cacheHelper.AddEnumerableToSortedSet(cacheKey, result);
+                }
             }
             catch (Exception ex)
             {
                 _logger.LogInformation($"GetTranportTypes_{ex.Message}");
             }
-            return Task.FromResult(result);
+            return result;
         }
     }
 }
