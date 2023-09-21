@@ -79,6 +79,7 @@ namespace Infra_Persistence.Services
                 List<GetAllSpeedViolationVehicleDto> result = new List<GetAllSpeedViolationVehicleDto>();
                 var totalCount = 0;
 
+                totalCount = (int)_cache.SortedSetLength($"{cacheKey}");
                 result = await _cacheHelper.GetDataFromCache< GetAllSpeedViolationVehicleDto>(cacheKey, input.Page, input.PageSize);
                 if(result.Count() == 0)
                 {
@@ -202,7 +203,7 @@ namespace Infra_Persistence.Services
             var result = new List<GetActivitySummariesDto>();
             try
             {
-                input.ToDate = input.FromDate.Value.AddDays(60); // test performance
+                //input.ToDate = input.FromDate.Value.AddDays(60); // test performance
                 var activitySummaries = await GetDataReportSpeedOver<ActivitySummaries>("SpeedViolationService", "GetActivitySummaries",
                                                                                     $"{_configuration["UrlBase"]}/Vehicles/activiti-summary?input={input.CompanyId}");
                 if (activitySummaries.Any())
@@ -237,7 +238,7 @@ namespace Infra_Persistence.Services
             var result = new List<GetSpeedOversDto>();
             try 
             {
-                input.ToDate = input.FromDate!.Value.AddDays(60);
+                //input.ToDate = input.FromDate!.Value.AddDays(60);// test perfromance
                 var speedOvers = await GetDataReportSpeedOver<SpeedOvers>("SpeedViolationService", "GetSpeedOvers",
                                                                         $"{_configuration["UrlBase"]}/Vehicles/speedOver?fromDate={input.FromDate}&toDate={input.ToDate}");
 
@@ -278,19 +279,13 @@ namespace Infra_Persistence.Services
             try
             {
                 string cacheKey = $"{DateTime.Now.ToString("dd_MM_yyyy_hh")} {input.FromDate}_{input.ToDate}_{string.Join("_", input.ListVhcId)}";
-                var totalCount = 0;
 
-                var cachedData = _cache.KeyExists(cacheKey);
-                if (cachedData)
+                result = await _cacheHelper.GetDataFromCache<GetAllSpeedViolationVehicleDto>(cacheKey, 0, 0);
+                if (result.Count() == 0)
                 {
-                    totalCount = (int)_cache.SortedSetLength($"{cacheKey}");
-                    var redisData = _cache.SortedSetRangeByScore(cacheKey);
-                    result = redisData.Select(d => JsonSerializer.Deserialize<GetAllSpeedViolationVehicleDto>(d) ?? new GetAllSpeedViolationVehicleDto()).ToList();
-                }
-                else
-                {
-                    var resultQuery = await GetSpeedViolationVehicle(input);
+                   var resultQuery = await GetSpeedViolationVehicle(input);
                     result = resultQuery.ToList();
+                    _cacheHelper.AddEnumerableToSortedSet(cacheKey, resultQuery);
                 }
 
             }

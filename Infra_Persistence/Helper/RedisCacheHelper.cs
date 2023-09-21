@@ -84,7 +84,7 @@ namespace Infra_Persistence.Helper
                              redisData = _cache.SortedSetRangeByScore(cacheKey);
                         } else
                         {
-                             redisData = _cache.SortedSetRangeByScore(cacheKey, (page - 1) * pageSize, (page) * page - (page == 1 ? 0 : 1));
+                             redisData = _cache.SortedSetRangeByScore(cacheKey, (page - 1) * pageSize + (page == 1 ? 0 : 1), (page) * pageSize);
                         }
                         result = redisData.Select(d => JsonSerializer.Deserialize<T>(d)).ToList();
 
