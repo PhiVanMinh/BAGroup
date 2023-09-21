@@ -1,7 +1,7 @@
 ﻿using Application.Interfaces;
-using Domain.Master;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Services.Common.Core.Entity;
 
 namespace Infrastructure.Repository
 {

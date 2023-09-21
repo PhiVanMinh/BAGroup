@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System.Text.Json;
-using Application.Model;
+using Services.Common.Core.Models;
 
 namespace Infra_Persistence.Services
 {
@@ -159,13 +159,13 @@ namespace Infra_Persistence.Services
             var result = new List<GetVehicleInfomationDto>();
             try
             {
-                var tranportTypes = await GetDataReportSpeedOver<TranportTypes>("SpeedViolationService", "GetVehicleInfomation",
+                var tranportTypes = await GetDataReportSpeedOver<BGT_TranportTypes>("SpeedViolationService", "GetVehicleInfomation",
                                                                     $"{_configuration["UrlBase"]}/Vehicles/transport-type");
 
-                var vehicleTransportTypes = await GetDataReportSpeedOver<VehicleTransportTypes>("SpeedViolationService", "GetVehicleInfomation",
+                var vehicleTransportTypes = await GetDataReportSpeedOver<BGT_VehicleTransportTypes>("SpeedViolationService", "GetVehicleInfomation",
                                                                     $"{_configuration["UrlBase"]}/Vehicles/vehicle-type");
 
-                var vehicles = await GetDataReportSpeedOver<Vehicles>("SpeedViolationService", "GetVehicleInfomation",
+                var vehicles = await GetDataReportSpeedOver<Vehicle_Vehicles>("SpeedViolationService", "GetVehicleInfomation",
                                                                     $"{_configuration["UrlBase"]}/Vehicles/vehicle?input={input.CompanyId}");
 
                 if (tranportTypes.Any() && vehicleTransportTypes.Any() && vehicles.Any())
@@ -204,7 +204,7 @@ namespace Infra_Persistence.Services
             try
             {
                 //input.ToDate = input.FromDate.Value.AddDays(60); // test performance
-                var activitySummaries = await GetDataReportSpeedOver<ActivitySummaries>("SpeedViolationService", "GetActivitySummaries",
+                var activitySummaries = await GetDataReportSpeedOver<Report_ActivitySummaries>("SpeedViolationService", "GetActivitySummaries",
                                                                                     $"{_configuration["UrlBase"]}/Vehicles/activiti-summary?input={input.CompanyId}");
                 if (activitySummaries.Any())
                 {
@@ -239,7 +239,7 @@ namespace Infra_Persistence.Services
             try 
             {
                 //input.ToDate = input.FromDate!.Value.AddDays(60);// test perfromance
-                var speedOvers = await GetDataReportSpeedOver<SpeedOvers>("SpeedViolationService", "GetSpeedOvers",
+                var speedOvers = await GetDataReportSpeedOver<BGT_SpeedOvers>("SpeedViolationService", "GetSpeedOvers",
                                                                         $"{_configuration["UrlBase"]}/Vehicles/speedOver?fromDate={input.FromDate}&toDate={input.ToDate}");
 
                 if (speedOvers.Any())

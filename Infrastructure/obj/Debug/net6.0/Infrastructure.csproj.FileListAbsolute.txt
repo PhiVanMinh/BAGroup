@@ -60,9 +60,7 @@ F:\LAB\BAGroup\Infrastructure\bin\Debug\net6.0\Infrastructure.runtimeconfig.json
 F:\LAB\BAGroup\Infrastructure\bin\Debug\net6.0\Infrastructure.dll
 F:\LAB\BAGroup\Infrastructure\bin\Debug\net6.0\Infrastructure.pdb
 F:\LAB\BAGroup\Infrastructure\bin\Debug\net6.0\Application.dll
-F:\LAB\BAGroup\Infrastructure\bin\Debug\net6.0\Domain.dll
 F:\LAB\BAGroup\Infrastructure\bin\Debug\net6.0\Application.pdb
-F:\LAB\BAGroup\Infrastructure\bin\Debug\net6.0\Domain.pdb
 F:\LAB\BAGroup\Infrastructure\obj\Debug\net6.0\Infrastructure.csproj.AssemblyReference.cache
 F:\LAB\BAGroup\Infrastructure\obj\Debug\net6.0\Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
 F:\LAB\BAGroup\Infrastructure\obj\Debug\net6.0\Infrastructure.AssemblyInfoInputs.cache
@@ -76,3 +74,5 @@ F:\LAB\BAGroup\Infrastructure\obj\Debug\net6.0\Infrastructure.genruntimeconfig.c
 F:\LAB\BAGroup\Infrastructure\obj\Debug\net6.0\ref\Infrastructure.dll
 F:\LAB\BAGroup\Infrastructure\bin\Debug\net6.0\Infra_Persistence.dll
 F:\LAB\BAGroup\Infrastructure\bin\Debug\net6.0\Infra_Persistence.pdb
+F:\LAB\BAGroup\Infrastructure\bin\Debug\net6.0\Services.Common.dll
+F:\LAB\BAGroup\Infrastructure\bin\Debug\net6.0\Services.Common.pdb

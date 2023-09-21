@@ -1,12 +1,7 @@
 ﻿using Application.Interfaces;
-using Domain.Master;
 using Infrastructure.Common;
 using Infrastructure.Persistence;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Services.Common.Core.Entity;
 
 namespace Persistence.Repository
 {

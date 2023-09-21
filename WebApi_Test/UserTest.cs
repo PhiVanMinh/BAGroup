@@ -1,6 +1,5 @@
 ﻿using Application.Dto.Common;
 using Application.Dto.Users;
-using Application.Enum;
 using Application.IService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;

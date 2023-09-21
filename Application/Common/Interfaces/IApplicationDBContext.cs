@@ -1,5 +1,4 @@
-﻿using Domain.Master;
-using Microsoft.EntityFrameworkCore;
+﻿
 
 namespace Application.Common.Interfaces
 {

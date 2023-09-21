@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Model
+namespace Services.Common.Core.Models
 {
     /// <summary>Bảng tổng hợp hoạt động</summary>
     /// <Modified>
     /// Name       Date       Comments
     /// minhpv    9/8/2023   created
     /// </Modified>
-    public class ActivitySummaries
+    public class Report_ActivitySummaries
     {
 
         /// <summary>Mã phương tiện</summary>

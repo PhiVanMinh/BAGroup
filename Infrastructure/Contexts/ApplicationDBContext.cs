@@ -1,6 +1,6 @@
 ﻿using Application.Common.Interfaces;
-using Domain.Master;
 using Microsoft.EntityFrameworkCore;
+using Services.Common.Core.Entity;
 using System.Reflection.Metadata;
 
 namespace Infrastructure.Persistence

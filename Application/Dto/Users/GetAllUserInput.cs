@@ -1,5 +1,4 @@
 ﻿
-using Application.Enum;
 
 namespace Application.Dto.Users
 {

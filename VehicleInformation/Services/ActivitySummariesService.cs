@@ -29,12 +29,14 @@ namespace VehicleInformation.Services
         public ActivitySummariesService(
             IActivitySummariesRepository activitySummariesRepository,
             ILogger<ActivitySummariesService> logger,
+            IConfiguration configuration,
             IRedisCacheHelper cacheHelper
             )
         {
             _activitySummariesRepository = activitySummariesRepository;
             _logger = logger;
             _cacheHelper = cacheHelper;
+            _configuration = configuration;
             var redis = ConnectionMultiplexer.Connect($"{_configuration["RedisCacheUrl"]},abortConnect=False");
             _cache = redis.GetDatabase();
         }

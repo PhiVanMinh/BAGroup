@@ -257,14 +257,14 @@
           "buildTransitive/netcoreapp3.1/_._": {}
         }
       },
-      "Domain/1.0.0": {
+      "Services.Common/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
         "compile": {
-          "bin/placeholder/Domain.dll": {}
+          "bin/placeholder/Services.Common.dll": {}
         },
         "runtime": {
-          "bin/placeholder/Domain.dll": {}
+          "bin/placeholder/Services.Common.dll": {}
         }
       }
     }
@@ -619,18 +619,18 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Domain/1.0.0": {
+    "Services.Common/1.0.0": {
       "type": "project",
-      "path": "../Domain/Domain.csproj",
-      "msbuildProject": "../Domain/Domain.csproj"
+      "path": "../BA-API/Services.Common/Services.Common.csproj",
+      "msbuildProject": "../BA-API/Services.Common/Services.Common.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net6.0": [
-      "Domain >= 1.0.0",
       "Microsoft.EntityFrameworkCore >= 6.0.1",
       "Microsoft.Extensions.DependencyInjection.Abstractions >= 6.0.0",
-      "Newtonsoft.Json >= 13.0.1"
+      "Newtonsoft.Json >= 13.0.1",
+      "Services.Common >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -660,8 +660,8 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "F:\\LAB\\BAGroup\\Domain\\Domain.csproj": {
-              "projectPath": "F:\\LAB\\BAGroup\\Domain\\Domain.csproj"
+            "F:\\LAB\\BAGroup\\BA-API\\Services.Common\\Services.Common.csproj": {
+              "projectPath": "F:\\LAB\\BAGroup\\BA-API\\Services.Common\\Services.Common.csproj"
             }
           }
         }

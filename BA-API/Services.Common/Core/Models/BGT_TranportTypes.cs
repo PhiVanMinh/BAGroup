@@ -5,14 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Model
+namespace Services.Common.Core.Models
 {
     /// <summary>Loại hình vận tải</summary>
     /// <Modified>
     /// Name       Date       Comments
     /// minhpv    9/8/2023   created
     /// </Modified>
-    public class TranportTypes
+    public class BGT_TranportTypes
     {
         /// <summary>Mã loại phương tiện</summary>
         public long PK_TransportTypeID { get; set; }

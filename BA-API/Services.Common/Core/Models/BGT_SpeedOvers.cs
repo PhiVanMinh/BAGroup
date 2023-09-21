@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Model
+namespace Services.Common.Core.Models
 {
     /// <summary>Thông tin vi phạm tốc độ</summary>
     /// <Modified>
     /// Name       Date       Comments
     /// minhpv    9/8/2023   created
     /// </Modified>
-    public class SpeedOvers
+    public class BGT_SpeedOvers
     {
         /// <summary>Mã phương tiện</summary>
         public long FK_VehicleID { get; set; }

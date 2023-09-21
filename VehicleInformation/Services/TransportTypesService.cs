@@ -30,12 +30,14 @@ namespace VehicleInformation.Services
         public TransportTypesService(
             ITransportTypesRepository transportTypeRepo,
             ILogger<TransportTypesService> logger,
+            IConfiguration configuration,
             IRedisCacheHelper cacheHelper
             )
         {
             _transportTypeRepo = transportTypeRepo;
             _logger = logger;
             _cacheHelper = cacheHelper;
+            _configuration = configuration;
             var redis = ConnectionMultiplexer.Connect($"{_configuration["RedisCacheUrl"]},abortConnect=False");
             _cache = redis.GetDatabase();
         }

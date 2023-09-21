@@ -19,21 +19,23 @@ namespace VehicleInformation.Services
     /// </Modified>
     public class VehicleTransportTypesService: IVehicleTransportTypesService
     {
+        private readonly IConfiguration _configuration;
         private readonly IVehicleTransportTypesRepository _vehicleTransportTypesRepository;
         private readonly ILogger<VehicleTransportTypesService> _logger;
         private readonly IRedisCacheHelper _cacheHelper;
-        private readonly IConfiguration _configuration;
         private readonly IDatabase _cache;
 
         public VehicleTransportTypesService(
             IVehicleTransportTypesRepository vehicleTransportTypesRepository,
             ILogger<VehicleTransportTypesService> logger,
+            IConfiguration configuration,
             IRedisCacheHelper cacheHelper
             )
         {
             _vehicleTransportTypesRepository = vehicleTransportTypesRepository;
             _logger = logger;
             _cacheHelper = cacheHelper;
+            _configuration = configuration;
             var redis = ConnectionMultiplexer.Connect($"{_configuration["RedisCacheUrl"]},abortConnect=False");
             _cache = redis.GetDatabase();
         }

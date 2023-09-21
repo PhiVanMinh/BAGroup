@@ -28,8 +28,8 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "F:\\LAB\\BAGroup\\Domain\\Domain.csproj": {
-                "projectPath": "F:\\LAB\\BAGroup\\Domain\\Domain.csproj"
+              "F:\\LAB\\BAGroup\\BA-API\\Services.Common\\Services.Common.csproj": {
+                "projectPath": "F:\\LAB\\BAGroup\\BA-API\\Services.Common\\Services.Common.csproj"
               }
             }
           }
@@ -77,14 +77,14 @@
         }
       }
     },
-    "F:\\LAB\\BAGroup\\Domain\\Domain.csproj": {
+    "F:\\LAB\\BAGroup\\BA-API\\Services.Common\\Services.Common.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\LAB\\BAGroup\\Domain\\Domain.csproj",
-        "projectName": "Domain",
-        "projectPath": "F:\\LAB\\BAGroup\\Domain\\Domain.csproj",
+        "projectUniqueName": "F:\\LAB\\BAGroup\\BA-API\\Services.Common\\Services.Common.csproj",
+        "projectName": "Services.Common",
+        "projectPath": "F:\\LAB\\BAGroup\\BA-API\\Services.Common\\Services.Common.csproj",
         "packagesPath": "C:\\Users\\minhpv\\.nuget\\packages\\",
-        "outputPath": "F:\\LAB\\BAGroup\\Domain\\obj\\",
+        "outputPath": "F:\\LAB\\BAGroup\\BA-API\\Services.Common\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\minhpv\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -282,6 +282,9 @@
             "projectReferences": {
               "F:\\LAB\\BAGroup\\Application\\Application.csproj": {
                 "projectPath": "F:\\LAB\\BAGroup\\Application\\Application.csproj"
+              },
+              "F:\\LAB\\BAGroup\\BA-API\\Services.Common\\Services.Common.csproj": {
+                "projectPath": "F:\\LAB\\BAGroup\\BA-API\\Services.Common\\Services.Common.csproj"
               }
             }
           }

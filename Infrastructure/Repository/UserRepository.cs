@@ -1,12 +1,10 @@
 ﻿using Application.Interfaces;
-using Domain.Master;
 using Infrastructure.Persistence;
 using Infrastructure.Common;
 using Infrastructure.Contexts;
 using Application.Dto.Users;
 using Dapper;
-using Application.Enum;
-using System.Reflection;
+using Services.Common.Core.Entity;
 
 namespace Infrastructure.Repository
 {

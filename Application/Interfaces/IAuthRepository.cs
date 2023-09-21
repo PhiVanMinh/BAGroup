@@ -1,4 +1,5 @@
-﻿using Domain.Master;
+﻿
+using Services.Common.Core.Entity;
 
 namespace Application.Interfaces
 {

@@ -3137,26 +3137,16 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v6.0",
         "dependencies": {
-          "Domain": "1.0.0",
           "Microsoft.EntityFrameworkCore": "6.0.1",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "6.0.0",
-          "Newtonsoft.Json": "13.0.1"
+          "Newtonsoft.Json": "13.0.1",
+          "Services.Common": "1.0.0"
         },
         "compile": {
           "bin/placeholder/Application.dll": {}
         },
         "runtime": {
           "bin/placeholder/Application.dll": {}
-        }
-      },
-      "Domain/1.0.0": {
-        "type": "project",
-        "framework": ".NETCoreApp,Version=v6.0",
-        "compile": {
-          "bin/placeholder/Domain.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Domain.dll": {}
         }
       },
       "Infra_Persistence/1.0.0": {
@@ -3171,13 +3161,24 @@
           "Microsoft.AspNetCore.Authorization": "6.0.1",
           "Microsoft.Extensions.Caching.StackExchangeRedis": "6.0.2",
           "Microsoft.Extensions.Configuration.Abstractions": "6.0.0",
-          "NEST": "7.17.5"
+          "NEST": "7.17.5",
+          "Services.Common": "1.0.0"
         },
         "compile": {
           "bin/placeholder/Infra_Persistence.dll": {}
         },
         "runtime": {
           "bin/placeholder/Infra_Persistence.dll": {}
+        }
+      },
+      "Services.Common/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "compile": {
+          "bin/placeholder/Services.Common.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Services.Common.dll": {}
         }
       }
     }
@@ -9456,15 +9457,15 @@
       "path": "../Application/Application.csproj",
       "msbuildProject": "../Application/Application.csproj"
     },
-    "Domain/1.0.0": {
-      "type": "project",
-      "path": "../Domain/Domain.csproj",
-      "msbuildProject": "../Domain/Domain.csproj"
-    },
     "Infra_Persistence/1.0.0": {
       "type": "project",
       "path": "../Infra_Persistence/Infra_Persistence.csproj",
       "msbuildProject": "../Infra_Persistence/Infra_Persistence.csproj"
+    },
+    "Services.Common/1.0.0": {
+      "type": "project",
+      "path": "../BA-API/Services.Common/Services.Common.csproj",
+      "msbuildProject": "../BA-API/Services.Common/Services.Common.csproj"
     }
   },
   "projectFileDependencyGroups": {

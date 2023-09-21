@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Enum
+namespace Services.Common.Core.Enums
 {
     /// <summary>Loại tìm kiếm</summary>
     /// <Modified>

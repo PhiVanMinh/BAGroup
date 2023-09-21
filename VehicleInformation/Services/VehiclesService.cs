@@ -29,12 +29,14 @@ namespace VehicleInformation.Services
         public VehiclesService(
             IVehiclesRepository vhcRepo,
             ILogger<VehiclesService> logger,
+            IConfiguration configuration,
             IRedisCacheHelper cacheHelper
             )
         {
             _vhcRepo = vhcRepo;
             _logger = logger;
             _cacheHelper = cacheHelper;
+            _configuration = configuration;
             var redis = ConnectionMultiplexer.Connect($"{_configuration["RedisCacheUrl"]},abortConnect=False");
             _cache = redis.GetDatabase();
         }

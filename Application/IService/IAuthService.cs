@@ -1,6 +1,5 @@
 ﻿using Application.Dto.Login;
 using Application.Dto.Users;
-using Domain.Master;
 
 
 namespace Application.IService

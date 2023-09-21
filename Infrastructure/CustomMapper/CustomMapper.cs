@@ -1,6 +1,6 @@
 ﻿using Application.Dto.Users;
 using AutoMapper;
-using Domain.Master;
+using Services.Common.Core.Entity;
 
 namespace Infrastructure.CustomMapper
 {

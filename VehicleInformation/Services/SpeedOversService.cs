@@ -29,12 +29,14 @@ namespace VehicleInformation.Services
         public SpeedOversService(
             ISpeedOversRepository speedOversRepository,
             ILogger<SpeedOversService> logger,
+            IConfiguration configuration,
             IRedisCacheHelper cacheHelper
             )
         {
             _speedOversRepository = speedOversRepository;
             _logger = logger;
             _cacheHelper = cacheHelper;
+            _configuration = configuration;
             var redis = ConnectionMultiplexer.Connect($"{_configuration["RedisCacheUrl"]},abortConnect=False");
             _cache = redis.GetDatabase();
         }

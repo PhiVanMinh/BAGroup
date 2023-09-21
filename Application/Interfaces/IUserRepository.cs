@@ -1,6 +1,6 @@
 ﻿using Application.Common.Interfaces;
 using Application.Dto.Users;
-using Domain.Master;
+using Services.Common.Core.Entity;
 
 namespace Application.Interfaces
 {

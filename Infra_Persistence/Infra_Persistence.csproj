@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Application\Application.csproj" />
+    <ProjectReference Include="..\BA-API\Services.Common\Services.Common.csproj" />
   </ItemGroup>
 
 </Project>
