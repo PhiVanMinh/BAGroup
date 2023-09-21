@@ -6,6 +6,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using ReportSpeedOver.API.Common.Helpers;
+using ReportSpeedOver.API.Common.Interfaces.IHelper;
+using System.Net;
 using VehicleInformation.DbContext;
 using VehicleInformation.Interfaces.IRepository;
 using VehicleInformation.Interfaces.IService;
@@ -39,6 +42,8 @@ namespace VehicleInformation
             services.AddTransient(typeof(IVehicleTransportTypesService), typeof(VehicleTransportTypesService));
             services.AddTransient(typeof(IVehiclesService), typeof(VehiclesService));
             services.AddTransient(typeof(ISpeedOversService), typeof(SpeedOversService));
+
+            services.AddTransient(typeof(IRedisCacheHelper), typeof(RedisCacheHelper));
 
             services.AddControllers();
 
