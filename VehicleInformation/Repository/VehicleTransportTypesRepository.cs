@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Services.Common.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +7,6 @@ using System.Threading.Tasks;
 using VehicleInformation.Common;
 using VehicleInformation.DbContext;
 using VehicleInformation.Interfaces.IRepository;
-using VehicleInformation.Models;
 
 namespace VehicleInformation.Repository
 {

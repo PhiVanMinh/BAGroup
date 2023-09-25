@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using ReportSpeedOver.API.Common.Interfaces.IHelper;
+using Services.Common.Core.Models;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,6 @@ using System.Net;
 using System.Threading.Tasks;
 using VehicleInformation.Interfaces.IRepository;
 using VehicleInformation.Interfaces.IService;
-using VehicleInformation.Models;
 using VehicleInformation.Repository;
 
 namespace VehicleInformation.Services

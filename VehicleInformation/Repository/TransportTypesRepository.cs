@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
-
+using Services.Common.Core.Models;
 using VehicleInformation.Common;
 using VehicleInformation.DbContext;
 using VehicleInformation.Interfaces.IRepository;
-using VehicleInformation.Models;
 
 namespace VehicleInformation.Repository
 {

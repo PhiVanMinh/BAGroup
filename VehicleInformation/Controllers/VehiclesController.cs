@@ -9,7 +9,7 @@ using System;
 using VehicleInformation.Dto;
 using VehicleInformation.Interfaces.IService;
 using VehicleInformation.Interfaces.IRepository;
-using VehicleInformation.Models;
+using Services.Common.Core.Models;
 
 namespace VehicleInformation.Controllers
 {
