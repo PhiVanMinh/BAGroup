@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using ReportSpeedOver.API.AutoMapper;
 using ReportSpeedOver.API.Common.Helpers;
 using ReportSpeedOver.API.Common.Interfaces.IHelper;
-using System.Net;
+using ReportSpeedOver.API.Services;
 using VehicleInformation.DbContext;
 using VehicleInformation.Interfaces.IRepository;
 using VehicleInformation.Interfaces.IService;
@@ -29,6 +29,10 @@ namespace VehicleInformation
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddGrpc();
+            // Mapper
+            services.AddAutoMapper(typeof(CustomMapper));
+
             services.AddSingleton<DapperContext>();
 
             services.AddScoped(typeof(ITransportTypesRepository), typeof(TransportTypesRepository));
@@ -61,7 +65,6 @@ namespace VehicleInformation
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-
             app.UseHttpsRedirection();
 
             app.UseRouting();
@@ -80,6 +83,16 @@ namespace VehicleInformation
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Showing API V1");
                 });
             }
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapGrpcService<ReportSpeedOverVehicleService>();
+
+                endpoints.MapGet("/", async context =>
+                {
+                    await context.Response.WriteAsync("Communication with gRPC endpoints must be made through a gRPC client.");
+                });
+            });
         }
     }
 }

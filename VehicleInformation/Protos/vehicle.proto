@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+option csharp_namespace = "ReportSpeedOver.API.Protos";
+
+import "google/protobuf/timestamp.proto";
+
+service ReportDataService {
+	rpc GetActivitySummaries (GetById) returns (ActivitySummaries);
+	rpc GetSpeedOver (GetSpeedOverRequest) returns (SpeedOvers);
+	rpc GetTransportTypes (Empty) returns (TranportTypes);
+	rpc GetVehicleInfo (GetById) returns (Vehicles);
+	rpc GetVehicleTransportType (Empty) returns (VehicleTransportTypes);
+}
+
+message GetById {
+	int32 id = 1;
+}
+
+message ActivitySummary {
+	int64 fK_VehicleID = 1;
+	int32 fK_CompanyID = 2;
+	int32 activityTime = 3;
+	float totalKmGps = 4;
+	google.protobuf.Timestamp fK_Date = 5;
+}
+
+message SpeedOver {
+        int64 fK_VehicleID = 1;
+
+        int32 fK_CompanyID = 2;
+
+        int32 velocityAllow = 3;
+
+        int32 velocityGps = 4;
+
+        float startKm = 5;
+
+        float endKm = 6;
+
+        google.protobuf.Timestamp startTime = 7;
+
+        google.protobuf.Timestamp endTime  = 8;
+
+        google.protobuf.Timestamp createdDate  = 9;
+
+}
+
+message GetSpeedOverRequest {
+	 google.protobuf.Timestamp fromDate = 1;
+	 google.protobuf.Timestamp toDate = 2;
+}
+
+message TranportType {
+        int64 pK_TransportTypeID = 1;
+
+        string displayName = 2;
+
+        bool isActivated = 3;
+}
+
+
+message Vehicle {
+        int64 pK_VehicleID = 1;
+
+        int32 fK_CompanyID = 2;
+
+        string privateCode = 3;
+
+        string vehiclePlate = 4;
+
+        bool isDeleted = 5;
+}
+
+message VehicleTransportType {
+        int64 fK_VehicleID = 1;
+
+        int64 fK_TransportTypeID = 2;
+
+        int32 fK_CompanyID = 3;
+
+        bool isDeleted = 4;
+}
+
+message Empty{}
+
+message ActivitySummaries {
+    repeated ActivitySummary items = 1;
+}
+
+message SpeedOvers {
+    repeated SpeedOver items = 1;
+}
+
+message TranportTypes {
+    repeated TranportType items = 1;
+}
+
+message Vehicles {
+    repeated Vehicle items = 1;
+}
+
+message VehicleTransportTypes {
+    repeated VehicleTransportType items = 1;
+}

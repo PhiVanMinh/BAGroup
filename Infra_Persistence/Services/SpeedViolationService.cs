@@ -7,6 +7,8 @@ using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System.Text.Json;
 using Services.Common.Core.Models;
+using Grpc.Net.Client;
+using ReportSpeedOver.API.Protos;
 
 namespace Infra_Persistence.Services
 {
@@ -24,6 +26,9 @@ namespace Infra_Persistence.Services
         private readonly ILogger<SpeedViolationService> _logger;
         private readonly IDatabase _cache;
 
+        private readonly GrpcChannel _channel;
+        private readonly ReportDataService.ReportDataServiceClient _client;
+
         public SpeedViolationService(
             IUnitOfWork unitOfWork,
             ILogger<SpeedViolationService> logger,
@@ -39,6 +44,9 @@ namespace Infra_Persistence.Services
             _httpHelper = httpHelper;
             var redis = ConnectionMultiplexer.Connect($"{_configuration["RedisCacheUrl"]},abortConnect=False");
             _cache = redis.GetDatabase();
+
+            _channel = GrpcChannel.ForAddress(_configuration["GrpcSettings:ReportDataServiceUrl"]);
+            _client = new ReportDataService.ReportDataServiceClient(_channel);
         }
 
         /// <summary>Lấy dánh sách các xe theo thông tin công ty</summary>
@@ -76,21 +84,24 @@ namespace Infra_Persistence.Services
             string cacheKey = $"{DateTime.Now.ToString("dd_MM_yyyy_hh")} {input.FromDate}_{input.ToDate}_{string.Join("_",input.ListVhcId)}";
             try
             {
-                List<GetAllSpeedViolationVehicleDto> result = new List<GetAllSpeedViolationVehicleDto>();
-                var totalCount = 0;
+                //List<GetAllSpeedViolationVehicleDto> result = new List<GetAllSpeedViolationVehicleDto>();
+                //var totalCount = 0;
 
-                totalCount = (int)_cache.SortedSetLength($"{cacheKey}");
-                result = await _cacheHelper.GetDataFromCache< GetAllSpeedViolationVehicleDto>(cacheKey, input.Page, input.PageSize);
-                if(result.Count() == 0)
-                {
-                    var vhcList = await GetSpeedViolationVehicle(input);
+                //totalCount = (int)_cache.SortedSetLength($"{cacheKey}");
+                //result = await _cacheHelper.GetDataFromCache< GetAllSpeedViolationVehicleDto>(cacheKey, input.Page, input.PageSize);
+                //if(result.Count() == 0)
+                //{
+                //    var vhcList = await GetSpeedViolationVehicle(input);
 
-                    totalCount = vhcList.Count();
-                    result = vhcList.Skip((input.Page - 1) * input.PageSize).Take(input.PageSize).ToList();
-                    _cacheHelper.AddEnumerableToSortedSet(cacheKey, vhcList);
-                }
-                valueReport.TotalCount = totalCount;
-                valueReport.Result = result;
+                //    totalCount = vhcList.Count();
+                //    result = vhcList.Skip((input.Page - 1) * input.PageSize).Take(input.PageSize).ToList();
+                //    _cacheHelper.AddEnumerableToSortedSet(cacheKey, vhcList);
+                //}
+                //valueReport.TotalCount = totalCount;
+                //valueReport.Result = result;
+
+                var response =  _client.GetTransportTypes(new Empty { });
+                var test = 0;
             }
             catch (Exception ex)
             {
