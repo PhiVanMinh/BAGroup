@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+option csharp_namespace = "ReportDataGrpcService";
+
+package greet;
+import "google/protobuf/timestamp.proto";
+
+// The greeting service definition.
+service Greeter {
+  // Sends a greeting
+  rpc SayHello (HelloRequest) returns (HelloReply);
+  rpc GetActivitySummaries (GetById) returns (ActivitySummaries);
+  rpc GetSpeedOver (GetSpeedOverRequest) returns (SpeedOvers);
+  rpc GetVehicleTransportType (Empty) returns (VehicleTransportTypes);
+}
+
+// The request message containing the user's name.
+message HelloRequest {
+  string name = 1;
+}
+
+// The response message containing the greetings.
+message HelloReply {
+  string message = 1;
+}
+
+message GetById {
+	int32 id = 1;
+}
+
+message ActivitySummary {
+	int64 fK_VehicleID = 1;
+	int32 fK_CompanyID = 2;
+	int32 activityTime = 3;
+	float totalKmGps = 4;
+	google.protobuf.Timestamp fK_Date = 5;
+}
+
+message SpeedOver {
+        int64 fK_VehicleID = 1;
+
+        int32 fK_CompanyID = 2;
+
+        int32 velocityAllow = 3;
+
+        int32 velocityGps = 4;
+
+        float startKm = 5;
+
+        float endKm = 6;
+
+        google.protobuf.Timestamp startTime = 7;
+
+        google.protobuf.Timestamp endTime  = 8;
+
+        google.protobuf.Timestamp createdDate  = 9;
+
+}
+
+message GetSpeedOverRequest {
+	 string fromDate = 1;
+	 string toDate = 2;
+}
+
+
+
+message VehicleTransportType {
+        int64 fK_VehicleID = 1;
+
+        int64 fK_TransportTypeID = 2;
+
+        int32 fK_CompanyID = 3;
+
+        bool isDeleted = 4;
+}
+
+message Empty{}
+
+message ActivitySummaries {
+    repeated ActivitySummary items = 1;
+}
+
+message SpeedOvers {
+    repeated SpeedOver items = 1;
+}
+
+message VehicleTransportTypes {
+    repeated VehicleTransportType items = 1;
+}

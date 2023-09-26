@@ -29,9 +29,10 @@ namespace VehicleInformation
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddGrpc();
-            // Mapper
-            services.AddAutoMapper(typeof(CustomMapper));
+            //services.AddGrpc();
+            //services.AddGrpcReflection();
+            //// Mapper
+            //services.AddAutoMapper(typeof(CustomMapper));
 
             services.AddSingleton<DapperContext>();
 
@@ -82,17 +83,20 @@ namespace VehicleInformation
                 app.UseSwaggerUI(c => {
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Showing API V1");
                 });
+
             }
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapGrpcService<ReportSpeedOverVehicleService>();
+            //app.UseEndpoints(endpoints =>
+            //{
+            //    endpoints.MapGrpcReflectionService();
 
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Communication with gRPC endpoints must be made through a gRPC client.");
-                });
-            });
+            //    endpoints.MapGrpcService<ReportSpeedOverVehicleService>();
+
+            //    endpoints.MapGet("/", async context =>
+            //    {
+            //        await context.Response.WriteAsync("Communication with gRPC endpoints must be made through a gRPC client.");
+            //    });
+            //});
         }
     }
 }

@@ -83,7 +83,14 @@ namespace ReportSpeedOver.API.Services
                 var result = await _transportTypes.GetAll();
                 foreach (BGT_TranportTypes value in result)
                 {
-                    response.Items.Add(_mapper.Map<TranportType>(value));
+                    var item = new TranportType
+                    {
+                        DisplayName = value.DisplayName,
+                        IsActivated = value.IsActivated,
+                        PKTransportTypeID = value.PK_TransportTypeID
+                    };
+                    //response.Items.Add(_mapper.Map<TranportType>(value));
+                    response.Items.Add(item);
                 }
             }
             catch (Exception ex)
