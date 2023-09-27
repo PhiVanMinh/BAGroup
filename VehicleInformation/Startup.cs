@@ -5,10 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using ReportSpeedOver.API.AutoMapper;
 using ReportSpeedOver.API.Common.Helpers;
 using ReportSpeedOver.API.Common.Interfaces.IHelper;
-using ReportSpeedOver.API.Services;
 using VehicleInformation.DbContext;
 using VehicleInformation.Interfaces.IRepository;
 using VehicleInformation.Interfaces.IService;
@@ -29,10 +27,6 @@ namespace VehicleInformation
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddGrpc();
-            //services.AddGrpcReflection();
-            //// Mapper
-            //services.AddAutoMapper(typeof(CustomMapper));
 
             services.AddSingleton<DapperContext>();
 
@@ -85,18 +79,6 @@ namespace VehicleInformation
                 });
 
             }
-
-            //app.UseEndpoints(endpoints =>
-            //{
-            //    endpoints.MapGrpcReflectionService();
-
-            //    endpoints.MapGrpcService<ReportSpeedOverVehicleService>();
-
-            //    endpoints.MapGet("/", async context =>
-            //    {
-            //        await context.Response.WriteAsync("Communication with gRPC endpoints must be made through a gRPC client.");
-            //    });
-            //});
         }
     }
 }

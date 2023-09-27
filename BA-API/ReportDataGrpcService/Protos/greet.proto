@@ -8,26 +8,26 @@ import "google/protobuf/timestamp.proto";
 // The greeting service definition.
 service Greeter {
   // Sends a greeting
-  rpc SayHello (HelloRequest) returns (HelloReply);
   rpc GetActivitySummaries (GetById) returns (ActivitySummaries);
   rpc GetSpeedOver (GetSpeedOverRequest) returns (SpeedOvers);
+  rpc GetTransportTypes (Empty) returns (TranportTypes);
+  rpc GetVehicleInfo (GetById) returns (Vehicles);
   rpc GetVehicleTransportType (Empty) returns (VehicleTransportTypes);
 }
 
-// The request message containing the user's name.
-message HelloRequest {
-  string name = 1;
-}
-
-// The response message containing the greetings.
-message HelloReply {
-  string message = 1;
-}
-
+// Input
 message GetById {
 	int32 id = 1;
 }
 
+message Empty{}
+
+message GetSpeedOverRequest {
+	 string fromDate = 1;
+	 string toDate = 2;
+}
+
+// Dto
 message ActivitySummary {
 	int64 fK_VehicleID = 1;
 	int32 fK_CompanyID = 2;
@@ -57,11 +57,28 @@ message SpeedOver {
 
 }
 
-message GetSpeedOverRequest {
-	 string fromDate = 1;
-	 string toDate = 2;
+
+
+
+message TranportType {
+        int64 pK_TransportTypeID = 1;
+
+        string displayName = 2;
+
+        bool isActivated = 3;
 }
 
+message Vehicle {
+        int64 pK_VehicleID = 1;
+
+        int32 fK_CompanyID = 2;
+
+        string privateCode = 3;
+
+        string vehiclePlate = 4;
+
+        bool isDeleted = 5;
+}
 
 
 message VehicleTransportType {
@@ -74,7 +91,8 @@ message VehicleTransportType {
         bool isDeleted = 4;
 }
 
-message Empty{}
+
+// List value 
 
 message ActivitySummaries {
     repeated ActivitySummary items = 1;
@@ -82,6 +100,14 @@ message ActivitySummaries {
 
 message SpeedOvers {
     repeated SpeedOver items = 1;
+}
+
+message TranportTypes {
+    repeated TranportType items = 1;
+}
+
+message Vehicles {
+    repeated Vehicle items = 1;
 }
 
 message VehicleTransportTypes {

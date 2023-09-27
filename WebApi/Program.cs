@@ -11,8 +11,6 @@ using Infra_Persistence.Services;
 using Infra_Persistence.Authorization;
 using Infrastructure.Contexts;
 using Infra_Persistence.Helper;
-using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
-using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 

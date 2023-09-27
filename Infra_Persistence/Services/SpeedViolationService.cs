@@ -9,6 +9,7 @@ using System.Text.Json;
 using Services.Common.Core.Models;
 using Grpc.Net.Client;
 using ReportDataGrpcService;
+using AutoMapper;
 
 namespace Infra_Persistence.Services
 {
@@ -22,6 +23,7 @@ namespace Infra_Persistence.Services
         private readonly IConfiguration _configuration;
         private readonly IRedisCacheHelper _cacheHelper;
         private readonly IHttpRequestHelper _httpHelper;
+        private readonly IMapper _mapper;
         public IUnitOfWork _unitOfWork;
         private readonly ILogger<SpeedViolationService> _logger;
         private readonly IDatabase _cache;
@@ -34,7 +36,8 @@ namespace Infra_Persistence.Services
             ILogger<SpeedViolationService> logger,
             IConfiguration configuration,
             IRedisCacheHelper cacheHelper,
-            IHttpRequestHelper httpHelper
+            IHttpRequestHelper httpHelper,
+            IMapper mapper
             )
         {
             _unitOfWork = unitOfWork;
@@ -42,6 +45,7 @@ namespace Infra_Persistence.Services
             _configuration = configuration;
             _cacheHelper = cacheHelper;
             _httpHelper = httpHelper;
+            _mapper = mapper;
             var redis = ConnectionMultiplexer.Connect($"{_configuration["RedisCacheUrl"]},abortConnect=False");
             _cache = redis.GetDatabase();
 
@@ -100,13 +104,7 @@ namespace Infra_Persistence.Services
                 valueReport.TotalCount = totalCount;
                 valueReport.Result = result;
 
-                //var response = _client.SayHello(new HelloRequest { Name = "minh" });
-                //var test = _client.GetVehicleTransportType(new Empty { });
-                //var test2 = _client.GetSpeedOver(new GetSpeedOverRequest
-                //{
-                //    FromDate = input.FromDate.ToString(),
-                //    ToDate = input.ToDate.ToString(),
-                //});
+
             }
             catch (Exception ex)
             {
@@ -175,14 +173,24 @@ namespace Infra_Persistence.Services
             var result = new List<GetVehicleInfomationDto>();
             try
             {
-                var tranportTypes = await GetDataReportSpeedOver<BGT_TranportTypes>("SpeedViolationService", "GetVehicleInfomation",
-                                                                    $"{_configuration["UrlBase"]}/Vehicles/transport-type");
+                //var tranportTypes = await GetDataReportSpeedOver<BGT_TranportTypes>("SpeedViolationService", "GetVehicleInfomation",
+                //                                                    $"{_configuration["UrlBase"]}/Vehicles/transport-type");
 
-                var vehicleTransportTypes = await GetDataReportSpeedOver<BGT_VehicleTransportTypes>("SpeedViolationService", "GetVehicleInfomation",
-                                                                    $"{_configuration["UrlBase"]}/Vehicles/vehicle-type");
+                //var vehicleTransportTypes = await GetDataReportSpeedOver<BGT_VehicleTransportTypes>("SpeedViolationService", "GetVehicleInfomation",
+                //                                                    $"{_configuration["UrlBase"]}/Vehicles/vehicle-type");
 
-                var vehicles = await GetDataReportSpeedOver<Vehicle_Vehicles>("SpeedViolationService", "GetVehicleInfomation",
-                                                                    $"{_configuration["UrlBase"]}/Vehicles/vehicle?input={input.CompanyId}");
+                //var vehicles = await GetDataReportSpeedOver<Vehicle_Vehicles>("SpeedViolationService", "GetVehicleInfomation",
+                //                                                    $"{_configuration["UrlBase"]}/Vehicles/vehicle?input={input.CompanyId}");
+
+
+                var reponseTransportTypes = _client.GetTransportTypes(new Empty { });
+                var tranportTypes = _mapper.Map<List<BGT_TranportTypes>>(reponseTransportTypes.Items);
+
+                var reponseVhcTransportTypes = _client.GetVehicleTransportType(new Empty { });
+                var vehicleTransportTypes = _mapper.Map<List<BGT_VehicleTransportTypes>>(reponseVhcTransportTypes.Items);
+
+                var reponseVehicle = _client.GetVehicleInfo(new GetById { Id = input.CompanyId });
+                var vehicles = _mapper.Map<List<Vehicle_Vehicles>>(reponseVehicle.Items);
 
                 if (tranportTypes.Any() && vehicleTransportTypes.Any() && vehicles.Any())
                 {
@@ -219,9 +227,12 @@ namespace Infra_Persistence.Services
             var result = new List<GetActivitySummariesDto>();
             try
             {
-                //input.ToDate = input.FromDate.Value.AddDays(60); // test performance
-                var activitySummaries = await GetDataReportSpeedOver<Report_ActivitySummaries>("SpeedViolationService", "GetActivitySummaries",
-                                                                                    $"{_configuration["UrlBase"]}/Vehicles/activiti-summary?input={input.CompanyId}");
+                //var activitySummaries = await GetDataReportSpeedOver<Report_ActivitySummaries>("SpeedViolationService", "GetActivitySummaries",
+                //                                                                    $"{_configuration["UrlBase"]}/Vehicles/activiti-summary?input={input.CompanyId}");
+
+                var respone = _client.GetActivitySummaries(new GetById { Id = input.CompanyId });
+                var activitySummaries = _mapper.Map<List<Report_ActivitySummaries>>(respone.Items);
+
                 if (activitySummaries.Any())
                 {
                     result = activitySummaries.GroupBy(e => new { e.FK_VehicleID, e.FK_CompanyID })
@@ -255,8 +266,16 @@ namespace Infra_Persistence.Services
             try 
             {
                 //input.ToDate = input.FromDate!.Value.AddDays(60);// test perfromance
-                var speedOvers = await GetDataReportSpeedOver<BGT_SpeedOvers>("SpeedViolationService", "GetSpeedOvers",
-                                                                        $"{_configuration["UrlBase"]}/Vehicles/speedOver?fromDate={input.FromDate}&toDate={input.ToDate}");
+                //var speedOvers = await GetDataReportSpeedOver<BGT_SpeedOvers>("SpeedViolationService", "GetSpeedOvers",
+                //                                                        $"{_configuration["UrlBase"]}/Vehicles/speedOver?fromDate={input.FromDate}&toDate={input.ToDate}");
+
+                var respone = _client.GetSpeedOver(new GetSpeedOverRequest
+                {
+                    FromDate = input.FromDate.ToString(),
+                    ToDate = input.ToDate.ToString(),
+                });
+
+                var speedOvers = _mapper.Map<List<BGT_SpeedOvers>>(respone.Items);
 
                 if (speedOvers.Any())
                 {

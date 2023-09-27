@@ -1,10 +1,18 @@
 ﻿using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Microsoft.Extensions.Configuration;
+using ReportDataGrpcService.Interfaces.IHelper;
 using ReportDataGrpcService.Interfaces.IRepository;
 using Services.Common.Core.Models;
+using StackExchange.Redis;
 
 namespace ReportDataGrpcService.Services
 {
+    /// <summary>Các hàm truyền dữ liệu qua gRPC</summary>
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    9/27/2023   created
+    /// </Modified>
     public class GreeterService : Greeter.GreeterBase
     {
         private readonly IVehicleTransportTypesRepository _vehicleTransportTypesRepository;
@@ -12,12 +20,10 @@ namespace ReportDataGrpcService.Services
         private readonly IActivitySummariesRepository _activitySummariesRepository;
         private readonly ITransportTypesRepository _transportTypesRepository;
         private readonly IVehiclesRepository _vehiclesRepository;
+        private readonly IConfiguration _configuration;
+        private readonly ICacheHelper _cacheHelper;
+        private readonly IDatabase _cache;
 
-        //private readonly IActivitySummariesService _activitySummaries;
-        //private readonly ISpeedOversService _speedOvers;
-        //private readonly ITransportTypesService _transportTypes;
-        //private readonly IVehiclesService _vehicle;
-        //private readonly IVehicleTransportTypesService _vhcTransportTypes;
         private readonly ILogger<GreeterService> _logger;
         public GreeterService(
             IVehicleTransportTypesRepository vehicleTransportTypesRepository,
@@ -26,12 +32,9 @@ namespace ReportDataGrpcService.Services
             IVehiclesRepository vehiclesRepository,
             ITransportTypesRepository transportTypesRepository,
 
-            //IActivitySummariesService activitySummaries,
-            //ISpeedOversService speedOvers,
-            //ITransportTypesService transportTypes,
-            //IVehiclesService vehicle,
-            //IVehicleTransportTypesService vhcTransportTypes,
-            ILogger<GreeterService> logger
+            ILogger<GreeterService> logger,
+            IConfiguration configuration,
+            ICacheHelper cacheHelper
         )
         {
             _vehicleTransportTypesRepository = vehicleTransportTypesRepository;
@@ -40,22 +43,21 @@ namespace ReportDataGrpcService.Services
             _transportTypesRepository = transportTypesRepository;
             _vehiclesRepository = vehiclesRepository;
 
-            //_activitySummaries = activitySummaries;
-            //_speedOvers = speedOvers;
-            //_transportTypes = transportTypes;
-            //_vehicle = vehicle;
-            //_vhcTransportTypes = vhcTransportTypes;
             _logger = logger;
+            _configuration = configuration;
+            _cacheHelper = cacheHelper;
+            var redis = ConnectionMultiplexer.Connect($"{_configuration["RedisCacheUrl"]},abortConnect=False");
+            _cache = redis.GetDatabase();
         }
 
-        public override Task<HelloReply> SayHello(HelloRequest request, ServerCallContext context)
-        {
-            return Task.FromResult(new HelloReply
-            {
-                Message = "Hello " + request.Name
-            });
-        }
-
+        /// <summary>Hàm truyền DL tổng hợp</summary>
+        /// <param name="request">The request received from the client.</param>
+        /// <param name="context">The context of the server-side call handler being invoked.</param>
+        /// <returns>The response to send back to the client (wrapped by a task).</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/27/2023   created
+        /// </Modified>
         public async override Task<ActivitySummaries> GetActivitySummaries(GetById request, ServerCallContext context)
         {
             ActivitySummaries response = new ActivitySummaries();
@@ -77,11 +79,19 @@ namespace ReportDataGrpcService.Services
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"ReportSpeedOverVehicleService_GetActivitySummaries_{request.Id}_{ex.Message}");
+                _logger.LogInformation($"GreeterService_GetActivitySummaries_{request.Id}_{ex.Message}");
             }
             return response;
         }
 
+        /// <summary>Hàm chuyền DL vi phạm tốc độ</summary>
+        /// <param name="request">The request received from the client.</param>
+        /// <param name="context">The context of the server-side call handler being invoked.</param>
+        /// <returns>The response to send back to the client (wrapped by a task).</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/27/2023   created
+        /// </Modified>
         public async override Task<SpeedOvers> GetSpeedOver(GetSpeedOverRequest request, ServerCallContext context)
         {
             SpeedOvers response = new SpeedOvers();
@@ -107,54 +117,85 @@ namespace ReportDataGrpcService.Services
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"ReportSpeedOverVehicleService_GetActivitySummaries_{request.FromDate}_{request.ToDate}_{ex.Message}");
+                _logger.LogInformation($"GreeterService_GetSpeedOver_{request.FromDate}_{request.ToDate}_{ex.Message}");
             }
             return response;
         }
 
-        //public async override Task<TranportTypes> GetTransportTypes(Empty request, ServerCallContext context)
-        //{
-        //    TranportTypes response = new TranportTypes();
-        //    try
-        //    {
-        //        var result = await _transportTypes.GetAll();
-        //        foreach (BGT_TranportTypes value in result)
-        //        {
-        //            var item = new TranportType
-        //            {
-        //                DisplayName = value.DisplayName,
-        //                IsActivated = value.IsActivated,
-        //                PKTransportTypeID = value.PK_TransportTypeID
-        //            };
-        //            //response.Items.Add(_mapper.Map<TranportType>(value));
-        //            response.Items.Add(item);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogInformation($"ReportSpeedOverVehicleService_GetActivitySummaries_{ex.Message}");
-        //    }
-        //    return response;
-        //}
+        /// <summary>Hàm truyền DL loại hình vận tải</summary>
+        /// <param name="request">The request received from the client.</param>
+        /// <param name="context">The context of the server-side call handler being invoked.</param>
+        /// <returns>The response to send back to the client (wrapped by a task).</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/27/2023   created
+        /// </Modified>
+        public async override Task<TranportTypes> GetTransportTypes(Empty request, ServerCallContext context)
+        {
+            TranportTypes response = new TranportTypes();
+            try
+            {
+                var result = await GetAllTranportTypes();
+                foreach (BGT_TranportTypes value in result)
+                {
+                    var item = new TranportType
+                    {
+                        DisplayName = value.DisplayName,
+                        IsActivated = value.IsActivated,
+                        PKTransportTypeID = value.PK_TransportTypeID
+                    };
+                    response.Items.Add(item);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"GreeterService_GetTransportTypes_{ex.Message}");
+            }
+            return response;
+        }
 
-        //public async override Task<Vehicles> GetVehicleInfo(GetById request, ServerCallContext context)
-        //{
-        //    Vehicles response = new Vehicles();
-        //    try
-        //    {
-        //        var result = await _vehicle.GetAllByCompany(request.Id);
-        //        //foreach (Vehicle_Vehicles value in result)
-        //        //{
-        //        //    response.Items.Add(_mapper.Map<Vehicle>(value));
-        //        //}
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogInformation($"ReportSpeedOverVehicleService_GetVehicleInfo_{request.Id}_{ex.Message}");
-        //    }
-        //    return response;
-        //}
+        /// <summary>Hàm truyền DL thông tin xe</summary>
+        /// <param name="request">The request received from the client.</param>
+        /// <param name="context">The context of the server-side call handler being invoked.</param>
+        /// <returns>The response to send back to the client (wrapped by a task).</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/27/2023   created
+        /// </Modified>
+        public async override Task<Vehicles> GetVehicleInfo(GetById request, ServerCallContext context)
+        {
+            Vehicles response = new Vehicles();
+            try
+            {
+                var result = await GetAllVehicleByCompany(request.Id);
+                foreach (Vehicle_Vehicles value in result)
+                {
+                    var item = new Vehicle
+                    {
+                        PKVehicleID = value.PK_VehicleID,
+                        FKCompanyID = value.FK_CompanyID,
+                        PrivateCode = value.PrivateCode,
+                        VehiclePlate = value.VehiclePlate,
+                        IsDeleted = value.IsDeleted ?? false
+                    };
+                    response.Items.Add(item);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"GreeterService_GetVehicleInfo_{request.Id}_{ex.Message}");
+            }
+            return response;
+        }
 
+        /// <summary>Hàm truyền DL thông tin vận tải của xe</summary>
+        /// <param name="request">The request received from the client.</param>
+        /// <param name="context">The context of the server-side call handler being invoked.</param>
+        /// <returns>The response to send back to the client (wrapped by a task).</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/27/2023   created
+        /// </Modified>
         public async override Task<VehicleTransportTypes> GetVehicleTransportType(Empty request, ServerCallContext context)
         {
             VehicleTransportTypes response = new VehicleTransportTypes();
@@ -175,7 +216,7 @@ namespace ReportDataGrpcService.Services
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"ReportSpeedOverVehicleService_GetVehicleTransportType_{ex.Message}");
+                _logger.LogInformation($"GreeterService_GetVehicleTransportType_{ex.Message}");
             }
             return response;
         }
@@ -187,25 +228,25 @@ namespace ReportDataGrpcService.Services
         /// Name       Date       Comments
         /// minhpv    9/11/2023   created
         /// </Modified>
-        private Task<List<Report_ActivitySummaries>> GetAllActivitySummariesByCompany(int input)
+        private async Task<List<Report_ActivitySummaries>> GetAllActivitySummariesByCompany(int input)
         {
             var result = new List<Report_ActivitySummaries>();
             try
             {
-                //var cacheKey = $"ActivitySummariesService_GetAllByCompany_Report_ActivitySummaries";
-                //result = await _cacheHelper.GetDataFromCache<Report_ActivitySummaries>(cacheKey, 0, 0);
-                //if (result.Count() == 0)
-                //{
+                var cacheKey = $"GreeterService_GetAllActivitySummariesByCompany_{input}";
+                result = await _cacheHelper.GetDataFromCache<Report_ActivitySummaries>(cacheKey, 0, 0);
+                if (result.Count() == 0)
+                {
                     var summaries = _activitySummariesRepository.GetAllByColumnId("FK_CompanyID", input, false);
                     result = summaries.ToList();
-                //    _cacheHelper.AddEnumerableToSortedSet(cacheKey, result);
-                //}
+                    _cacheHelper.AddEnumerableToSortedSet(cacheKey, result);
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"GetActivitySummaries_{ex.Message}_{input}");
+                _logger.LogInformation($"GreeterService_GetAllActivitySummariesByCompany_{ex.Message}_{input}");
             }
-            return Task.FromResult(result);
+            return result;
         }
 
         /// <summary>Thông tin loại hình vận tải của phương tiện</summary>
@@ -214,25 +255,25 @@ namespace ReportDataGrpcService.Services
         /// Name       Date       Comments
         /// minhpv    9/11/2023   created
         /// </Modified>
-        private Task<List<BGT_VehicleTransportTypes>> GetAllVehicleTransportTypes()
+        private async Task<List<BGT_VehicleTransportTypes>> GetAllVehicleTransportTypes()
         {
             var result = new List<BGT_VehicleTransportTypes>();
             try
             {
-                //var cacheKey = $"VehicleTransportTypesService_GetAll_BGT_VehicleTransportTypes";
-                //result = await _cacheHelper.GetDataFromCache<BGT_VehicleTransportTypes>(cacheKey, 0, 0);
-                //if (result.Count() == 0)
-                //{
+                var cacheKey = $"GreeterService_GetAllVehicleTransportTypes";
+                result = await _cacheHelper.GetDataFromCache<BGT_VehicleTransportTypes>(cacheKey, 0, 0);
+                if (result.Count() == 0)
+                {
                     var respon = _vehicleTransportTypesRepository.GetAll();
                     result = respon.ToList();
-                    //_cacheHelper.AddEnumerableToSortedSet(cacheKey, result);
-                //}
+                    _cacheHelper.AddEnumerableToSortedSet(cacheKey, result);
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"GetVehicleTransportTypes_{ex.Message}");
+                _logger.LogInformation($"GreeterService_GetAllVehicleTransportTypes_{ex.Message}");
             }
-            return Task.FromResult(result);
+            return result;
         }
 
         /// <summary>Thông tin vi phạm tốc độ theo ngày</summary>
@@ -243,25 +284,80 @@ namespace ReportDataGrpcService.Services
         /// Name       Date       Comments
         /// minhpv    9/11/2023   created
         /// </Modified>
-        private Task<List<BGT_SpeedOvers>> GetAllSpeedOversByDate(DateTime fromDate, DateTime toDate)
+        private async Task<List<BGT_SpeedOvers>> GetAllSpeedOversByDate(DateTime fromDate, DateTime toDate)
         {
             var result = new List<BGT_SpeedOvers>();
             try
             {
-                //var cacheKey = $"SpeedOversService_GetAllSpeedOversByDate_BGT_SpeedOvers";
-                //result = await _cacheHelper.GetDataFromCache<BGT_SpeedOvers>(cacheKey, 0, 0);
-                //if (result.Count() == 0)
-                //{
+                var cacheKey = $"GreeterService_GetAllSpeedOversByDate_BGT_SpeedOvers_{fromDate}_{toDate}";
+                result = await _cacheHelper.GetDataFromCache<BGT_SpeedOvers>(cacheKey, 0, 0);
+                if (result.Count() == 0)
+                {
                     var speedOvers = _speedOversRepository.GetAllByDate("StartTime", fromDate, toDate, false);
                     result = speedOvers.ToList();
-                //    _cacheHelper.AddEnumerableToSortedSet(cacheKey, result);
-                //}
+                    _cacheHelper.AddEnumerableToSortedSet(cacheKey, result);
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"GetSpeedOvers_{ex.Message}_{fromDate}_{toDate}");
+                _logger.LogInformation($"GreeterService_GetAllSpeedOversByDate_{ex.Message}_{fromDate}_{toDate}");
             }
-            return Task.FromResult(result);
+            return result;
+        }
+
+        /// <summary>Lấy các thông tin loại hình vận tải</summary>
+        /// <returns> Các thông tin loại hình vận tải</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/11/2023   created
+        /// </Modified>
+        private async Task<List<BGT_TranportTypes>> GetAllTranportTypes()
+        {
+            var result = new List<BGT_TranportTypes>();
+            try
+            {
+                var cacheKey = $"GreeterService_GetAllTranportTypes";
+                result = await _cacheHelper.GetDataFromCache<BGT_TranportTypes>(cacheKey, 0, 0);
+                if (result.Count() == 0)
+                {
+                    var types = _transportTypesRepository.GetAll();
+                    result = types.ToList();
+                    _cacheHelper.AddEnumerableToSortedSet(cacheKey, result);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"GreeterService_GetAllTranportTypes_{ex.Message}");
+            }
+            return result;
+        }
+
+        /// <summary>Lấy thông tin xe theo đơn vị vận tải</summary>
+        /// <param name="input">Mã đơn vị vận tải</param>
+        /// <returns>Thông tin các xe</returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    9/11/2023   created
+        /// </Modified>
+        private async Task<List<Vehicle_Vehicles>> GetAllVehicleByCompany(int input)
+        {
+            var result = new List<Vehicle_Vehicles>();
+            try
+            {
+                var cacheKey = $"GreeterService_GetAllVehicleByCompany_{input}";
+                result = await _cacheHelper.GetDataFromCache<Vehicle_Vehicles>(cacheKey, 0, 0);
+                if (result.Count() == 0)
+                {
+                    var vehicles = _vehiclesRepository.GetAllByColumnId("FK_CompanyID", input, true);
+                    result = vehicles.ToList();
+                    _cacheHelper.AddEnumerableToSortedSet(cacheKey, result);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"GreeterService_GetAllVehicleByCompany_{input}_{ex.Message}");
+            }
+            return result;
         }
     }
 }

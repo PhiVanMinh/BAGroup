@@ -53,7 +53,7 @@ namespace VehicleInformation.Services
             var result = new List<Vehicle_Vehicles>();
             try
             {
-                var cacheKey = $"VehiclesService_GetAllByCompany_Vehicle_Vehicles";
+                var cacheKey = $"VehiclesService_GetAllByCompany_Vehicle_Vehicles_{input}";
                 result = await _cacheHelper.GetDataFromCache<Vehicle_Vehicles>(cacheKey, 0, 0);
                 if (result.Count() == 0)
                 {

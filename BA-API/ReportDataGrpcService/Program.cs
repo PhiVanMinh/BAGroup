@@ -1,4 +1,6 @@
 using ReportDataGrpcService.DBContext;
+using ReportDataGrpcService.Helpers;
+using ReportDataGrpcService.Interfaces.IHelper;
 using ReportDataGrpcService.Interfaces.IRepository;
 using ReportDataGrpcService.Repository;
 using ReportDataGrpcService.Services;
@@ -19,6 +21,8 @@ builder.Services.AddScoped(typeof(IActivitySummariesRepository), typeof(Activity
 builder.Services.AddScoped(typeof(IVehicleTransportTypesRepository), typeof(VehicleTransportTypesRepository));
 builder.Services.AddScoped(typeof(IVehiclesRepository), typeof(VehiclesRepository));
 builder.Services.AddScoped(typeof(ISpeedOversRepository), typeof(SpeedOversRepository));
+
+builder.Services.AddTransient(typeof(ICacheHelper), typeof(CacheHelper));
 
 var app = builder.Build();
 

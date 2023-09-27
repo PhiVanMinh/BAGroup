@@ -53,7 +53,7 @@ namespace VehicleInformation.Services
             var result = new List<Report_ActivitySummaries>();
             try
             {
-                var cacheKey = $"ActivitySummariesService_GetAllByCompany_Report_ActivitySummaries";
+                var cacheKey = $"ActivitySummariesService_GetAllByCompany_Report_ActivitySummaries_{input}";
                 result = await _cacheHelper.GetDataFromCache<Report_ActivitySummaries>(cacheKey, 0, 0);
                 if (result.Count() == 0)
                 {

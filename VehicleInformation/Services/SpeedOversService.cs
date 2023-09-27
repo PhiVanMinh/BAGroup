@@ -54,7 +54,7 @@ namespace VehicleInformation.Services
             var result = new List<BGT_SpeedOvers>();
             try
             {
-                var cacheKey = $"SpeedOversService_GetAllSpeedOversByDate_BGT_SpeedOvers";
+                var cacheKey = $"SpeedOversService_GetAllSpeedOversByDate_BGT_SpeedOvers_{fromDate}_{toDate}";
                 result = await _cacheHelper.GetDataFromCache<BGT_SpeedOvers>(cacheKey, 0, 0);
                 if (result.Count() == 0)
                 {
