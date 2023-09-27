@@ -1,4 +1,6 @@
-﻿using Google.Protobuf.WellKnownTypes;
+﻿using AutoMapper;
+using Google.Protobuf.Collections;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.Configuration;
 using ReportDataGrpcService.Interfaces.IHelper;
@@ -22,6 +24,7 @@ namespace ReportDataGrpcService.Services
         private readonly IVehiclesRepository _vehiclesRepository;
         private readonly IConfiguration _configuration;
         private readonly ICacheHelper _cacheHelper;
+        private readonly IMapper _mapper;
         private readonly IDatabase _cache;
 
         private readonly ILogger<GreeterService> _logger;
@@ -34,7 +37,8 @@ namespace ReportDataGrpcService.Services
 
             ILogger<GreeterService> logger,
             IConfiguration configuration,
-            ICacheHelper cacheHelper
+            ICacheHelper cacheHelper,
+            IMapper mapper
         )
         {
             _vehicleTransportTypesRepository = vehicleTransportTypesRepository;
@@ -46,6 +50,7 @@ namespace ReportDataGrpcService.Services
             _logger = logger;
             _configuration = configuration;
             _cacheHelper = cacheHelper;
+            _mapper = mapper;
             var redis = ConnectionMultiplexer.Connect($"{_configuration["RedisCacheUrl"]},abortConnect=False");
             _cache = redis.GetDatabase();
         }
@@ -64,18 +69,7 @@ namespace ReportDataGrpcService.Services
             try
             {
                 var result = await GetAllActivitySummariesByCompany(request.Id);
-                foreach (Report_ActivitySummaries value in result)
-                {
-                    var item = new ActivitySummary
-                    {
-                        FKVehicleID = value.FK_VehicleID,
-                        FKCompanyID = value.FK_CompanyID,
-                        ActivityTime = value.ActivityTime ?? 0,
-                        FKDate = Timestamp.FromDateTime(value.FK_Date .ToUniversalTime()),
-                        TotalKmGps = value.TotalKmGps ?? 0f
-                    };
-                    response.Items.Add(item);
-                }
+                if (result != null) response.Items.AddRange(_mapper.Map<RepeatedField<ActivitySummary>>(result));
             }
             catch (Exception ex)
             {
@@ -98,22 +92,8 @@ namespace ReportDataGrpcService.Services
             try
             {
                 var result = await GetAllSpeedOversByDate(DateTime.Parse(request.FromDate), DateTime.Parse(request.ToDate));
-                foreach (BGT_SpeedOvers value in result)
-                {
-                    var item = new SpeedOver
-                    {
-                        FKVehicleID = value.FK_VehicleID,
-                        FKCompanyID = value.FK_CompanyID,
-                        VelocityAllow = value.VelocityAllow ?? 0,
-                        VelocityGps = value.VelocityGps ?? 0,
-                        CreatedDate = Timestamp.FromDateTime((value.CreatedDate ?? DateTime.Now).ToUniversalTime()),
-                        StartKm = value.StartKm ?? 0,
-                        EndKm = value.EndKm ?? 0,
-                        StartTime = Timestamp.FromDateTime((value.StartTime?? DateTime.Now).ToUniversalTime()),
-                        EndTime = Timestamp.FromDateTime((value.EndTime ?? DateTime.Now).ToUniversalTime()),
-                    };
-                    response.Items.Add(item);
-                }
+
+                if (result != null)  response.Items.AddRange(_mapper.Map<RepeatedField<SpeedOver>>(result));
             }
             catch (Exception ex)
             {
@@ -136,16 +116,7 @@ namespace ReportDataGrpcService.Services
             try
             {
                 var result = await GetAllTranportTypes();
-                foreach (BGT_TranportTypes value in result)
-                {
-                    var item = new TranportType
-                    {
-                        DisplayName = value.DisplayName,
-                        IsActivated = value.IsActivated,
-                        PKTransportTypeID = value.PK_TransportTypeID
-                    };
-                    response.Items.Add(item);
-                }
+                if (result != null) response.Items.AddRange(_mapper.Map<RepeatedField<TranportType>>(result));
             }
             catch (Exception ex)
             {
@@ -168,18 +139,8 @@ namespace ReportDataGrpcService.Services
             try
             {
                 var result = await GetAllVehicleByCompany(request.Id);
-                foreach (Vehicle_Vehicles value in result)
-                {
-                    var item = new Vehicle
-                    {
-                        PKVehicleID = value.PK_VehicleID,
-                        FKCompanyID = value.FK_CompanyID,
-                        PrivateCode = value.PrivateCode,
-                        VehiclePlate = value.VehiclePlate,
-                        IsDeleted = value.IsDeleted ?? false
-                    };
-                    response.Items.Add(item);
-                }
+                if (result != null) response.Items.AddRange(_mapper.Map<RepeatedField<Vehicle>>(result));
+
             }
             catch (Exception ex)
             {
@@ -202,17 +163,7 @@ namespace ReportDataGrpcService.Services
             try
             {
                 var result = await GetAllVehicleTransportTypes();
-                foreach (BGT_VehicleTransportTypes value in result)
-                {
-                    var item = new VehicleTransportType
-                    {
-                        FKVehicleID = value.FK_VehicleID,
-                        FKCompanyID = value.FK_CompanyID,
-                        FKTransportTypeID = value.FK_TransportTypeID,
-                        IsDeleted = value.IsDeleted ?? false,
-                    };
-                    response.Items.Add(item);
-                }
+                if (result != null) response.Items.AddRange(_mapper.Map<RepeatedField<VehicleTransportType>>(result));
             }
             catch (Exception ex)
             {

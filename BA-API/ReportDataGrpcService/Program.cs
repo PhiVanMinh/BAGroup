@@ -1,3 +1,4 @@
+using ReportDataGrpcService.AutoMapper;
 using ReportDataGrpcService.DBContext;
 using ReportDataGrpcService.Helpers;
 using ReportDataGrpcService.Interfaces.IHelper;
@@ -15,6 +16,9 @@ builder.Services.AddSingleton<DapperDbContext>();
 // Add services to the container.
 builder.Services.AddGrpc();
 builder.Services.AddGrpcReflection();
+
+// Mapper
+builder.Services.AddAutoMapper(typeof(Mapper));
 
 builder.Services.AddScoped(typeof(ITransportTypesRepository), typeof(TransportTypesRepository));
 builder.Services.AddScoped(typeof(IActivitySummariesRepository), typeof(ActivitySummariesRepository));

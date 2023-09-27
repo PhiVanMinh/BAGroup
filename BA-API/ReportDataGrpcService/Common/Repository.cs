@@ -9,10 +9,12 @@ using ReportDataGrpcService.Interfaces.Common;
 
 namespace ReportDataGrpcService.Common
 {
-    public class Repository
-    {
-    }
-
+    /// <summary>Khai báo các hàm chung cho repository</summary>
+    /// <typeparam name="T">Tên bảng</typeparam>
+    /// <Modified>
+    /// Name       Date       Comments
+    /// minhpv    9/27/2023   created
+    /// </Modified>
     public class Repository<T> : IRepository<T> where T : class
     {
         IDbConnection _connection;

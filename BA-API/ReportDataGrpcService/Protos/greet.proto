@@ -54,10 +54,7 @@ message SpeedOver {
         google.protobuf.Timestamp endTime  = 8;
 
         google.protobuf.Timestamp createdDate  = 9;
-
 }
-
-
 
 
 message TranportType {
@@ -80,7 +77,6 @@ message Vehicle {
         bool isDeleted = 5;
 }
 
-
 message VehicleTransportType {
         int64 fK_VehicleID = 1;
 
@@ -90,7 +86,6 @@ message VehicleTransportType {
 
         bool isDeleted = 4;
 }
-
 
 // List value 
 

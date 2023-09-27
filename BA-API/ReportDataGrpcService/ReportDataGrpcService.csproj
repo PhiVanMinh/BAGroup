@@ -11,6 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="11.0.0" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
     <PackageReference Include="CachingFramework.Redis" Version="14.0.0" />
     <PackageReference Include="Dapper" Version="2.0.90" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.50.0" />
