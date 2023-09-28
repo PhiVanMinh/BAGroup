@@ -5,11 +5,6 @@ using Application.IService;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
-using System.Text.Json;
-using Services.Common.Core.Models;
-using Grpc.Net.Client;
-using ReportDataGrpcService;
-using AutoMapper;
 
 namespace Infra_Persistence.Services
 {
@@ -22,35 +17,26 @@ namespace Infra_Persistence.Services
     {
         private readonly IConfiguration _configuration;
         private readonly IRedisCacheHelper _cacheHelper;
-        private readonly IHttpRequestHelper _httpHelper;
-        private readonly IMapper _mapper;
+        private readonly IDataService _data;
         public IUnitOfWork _unitOfWork;
         private readonly ILogger<SpeedViolationService> _logger;
         private readonly IDatabase _cache;
 
-        private readonly GrpcChannel _channel;
-        private readonly Greeter.GreeterClient _client;
-
         public SpeedViolationService(
+            IDataService data,
             IUnitOfWork unitOfWork,
             ILogger<SpeedViolationService> logger,
             IConfiguration configuration,
-            IRedisCacheHelper cacheHelper,
-            IHttpRequestHelper httpHelper,
-            IMapper mapper
+            IRedisCacheHelper cacheHelper
             )
         {
+            _data = data;
             _unitOfWork = unitOfWork;
             _logger = logger;
             _configuration = configuration;
             _cacheHelper = cacheHelper;
-            _httpHelper = httpHelper;
-            _mapper = mapper;
             var redis = ConnectionMultiplexer.Connect($"{_configuration["RedisCacheUrl"]},abortConnect=False");
             _cache = redis.GetDatabase();
-
-            _channel = GrpcChannel.ForAddress(_configuration["GrpcSettings:ReportDataServiceUrl"]);
-            _client = new Greeter.GreeterClient(_channel);
         }
 
         /// <summary>Lấy dánh sách các xe theo thông tin công ty</summary>
@@ -173,24 +159,9 @@ namespace Infra_Persistence.Services
             var result = new List<GetVehicleInfomationDto>();
             try
             {
-                //var tranportTypes = await GetDataReportSpeedOver<BGT_TranportTypes>("SpeedViolationService", "GetVehicleInfomation",
-                //                                                    $"{_configuration["UrlBase"]}/Vehicles/transport-type");
-
-                //var vehicleTransportTypes = await GetDataReportSpeedOver<BGT_VehicleTransportTypes>("SpeedViolationService", "GetVehicleInfomation",
-                //                                                    $"{_configuration["UrlBase"]}/Vehicles/vehicle-type");
-
-                //var vehicles = await GetDataReportSpeedOver<Vehicle_Vehicles>("SpeedViolationService", "GetVehicleInfomation",
-                //                                                    $"{_configuration["UrlBase"]}/Vehicles/vehicle?input={input.CompanyId}");
-
-
-                var reponseTransportTypes = _client.GetTransportTypes(new Empty { });
-                var tranportTypes = _mapper.Map<List<BGT_TranportTypes>>(reponseTransportTypes.Items);
-
-                var reponseVhcTransportTypes = _client.GetVehicleTransportType(new Empty { });
-                var vehicleTransportTypes = _mapper.Map<List<BGT_VehicleTransportTypes>>(reponseVhcTransportTypes.Items);
-
-                var reponseVehicle = _client.GetVehicleInfo(new GetById { Id = input.CompanyId });
-                var vehicles = _mapper.Map<List<Vehicle_Vehicles>>(reponseVehicle.Items);
+                var tranportTypes = await _data.GetTransportTypes();
+                var vehicleTransportTypes = await _data.GetVehicleTransportType();
+                var vehicles = await _data.GetVehicleInfo(input.CompanyId);
 
                 if (tranportTypes.Any() && vehicleTransportTypes.Any() && vehicles.Any())
                 {
@@ -227,11 +198,7 @@ namespace Infra_Persistence.Services
             var result = new List<GetActivitySummariesDto>();
             try
             {
-                //var activitySummaries = await GetDataReportSpeedOver<Report_ActivitySummaries>("SpeedViolationService", "GetActivitySummaries",
-                //                                                                    $"{_configuration["UrlBase"]}/Vehicles/activiti-summary?input={input.CompanyId}");
-
-                var respone = _client.GetActivitySummaries(new GetById { Id = input.CompanyId });
-                var activitySummaries = _mapper.Map<List<Report_ActivitySummaries>>(respone.Items);
+                var activitySummaries = await _data.GetActivitySummaries(input.CompanyId);
 
                 if (activitySummaries.Any())
                 {
@@ -265,17 +232,9 @@ namespace Infra_Persistence.Services
             var result = new List<GetSpeedOversDto>();
             try 
             {
-                //input.ToDate = input.FromDate!.Value.AddDays(60);// test perfromance
-                //var speedOvers = await GetDataReportSpeedOver<BGT_SpeedOvers>("SpeedViolationService", "GetSpeedOvers",
-                //                                                        $"{_configuration["UrlBase"]}/Vehicles/speedOver?fromDate={input.FromDate}&toDate={input.ToDate}");
+                input.ToDate = input.FromDate!.Value.AddDays(60);// test perfromance
 
-                var respone = _client.GetSpeedOver(new GetSpeedOverRequest
-                {
-                    FromDate = input.FromDate.ToString(),
-                    ToDate = input.ToDate.ToString(),
-                });
-
-                var speedOvers = _mapper.Map<List<BGT_SpeedOvers>>(respone.Items);
+                var speedOvers = await _data.GetSpeedOvers(input.FromDate ?? DateTime.Now, input.ToDate ?? DateTime.Now);
 
                 if (speedOvers.Any())
                 {
@@ -331,35 +290,5 @@ namespace Infra_Persistence.Services
             return result;
         }
 
-        /// <summary>Lấy thông tin báo cáo</summary>
-        /// <typeparam name="T">Loại dữ liệu</typeparam>
-        /// <param name="service">Tên service</param>
-        /// <param name="method">Tên phương thức</param>
-        /// <param name="link">URL</param>
-        /// <returns>Thông tin vi phạm</returns>
-        /// <Modified>
-        /// Name       Date       Comments
-        /// minhpv    9/19/2023   created
-        /// </Modified>
-        private async Task<IEnumerable<T>> GetDataReportSpeedOver<T>(string service, string method, string link)
-        {
-            var result = new List<T>();
-            try
-            {
-                var cacheKey = $"{service}_{method}_{link}";
-                result = await _cacheHelper.GetDataFromCache<T>(cacheKey, 0, 0);
-                if (result.Count() == 0)
-                {
-                    var respon = await _httpHelper.GetDataFromOtherService<T>(link);
-                    result = respon.ToList();
-                    _cacheHelper.AddEnumerableToSortedSet(cacheKey, result);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation(ex.Message);
-            }
-            return result;
-        }
     }
 }

@@ -1,5 +1,4 @@
-﻿using Application.Dto.Common;
-using Application.Dto.Users;
+﻿using Application.Dto.Users;
 using Application.Interfaces;
 using Application.IService;
 using CachingFramework.Redis;
@@ -7,12 +6,10 @@ using CachingFramework.Redis.Contracts;
 using CachingFramework.Redis.Contracts.RedisObjects;
 using Infra_Persistence.Authorization;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Services.Common.Core.Entity;
 using StackExchange.Redis;
-using System.Text;
 using System.Text.Json;
 
 namespace Infra_Persistence.Services

@@ -2,7 +2,6 @@
 using Application.Interfaces;
 using Dapper;
 using Infrastructure.Contexts;
-using System.ComponentModel.Design;
 
 namespace Infrastructure.Repository
 {

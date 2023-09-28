@@ -1,7 +1,6 @@
 ﻿using Application.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Services.Common.Core.Entity;
-using System.Reflection.Metadata;
 
 namespace Infrastructure.Persistence
 {

@@ -29,4 +29,5 @@ namespace Services.Common.Core.Enums
         No = 0,
         Yes = 1
     }
+
 }
