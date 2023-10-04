@@ -1,23 +1,14 @@
-﻿{
-  "$schema": "https://json.schemastore.org/launchsettings.json",
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "http://localhost:34769",
-      "sslPort": 7077
-    }
-  },
+{
   "profiles": {
     "OcelotGateway": {
       "commandName": "Project",
-      "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "https://localhost:7077;http://localhost:5169",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7077;http://localhost:5169",
       "IIS Express": {
         "commandName": "IISExpress",
         "launchBrowser": true,
@@ -26,6 +17,22 @@
           "ASPNETCORE_ENVIRONMENT": "Development"
         }
       }
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchBrowser": true,
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
+      "publishAllPorts": true,
+      "useSSL": true
+    }
+  },
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:34769",
+      "sslPort": 7077
     }
   }
 }

@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "ocelotgateway": "StartDebugging",
+        "ba.api": "StartDebugging",
+        "reportdatagrpcservice": "StartDebugging",
+        "reportspeedover.api": "StartDebugging"
+      }
+    }
+  }
+}

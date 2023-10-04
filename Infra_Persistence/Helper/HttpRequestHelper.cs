@@ -40,8 +40,12 @@ namespace Infra_Persistence.Helper
                         {
                             PropertyNameCaseInsensitive = true
                         };
-                        var response = await httpClient.PostAsync(link, null);
-                        string apiResponse = await response.Content.ReadAsStringAsync();
+                    var watch = System.Diagnostics.Stopwatch.StartNew();
+                    var response = await httpClient.PostAsync(link, null);
+                    watch.Stop();
+                    if(link.Contains("/Vehicles/transport-type")) Console.WriteLine($"Execution transportType Time: {watch.ElapsedMilliseconds} ms");
+                    if (link.Contains("/Vehicles/speedOver")) Console.WriteLine($"Execution speedOver Time: {watch.ElapsedMilliseconds} ms");
+                    string apiResponse = await response.Content.ReadAsStringAsync();
                         result = JsonSerializer.Deserialize<List<T>>(apiResponse, option) ?? new List<T>();
                 }
             }

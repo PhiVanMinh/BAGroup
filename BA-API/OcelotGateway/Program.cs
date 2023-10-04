@@ -4,7 +4,9 @@ using Ocelot.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
+var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+builder.Configuration.AddJsonFile($"ocelot.{env}.json", optional: false, reloadOnChange: true);
 builder.Services.AddOcelot(builder.Configuration);
 
 // Add services to the container.

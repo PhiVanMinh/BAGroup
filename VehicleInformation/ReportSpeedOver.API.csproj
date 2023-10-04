@@ -2,6 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>..\BA-API</DockerfileContext>
+    <UserSecretsId>27d49ec0-86e0-423e-af02-f989514f926d</UserSecretsId>
+    <DockerComposeProjectPath>..\BA-API\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,6 +14,7 @@
     <PackageReference Include="CachingFramework.Redis" Version="14.0.0" />
     <PackageReference Include="Dapper" Version="2.0.90" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="6.0.2" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.2" />
     <PackageReference Include="Serilog.AspNetCore" Version="6.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />

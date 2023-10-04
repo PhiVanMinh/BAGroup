@@ -1,0 +1,35 @@
+version: '3.4'
+
+services:
+
+  bagroupDB:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+
+  ocelotgateway:
+    image: ${DOCKER_REGISTRY-}ocelotgateway
+    build:
+      context: .
+      dockerfile: OcelotGateway/Dockerfile
+
+  ba.api:
+    image: ${DOCKER_REGISTRY-}baapi
+    build:
+      context: ..
+      dockerfile: WebApi/Dockerfile
+    network_mode: host
+
+  reportdatagrpcservice:
+    image: ${DOCKER_REGISTRY-}reportdatagrpcservice
+    build:
+      context: ..
+      dockerfile: BA-API/ReportDataGrpcService/Dockerfile
+
+
+  reportspeedover.api:
+    image: ${DOCKER_REGISTRY-}reportspeedoverapi
+    build:
+      context: ..
+      dockerfile: VehicleInformation/Dockerfile
+
+
+

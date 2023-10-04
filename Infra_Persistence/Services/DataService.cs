@@ -3,6 +3,7 @@ using AutoMapper;
 using Grpc.Net.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Nest;
 using ReportDataGrpcService;
 using Services.Common.Core.Models;
 
@@ -63,8 +64,11 @@ namespace Infra_Persistence.Services
                 {
                     if (_connect == "http")
                     {
+                        var watch = System.Diagnostics.Stopwatch.StartNew();
                         var reponseRest = await _httpHelper.GetDataFromOtherService<BGT_TranportTypes>($"{_configuration["UrlBase"]}/Vehicles/transport-type");
                         result = reponseRest.ToList();
+                        watch.Stop();
+                        Console.WriteLine($"Execution abcasd Time: {watch.ElapsedMilliseconds} ms");
                     }
                     else
                     {

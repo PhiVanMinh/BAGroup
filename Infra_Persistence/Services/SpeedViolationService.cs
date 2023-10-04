@@ -4,6 +4,7 @@ using Application.Interfaces;
 using Application.IService;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Nest;
 using StackExchange.Redis;
 
 namespace Infra_Persistence.Services
@@ -82,7 +83,6 @@ namespace Infra_Persistence.Services
                 if (result.Count() == 0)
                 {
                     var vhcList = await GetSpeedViolationVehicle(input);
-
                     totalCount = vhcList.Count();
                     result = vhcList.Skip((input.Page - 1) * input.PageSize).Take(input.PageSize).ToList();
                     _cacheHelper.AddEnumerableToSortedSet(cacheKey, vhcList);
@@ -112,9 +112,18 @@ namespace Infra_Persistence.Services
             var result = new List<GetAllSpeedViolationVehicleDto>();
             try
             {
+                var watch = System.Diagnostics.Stopwatch.StartNew();
+
                 var vehicleInfo = await GetVehicleInfomation(input);
+                watch.Stop();
+                Console.WriteLine($"Execution GetVehicleInfomation Time: {watch.ElapsedMilliseconds} ms");
+
                 var activityGroup = await GetActivitySummaries(input);
+
+                watch = System.Diagnostics.Stopwatch.StartNew();
                 var speedGroup = await GetSpeedOvers(input);
+                watch.Stop();
+                Console.WriteLine($"Execution GetSpeedOvers Time: {watch.ElapsedMilliseconds} ms");
 
                 result =  ( from speed in speedGroup
                             join vhc in vehicleInfo on speed.VehicleID equals vhc.VehicleID
@@ -138,6 +147,7 @@ namespace Infra_Persistence.Services
                                 TotalTimeVio = speed.TotalTimeVio,
                                 TotalTime = atv?.TotalTime
                             }).ToList();
+
             }
             catch (Exception ex)
             {
@@ -159,8 +169,15 @@ namespace Infra_Persistence.Services
             var result = new List<GetVehicleInfomationDto>();
             try
             {
+                var watch = System.Diagnostics.Stopwatch.StartNew();
+
                 var tranportTypes = await _data.GetTransportTypes();
+                watch.Stop();
+                Console.WriteLine($"Execution GetVehicle_1 Time: {watch.ElapsedMilliseconds} ms");
+
+
                 var vehicleTransportTypes = await _data.GetVehicleTransportType();
+
                 var vehicles = await _data.GetVehicleInfo(input.CompanyId);
 
                 if (tranportTypes.Any() && vehicleTransportTypes.Any() && vehicles.Any())
