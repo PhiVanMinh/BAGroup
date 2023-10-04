@@ -315,6 +315,20 @@
               "target": "Package",
               "version": "[7.17.5, )"
             },
+            "Google.Protobuf": {
+              "target": "Package",
+              "version": "[3.21.5, )"
+            },
+            "Grpc.Net.ClientFactory": {
+              "target": "Package",
+              "version": "[2.49.0, )"
+            },
+            "Grpc.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.49.0, )"
+            },
             "Microsoft.AspNetCore.Authorization": {
               "target": "Package",
               "version": "[6.0.1, )"
