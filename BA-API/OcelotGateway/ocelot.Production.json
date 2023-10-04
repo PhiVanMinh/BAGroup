@@ -1,0 +1,167 @@
+
+  {
+    "GlobalConfiguration": {
+      "BaseUrl": "http://10.1.11.115:6006"
+    },
+    "Routes": [
+
+      // BA.API
+
+      {
+        "DownstreamPathTemplate": "/Auth/login",
+        "DownstreamScheme": "http",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "10.1.11.115",
+            "Port": 1026
+          }
+        ],
+        "UpstreamPathTemplate": "/apigateway/Auth/login",
+        "UpstreamHttpMethod": [ "Post" ]
+      },
+
+      {
+        "DownstreamPathTemplate": "/Users/employees",
+        "DownstreamScheme": "http",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "10.1.11.115",
+            "Port": 1026
+          }
+        ],
+        "UpstreamPathTemplate": "/apigateway/Users/employees",
+        "UpstreamHttpMethod": [ "Post" ]
+      },
+
+      {
+        "DownstreamPathTemplate": "/Users/createOrEdit-employees",
+        "DownstreamScheme": "http",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "10.1.11.115",
+            "Port": 1026
+          }
+        ],
+        "UpstreamPathTemplate": "/apigateway/Users/createOrEdit-employees",
+        "UpstreamHttpMethod": [ "Post" ]
+      },
+
+      {
+        "DownstreamPathTemplate": "/Users/delete-employees",
+        "DownstreamScheme": "http",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "10.1.11.115",
+            "Port": 1026
+          }
+        ],
+        "UpstreamPathTemplate": "/apigateway/Users/delete-employees",
+        "UpstreamHttpMethod": [ "Post" ]
+      },
+
+      {
+        "DownstreamPathTemplate": "/SpeedViolation/list-vehicle",
+        "DownstreamScheme": "http",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "10.1.11.115",
+            "Port": 1026
+          }
+        ],
+        "UpstreamPathTemplate": "/apigateway/SpeedViolation/list-vehicle",
+        "UpstreamHttpMethod": [ "Post" ]
+      },
+
+      {
+        "DownstreamPathTemplate": "/SpeedViolation/speed-violation",
+        "DownstreamScheme": "http",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "10.1.11.115",
+            "Port": 1026
+          }
+        ],
+        "UpstreamPathTemplate": "/apigateway/SpeedViolation/speed-violation",
+        "UpstreamHttpMethod": [ "Post" ]
+      },
+
+      {
+        "DownstreamPathTemplate": "/SpeedViolation/report_speed_violation",
+        "DownstreamScheme": "http",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "10.1.11.115",
+            "Port": 1026
+          }
+        ],
+        "UpstreamPathTemplate": "/apigateway/SpeedViolation/report_speed_violation",
+        "UpstreamHttpMethod": [ "Post" ]
+      },
+
+      // Report speed over API
+      {
+        "DownstreamPathTemplate": "/Vehicles/vehicle",
+        "DownstreamScheme": "http",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "10.1.11.115",
+            "Port": 1080
+          }
+        ],
+        "UpstreamPathTemplate": "/apigateway/Vehicles/vehicle",
+        "UpstreamHttpMethod": [ "Post" ]
+      },
+
+      {
+        "DownstreamPathTemplate": "/Vehicles/transport-type",
+        "DownstreamScheme": "http",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "10.1.11.115",
+            "Port": 1080
+          }
+        ],
+        "UpstreamPathTemplate": "/apigateway/Vehicles/transport-type",
+        "UpstreamHttpMethod": [ "Post" ]
+      },
+
+      {
+        "DownstreamPathTemplate": "/Vehicles/vehicle-type",
+        "DownstreamScheme": "http",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "10.1.11.115",
+            "Port": 1080
+          }
+        ],
+        "UpstreamPathTemplate": "/apigateway/Vehicles/vehicle-type",
+        "UpstreamHttpMethod": [ "Post" ]
+      },
+
+      {
+        "DownstreamPathTemplate": "/Vehicles/speedOver",
+        "DownstreamScheme": "http",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "10.1.11.115",
+            "Port": 1080
+          }
+        ],
+        "UpstreamPathTemplate": "/apigateway/Vehicles/speedOver",
+        "UpstreamHttpMethod": [ "Post" ]
+      },
+
+      {
+        "DownstreamPathTemplate": "/Vehicles/activiti-summary",
+        "DownstreamScheme": "http",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "10.1.11.115",
+            "Port": 1080
+          }
+        ],
+        "UpstreamPathTemplate": "/apigateway/Vehicles/activiti-summary",
+        "UpstreamHttpMethod": [ "Post" ]
+      }
+    ]
+}
