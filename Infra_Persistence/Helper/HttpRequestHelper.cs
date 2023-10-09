@@ -34,8 +34,11 @@ namespace Infra_Persistence.Helper
             var result = new List<T>();
             try
             {
-                using (var httpClient = new HttpClient())
+                using (var httpClientHandler = new HttpClientHandler())
                 {
+                    httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+                    using (var httpClient = new HttpClient(httpClientHandler))
+                    {
                         var option = new JsonSerializerOptions
                         {
                             PropertyNameCaseInsensitive = true
@@ -43,6 +46,7 @@ namespace Infra_Persistence.Helper
                         var response = await httpClient.PostAsync(link, null);
                         string apiResponse = await response.Content.ReadAsStringAsync();
                         result = JsonSerializer.Deserialize<List<T>>(apiResponse, option) ?? new List<T>();
+                    }
                 }
             }
             catch (Exception ex)

@@ -1,0 +1,32 @@
+version: '3.4'
+
+services:
+  basketdb:
+    image: redis:alpine
+
+  ba.api:
+    image: ${DOCKER_REGISTRY-}baapi
+    build:
+      context: ..
+      dockerfile: WebApi/Dockerfile
+
+
+  reportdatagrpcservice:
+    image: ${DOCKER_REGISTRY-}reportdatagrpcservice
+    build:
+      context: ..
+      dockerfile: BA-API/ReportDataGrpcService/Dockerfile
+
+
+  reportspeedover.api:
+    image: ${DOCKER_REGISTRY-}reportspeedoverapi
+    build:
+      context: ..
+      dockerfile: VehicleInformation/Dockerfile
+
+  ocelotgateway:
+    image: ${DOCKER_REGISTRY-}ocelotgateway
+    build:
+      context: .
+      dockerfile: OcelotGateway/Dockerfile
+

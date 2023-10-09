@@ -31,13 +31,19 @@ namespace Infrastructure.Repository
         public async Task<User> Login(string username, string password)
         {
             var user = new User();
-            var userLogin = await _context.Users.FirstOrDefaultAsync(x => x.UserName == username);
-            if (userLogin == null)
-                return user;
+            try
+            {
+                var userLogin = await _context.Users.FirstOrDefaultAsync(x => x.UserName == username);
+                if (userLogin == null)
+                    return user;
 
-            if (!VerifyPasswordHash(password, userLogin.PasswordHash, userLogin.PasswordSalt))
-                return user;
-            user = userLogin;
+                if (!VerifyPasswordHash(password, userLogin.PasswordHash, userLogin.PasswordSalt))
+                    return user;
+                user = userLogin;
+            } catch (Exception ex)
+            {
+                var message = ex.Message;
+            }
             return user;
         }
 

@@ -1,0 +1,75 @@
+version: '3.4'
+
+services:
+
+  basketdb:
+    container_name: basketdb
+    restart: always    
+    ports:
+        - "6379:6379"
+
+  reportspeedover.api:
+    container_name: reportspeedover.api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "ConnectionStrings:ServerLab3=Server=192.168.1.49\\BASQL;Database=GPS3_LAB;User Id=gps3_lab;Password=gps3_lab; TrustServerCertificate=true; Encrypt=False"
+      - "RedisCacheUrl=basketdb:6379"
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+    depends_on: 
+      - basketdb
+    ports:
+      - "8000:80"
+      - "59120:443"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  ba.api:
+    container_name: ba.api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "ConnectionStrings:Default=Server=host.docker.internal,1433;Database=LabDB;User Id=sa;Password=Minh&1234"  
+      - "ConnectionStrings:ServerLab3=Server=192.168.1.49\\BASQL;Database=GPS3_LAB;User Id=gps3_lab;Password=gps3_lab; TrustServerCertificate=true; Encrypt=False"
+      - "RedisCacheUrl=basketdb:6379"
+      - "UrlBase=http://reportspeedover.api:8000"
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+    depends_on: 
+      - basketdb
+      - reportspeedover.api
+    ports:
+      - "8001:80"
+      - "59121:443"
+
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  reportdatagrpcservice:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "ConnectionStrings:ServerLab3=Server=192.168.1.49\\BASQL;Database=GPS3_LAB;User Id=gps3_lab;Password=gps3_lab; TrustServerCertificate=true; Encrypt=False"
+      - "RedisCacheUrl=basketdb:6379"
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+    depends_on: 
+      - basketdb
+    ports:
+     - "8002:80"
+     - "59122:443"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  ocelotgateway:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+    depends_on: 
+      - ba.api
+      - reportspeedover.api
+    ports:
+      - "8010:80"
+      - "59686:443"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+

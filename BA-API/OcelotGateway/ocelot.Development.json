@@ -11,8 +11,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ba.api",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 32788
         }
       ],
       "UpstreamPathTemplate": "/apigateway/Auth/login",
@@ -24,8 +24,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ba.api",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 32788
         }
       ],
       "UpstreamPathTemplate": "/apigateway/Users/employees",
@@ -37,8 +37,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ba.api",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 32788
         }
       ],
       "UpstreamPathTemplate": "/apigateway/Users/createOrEdit-employees",
@@ -50,8 +50,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ba.api",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 32788
         }
       ],
       "UpstreamPathTemplate": "/apigateway/Users/delete-employees",
@@ -63,8 +63,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ba.api",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 32788
         }
       ],
       "UpstreamPathTemplate": "/apigateway/SpeedViolation/list-vehicle",
@@ -77,7 +77,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 58690
+          "Port": 32788
         }
       ],
       "UpstreamPathTemplate": "/apigateway/SpeedViolation/speed-violation",
@@ -89,8 +89,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ba.api",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 32788
         }
       ],
       "UpstreamPathTemplate": "/apigateway/SpeedViolation/report_speed_violation",
@@ -103,8 +103,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "reportspeedover.api",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 32786
         }
       ],
       "UpstreamPathTemplate": "/apigateway/Vehicles/vehicle",
@@ -113,11 +113,11 @@
 
     {
       "DownstreamPathTemplate": "/Vehicles/transport-type",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "reportspeedover.api",
-          "Port": 80
+          "Host": "localhost",
+          "Port": 32786
         }
       ],
       "UpstreamPathTemplate": "/apigateway/Vehicles/transport-type",
@@ -129,8 +129,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "reportspeedover.api",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 32786
         }
       ],
       "UpstreamPathTemplate": "/apigateway/Vehicles/vehicle-type",
@@ -142,8 +142,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "reportspeedover.api",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 32786
         }
       ],
       "UpstreamPathTemplate": "/apigateway/Vehicles/speedOver",
@@ -155,8 +155,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "reportspeedover.api",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 32786
         }
       ],
       "UpstreamPathTemplate": "/apigateway/Vehicles/activiti-summary",
@@ -164,3 +164,5 @@
     }
   ]
 }
+
+
