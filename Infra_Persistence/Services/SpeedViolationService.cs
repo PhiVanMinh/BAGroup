@@ -232,7 +232,7 @@ namespace Infra_Persistence.Services
             var result = new List<GetSpeedOversDto>();
             try 
             {
-                input.ToDate = input.FromDate!.Value.AddDays(60);// test perfromance
+                //input.ToDate = input.FromDate!.Value.AddDays(60);// test perfromance
 
                 var speedOvers = await _data.GetSpeedOvers(input.FromDate ?? DateTime.Now, input.ToDate ?? DateTime.Now);
 
