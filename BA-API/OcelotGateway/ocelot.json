@@ -8,11 +8,11 @@
 
     {
       "DownstreamPathTemplate": "/Auth/login",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ba.api",
-          "Port": 443
+          "Host": "host.docker.internal",
+          "Port": 8001
         }
       ],
       "UpstreamPathTemplate": "/apigateway/Auth/login",
@@ -21,11 +21,11 @@
 
     {
       "DownstreamPathTemplate": "/Users/employees",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ba.api",
-          "Port": 443
+          "Host": "host.docker.internal",
+          "Port": 8001
         }
       ],
       "UpstreamPathTemplate": "/apigateway/Users/employees",
@@ -34,11 +34,11 @@
 
     {
       "DownstreamPathTemplate": "/Users/createOrEdit-employees",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ba.api",
-          "Port": 443
+          "Host": "host.docker.internal",
+          "Port": 8001
         }
       ],
       "UpstreamPathTemplate": "/apigateway/Users/createOrEdit-employees",
@@ -47,11 +47,11 @@
 
     {
       "DownstreamPathTemplate": "/Users/delete-employees",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ba.api",
-          "Port": 443
+          "Host": "host.docker.internal",
+          "Port": 8001
         }
       ],
       "UpstreamPathTemplate": "/apigateway/Users/delete-employees",
@@ -60,11 +60,11 @@
 
     {
       "DownstreamPathTemplate": "/SpeedViolation/list-vehicle",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ba.api",
-          "Port": 443
+          "Host": "host.docker.internal",
+          "Port": 8001
         }
       ],
       "UpstreamPathTemplate": "/apigateway/SpeedViolation/list-vehicle",
@@ -73,11 +73,11 @@
 
     {
       "DownstreamPathTemplate": "/SpeedViolation/speed-violation",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 58690
+          "Host": "host.docker.internal",
+          "Port": 8001
         }
       ],
       "UpstreamPathTemplate": "/apigateway/SpeedViolation/speed-violation",
@@ -86,11 +86,11 @@
 
     {
       "DownstreamPathTemplate": "/SpeedViolation/report_speed_violation",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "ba.api",
-          "Port": 443
+          "Host": "host.docker.internal",
+          "Port": 8001
         }
       ],
       "UpstreamPathTemplate": "/apigateway/SpeedViolation/report_speed_violation",
@@ -100,11 +100,11 @@
     // Report speed over API
     {
       "DownstreamPathTemplate": "/Vehicles/vehicle",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "reportspeedover.api",
-          "Port": 443
+          "Host": "host.docker.internal",
+          "Port": 8000
         }
       ],
       "UpstreamPathTemplate": "/apigateway/Vehicles/vehicle",
@@ -116,8 +116,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "reportspeedover.api",
-          "Port": 80
+          "Host": "host.docker.internal",
+          "Port": 8000
         }
       ],
       "UpstreamPathTemplate": "/apigateway/Vehicles/transport-type",
@@ -126,11 +126,11 @@
 
     {
       "DownstreamPathTemplate": "/Vehicles/vehicle-type",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "reportspeedover.api",
-          "Port": 443
+          "Host": "host.docker.internal",
+          "Port": 8000
         }
       ],
       "UpstreamPathTemplate": "/apigateway/Vehicles/vehicle-type",
@@ -139,11 +139,11 @@
 
     {
       "DownstreamPathTemplate": "/Vehicles/speedOver",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "reportspeedover.api",
-          "Port": 443
+          "Host": "host.docker.internal",
+          "Port": 8000
         }
       ],
       "UpstreamPathTemplate": "/apigateway/Vehicles/speedOver",
@@ -152,11 +152,11 @@
 
     {
       "DownstreamPathTemplate": "/Vehicles/activiti-summary",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "reportspeedover.api",
-          "Port": 443
+          "Host": "host.docker.internal",
+          "Port": 8000
         }
       ],
       "UpstreamPathTemplate": "/apigateway/Vehicles/activiti-summary",
