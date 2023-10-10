@@ -3,6 +3,7 @@ using AutoMapper;
 using Grpc.Net.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Nest;
 using ReportDataGrpcService;
 using Services.Common.Core.Models;
 
@@ -63,13 +64,21 @@ namespace Infra_Persistence.Services
                 {
                     if (_connect == "http")
                     {
+                        var watch = System.Diagnostics.Stopwatch.StartNew();
                         var reponseRest = await _httpHelper.GetDataFromOtherService<BGT_TranportTypes>($"{_configuration["UrlBase"]}/Vehicles/transport-type");
+                        result = reponseRest.ToList();
+                        watch.Stop();
+                        Console.WriteLine($"Execution BGT_TranportTypes by Rest Time: {watch.ElapsedMilliseconds} ms");
+                        //var reponseRest = await _httpHelper.GetDataFromOtherService<BGT_TranportTypes>($"{_configuration["UrlBase"]}/Vehicles/transport-type");
                         result = reponseRest.ToList();
                     }
                     else
                     {
+                        var watch = System.Diagnostics.Stopwatch.StartNew();
                         var reponseGrpc = _client.GetTransportTypes(new Empty { });
                         result = _mapper.Map<List<BGT_TranportTypes>>(reponseGrpc.Items);
+                        watch.Stop();
+                        Console.WriteLine($"Execution BGT_TranportTypes by grpc Time: {watch.ElapsedMilliseconds} ms");
                     }
                     _cacheHelper.AddEnumerableToSortedSet(cacheKey, result);
                 }
@@ -97,13 +106,19 @@ namespace Infra_Persistence.Services
                 {
                     if (_connect == "http")
                     {
+                        var watch = System.Diagnostics.Stopwatch.StartNew();
                         var reponseRest = await _httpHelper.GetDataFromOtherService<BGT_VehicleTransportTypes>($"{_configuration["UrlBase"]}/Vehicles/vehicle-type");
+                        watch.Stop();
+                        Console.WriteLine($"Execution BGT_VehicleTransportTypes Time: {watch.ElapsedMilliseconds} ms");
                         result = reponseRest.ToList();
                     }
                     else
                     {
+                        var watch = System.Diagnostics.Stopwatch.StartNew();
                         var reponseGrpc = _client.GetVehicleTransportType(new Empty { });
                         result = _mapper.Map<List<BGT_VehicleTransportTypes>>(reponseGrpc.Items);
+                        watch.Stop();
+                        Console.WriteLine($"Execution BGT_VehicleTransportTypes by grpc Time: {watch.ElapsedMilliseconds} ms");
                     }
                     _cacheHelper.AddEnumerableToSortedSet(cacheKey, result);
                 }
@@ -135,14 +150,20 @@ namespace Infra_Persistence.Services
                 {
                     if (_connect == "http")
                     {
+                        var watch = System.Diagnostics.Stopwatch.StartNew();
                         var reponseRest = await _httpHelper.GetDataFromOtherService<Vehicle_Vehicles>
                                                 ($"{_configuration["UrlBase"]}/Vehicles/vehicle?input={input}");
+                        watch.Stop();
+                        Console.WriteLine($"Execution Vehicle_Vehicles Time: {watch.ElapsedMilliseconds} ms");
                         result = reponseRest.ToList();
                     }
                     else
                     {
+                        var watch = System.Diagnostics.Stopwatch.StartNew();
                         var reponseGrpc = _client.GetVehicleInfo(new GetById { Id = input });
                         result = _mapper.Map<List<Vehicle_Vehicles>>(reponseGrpc.Items);
+                        watch.Stop();
+                        Console.WriteLine($"Execution Vehicle_Vehicles by grpc Time: {watch.ElapsedMilliseconds} ms");
                     }
                     _cacheHelper.AddEnumerableToSortedSet(cacheKey, result);
                 }
@@ -172,14 +193,20 @@ namespace Infra_Persistence.Services
                 {
                     if (_connect == "http")
                     {
+                        var watch = System.Diagnostics.Stopwatch.StartNew();
                         var reponseRest = await _httpHelper.GetDataFromOtherService<Report_ActivitySummaries>
                                                 ($"{_configuration["UrlBase"]}/Vehicles/activiti-summary?input={input}");
+                        watch.Stop();
+                        Console.WriteLine($"Execution Report_ActivitySummaries Time: {watch.ElapsedMilliseconds} ms");
                         result = reponseRest.ToList();
                     }
                     else
                     {
+                        var watch = System.Diagnostics.Stopwatch.StartNew();
                         var reponseGrpc = _client.GetActivitySummaries(new GetById { Id = input });
                         result = _mapper.Map<List<Report_ActivitySummaries>>(reponseGrpc.Items);
+                        watch.Stop();
+                        Console.WriteLine($"Execution Report_ActivitySummaries by grpc Time: {watch.ElapsedMilliseconds} ms");
                     }
                     _cacheHelper.AddEnumerableToSortedSet(cacheKey, result);
                 }
@@ -210,18 +237,24 @@ namespace Infra_Persistence.Services
                 {
                     if (_connect == "http")
                     {
+                        var watch = System.Diagnostics.Stopwatch.StartNew();
                         var reponseRest = await _httpHelper.GetDataFromOtherService<BGT_SpeedOvers>
                                                 ($"{_configuration["UrlBase"]}/Vehicles/speedOver?fromDate={fromDate}&toDate={toDate}");
+                        watch.Stop();
+                        Console.WriteLine($"Execution BGT_SpeedOvers Time: {watch.ElapsedMilliseconds} ms");
                         result = reponseRest.ToList();
                     }
                     else
                     {
+                        var watch = System.Diagnostics.Stopwatch.StartNew();
                         var reponseGrpc = _client.GetSpeedOver(new GetSpeedOverRequest
                         {
                             FromDate = fromDate.ToString(),
                             ToDate = toDate.ToString(),
                         });
                         result = _mapper.Map<List<BGT_SpeedOvers>>(reponseGrpc.Items);
+                        watch.Stop();
+                        Console.WriteLine($"Execution BGT_SpeedOvers by grpc Time: {watch.ElapsedMilliseconds} ms");
                     }
                     _cacheHelper.AddEnumerableToSortedSet(cacheKey, result);
                 }
