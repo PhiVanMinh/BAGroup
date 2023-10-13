@@ -2,6 +2,7 @@
 using Application.IService;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -15,6 +16,7 @@ namespace WebApi.Controllers
     /// Name       Date       Comments
     /// minhpv    8/10/2023   created
     /// </Modified>
+    [EnableCors("MyPolicy")]
     [ApiController]
     [Route("[controller]")]
     public class AuthController : ControllerBase

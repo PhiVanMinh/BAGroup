@@ -42,7 +42,16 @@ builder.Services.AddTransient(typeof(IDataService), typeof(DataService));
 builder.Services.AddTransient(typeof(IRedisCacheHelper), typeof(RedisCacheHelper));
 builder.Services.AddTransient(typeof(IHttpRequestHelper), typeof(HttpRequestHelper));
 
-builder.Services.AddCors();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "MyPolicy",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
+});
 
 // Dependency Injection
 builder.Services.AddPersistence(builder.Configuration);
@@ -67,7 +76,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Auth0:SecretKey"])),
             ClockSkew = TimeSpan.Zero
         };
-        builder.Services.AddCors();
     });
 
 builder.Services.AddAuthorization(config =>
@@ -88,10 +96,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     app.UseSwaggerUI();
 }
 
-app.UseCors(x => x
-            .AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader());
+app.UseCors("MyPolicy");
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

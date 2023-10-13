@@ -120,7 +120,7 @@ namespace WebApi.Controllers
         {
             try
             {
-                var xmlFile = Path.Combine(Environment.CurrentDirectory, @"ReportFile\report_speed_violation.xlsx");
+                var xmlFile = Path.Combine(Environment.CurrentDirectory, @"ReportFile/report_speed_violation.xlsx");
                 using (var workBook = new XLWorkbook(xmlFile))
                 {
                     var fileName = $"Speed_Violation_Report_{DateTime.Now.ToString("dd_MM_yyyy_hh_mm_ss")}";
