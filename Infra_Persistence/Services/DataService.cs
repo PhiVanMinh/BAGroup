@@ -52,7 +52,7 @@ namespace Infra_Persistence.Services
         /// Name       Date       Comments
         /// minhpv    9/28/2023   created
         /// </Modified>
-        public async Task<IEnumerable<BGT_TranportTypes>> GetTransportTypes()
+        public async Task<IEnumerable<BGT_TranportTypes>> GetTransportTypes(HttpClient httpClient)
         {
             var result = new List<BGT_TranportTypes>();
             try
@@ -63,7 +63,7 @@ namespace Infra_Persistence.Services
                 {
                     if (_connect == "http")
                     {
-                        var reponseRest = await _httpHelper.GetDataFromOtherService<BGT_TranportTypes>($"{_configuration["UrlBase"]}/Vehicles/transport-type");
+                        var reponseRest = await _httpHelper.GetDataFromOtherService<BGT_TranportTypes>($"{_configuration["UrlBase"]}/Vehicles/transport-type", httpClient);
                         result = reponseRest.ToList();
                     }
                     else
@@ -86,7 +86,7 @@ namespace Infra_Persistence.Services
         /// Name       Date       Comments
         /// minhpv    9/28/2023   created
         /// </Modified>
-        public async Task<IEnumerable<BGT_VehicleTransportTypes>> GetVehicleTransportType()
+        public async Task<IEnumerable<BGT_VehicleTransportTypes>> GetVehicleTransportType(HttpClient httpClient)
         {
             var result = new List<BGT_VehicleTransportTypes>();
             try
@@ -97,7 +97,7 @@ namespace Infra_Persistence.Services
                 {
                     if (_connect == "http")
                     {
-                        var reponseRest = await _httpHelper.GetDataFromOtherService<BGT_VehicleTransportTypes>($"{_configuration["UrlBase"]}/Vehicles/vehicle-type");
+                        var reponseRest = await _httpHelper.GetDataFromOtherService<BGT_VehicleTransportTypes>($"{_configuration["UrlBase"]}/Vehicles/vehicle-type", httpClient);
                         result = reponseRest.ToList();
                     }
                     else
@@ -124,7 +124,7 @@ namespace Infra_Persistence.Services
         /// Name       Date       Comments
         /// minhpv    9/28/2023   created
         /// </Modified>
-        public async Task<IEnumerable<Vehicle_Vehicles>> GetVehicleInfo(int input)
+        public async Task<IEnumerable<Vehicle_Vehicles>> GetVehicleInfo(int input, HttpClient httpClient)
         {
             var result = new List<Vehicle_Vehicles>();
             try
@@ -136,7 +136,7 @@ namespace Infra_Persistence.Services
                     if (_connect == "http")
                     {
                         var reponseRest = await _httpHelper.GetDataFromOtherService<Vehicle_Vehicles>
-                                                ($"{_configuration["UrlBase"]}/Vehicles/vehicle?input={input}");
+                                                ($"{_configuration["UrlBase"]}/Vehicles/vehicle?input={input}", httpClient);
                         result = reponseRest.ToList();
                     }
                     else
@@ -161,7 +161,7 @@ namespace Infra_Persistence.Services
         /// Name       Date       Comments
         /// minhpv    9/28/2023   created
         /// </Modified>
-        public async Task<IEnumerable<Report_ActivitySummaries>> GetActivitySummaries(int input)
+        public async Task<IEnumerable<Report_ActivitySummaries>> GetActivitySummaries(int input, HttpClient httpClient)
         {
             var result = new List<Report_ActivitySummaries>();
             try
@@ -173,7 +173,7 @@ namespace Infra_Persistence.Services
                     if (_connect == "http")
                     {
                         var reponseRest = await _httpHelper.GetDataFromOtherService<Report_ActivitySummaries>
-                                                ($"{_configuration["UrlBase"]}/Vehicles/activiti-summary?input={input}");
+                                                ($"{_configuration["UrlBase"]}/Vehicles/activiti-summary?input={input}", httpClient);
                         result = reponseRest.ToList();
                     }
                     else
@@ -199,7 +199,7 @@ namespace Infra_Persistence.Services
         /// Name       Date       Comments
         /// minhpv    9/28/2023   created
         /// </Modified>
-        public async Task<IEnumerable<BGT_SpeedOvers>> GetSpeedOvers(DateTime fromDate, DateTime toDate)
+        public async Task<IEnumerable<BGT_SpeedOvers>> GetSpeedOvers(DateTime fromDate, DateTime toDate, HttpClient httpClient)
         {
             var result = new List<BGT_SpeedOvers>();
             try
@@ -211,7 +211,7 @@ namespace Infra_Persistence.Services
                     if (_connect == "http")
                     {
                         var reponseRest = await _httpHelper.GetDataFromOtherService<BGT_SpeedOvers>
-                                                ($"{_configuration["UrlBase"]}/Vehicles/speedOver?fromDate={fromDate}&toDate={toDate}");
+                                                ($"{_configuration["UrlBase"]}/Vehicles/speedOver?fromDate={fromDate}&toDate={toDate}", httpClient);
                         result = reponseRest.ToList();
                     }
                     else

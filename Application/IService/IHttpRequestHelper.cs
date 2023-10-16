@@ -8,6 +8,6 @@ namespace Application.IService
 {
     public interface IHttpRequestHelper
     {
-        Task<IEnumerable<T>> GetDataFromOtherService<T>(string link);
+        Task<IEnumerable<T>> GetDataFromOtherService<T>(string link, HttpClient httpClient);
     }
 }

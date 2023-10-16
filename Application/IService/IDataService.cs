@@ -9,11 +9,11 @@ namespace Application.IService
 {
     public interface IDataService
     {
-        Task<IEnumerable<BGT_TranportTypes>> GetTransportTypes();
-        Task<IEnumerable<BGT_VehicleTransportTypes>> GetVehicleTransportType();
-        Task<IEnumerable<Vehicle_Vehicles>> GetVehicleInfo(int input);
-        Task<IEnumerable<Report_ActivitySummaries>> GetActivitySummaries(int input);
-        Task<IEnumerable<BGT_SpeedOvers>> GetSpeedOvers(DateTime fromDate, DateTime toDate);
+        Task<IEnumerable<BGT_TranportTypes>> GetTransportTypes(HttpClient httpClient);
+        Task<IEnumerable<BGT_VehicleTransportTypes>> GetVehicleTransportType(HttpClient httpClient);
+        Task<IEnumerable<Vehicle_Vehicles>> GetVehicleInfo(int input, HttpClient httpClient);
+        Task<IEnumerable<Report_ActivitySummaries>> GetActivitySummaries(int input, HttpClient httpClient);
+        Task<IEnumerable<BGT_SpeedOvers>> GetSpeedOvers(DateTime fromDate, DateTime toDate, HttpClient httpClient);
 
     }
 }

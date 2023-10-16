@@ -29,25 +29,18 @@ namespace Infra_Persistence.Helper
         /// Name       Date       Comments
         /// minhpv    9/18/2023   created
         /// </Modified>
-        public async Task<IEnumerable<T>> GetDataFromOtherService<T>(string link)
+        public async Task<IEnumerable<T>> GetDataFromOtherService<T>(string link, HttpClient httpClient)
         {
             var result = new List<T>();
             try
             {
-                using (var httpClientHandler = new HttpClientHandler())
+                var option = new JsonSerializerOptions
                 {
-                    httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
-                    using (var httpClient = new HttpClient(httpClientHandler))
-                    {
-                        var option = new JsonSerializerOptions
-                        {
-                            PropertyNameCaseInsensitive = true
-                        };
-                        var response = await httpClient.PostAsync(link, null);
-                        string apiResponse = await response.Content.ReadAsStringAsync();
-                        result = JsonSerializer.Deserialize<List<T>>(apiResponse, option) ?? new List<T>();
-                    }
-                }
+                    PropertyNameCaseInsensitive = true
+                };
+                var response = await httpClient.PostAsync(link, null);
+                string apiResponse = await response.Content.ReadAsStringAsync();
+                result = JsonSerializer.Deserialize<List<T>>(apiResponse, option) ?? new List<T>();
             }
             catch (Exception ex)
             {

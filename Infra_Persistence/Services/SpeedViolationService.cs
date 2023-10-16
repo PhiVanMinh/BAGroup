@@ -112,32 +112,39 @@ namespace Infra_Persistence.Services
             var result = new List<GetAllSpeedViolationVehicleDto>();
             try
             {
-                var vehicleInfo = await GetVehicleInfomation(input);
-                var activityGroup = await GetActivitySummaries(input);
-                var speedGroup = await GetSpeedOvers(input);
+                using (var httpClientHandler = new HttpClientHandler())
+                {
+                    httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+                    using (var httpClient = new HttpClient(httpClientHandler))
+                    {
+                        var vehicleInfo = await GetVehicleInfomation(input, httpClient);
+                        var activityGroup = await GetActivitySummaries(input, httpClient);
+                        var speedGroup = await GetSpeedOvers(input, httpClient);
 
-                result =  ( from speed in speedGroup
-                            join vhc in vehicleInfo on speed.VehicleID equals vhc.VehicleID
-                            join atv in activityGroup on vhc.VehicleID equals atv.VehicleID into activityGroupJoin
-                            from atv in activityGroupJoin.DefaultIfEmpty()
-                            orderby speed.VehicleID
-                            select new GetAllSpeedViolationVehicleDto
-                            {
-                                VehicleID = vhc.VehicleID,
-                                VehiclePlate = vhc.VehiclePlate,
-                                PrivateCode = vhc.PrivateCode,
-                                TransportType = vhc.TransportType,
-                                SpeedVioLevel1 = speed.SpeedVioLevel1,
-                                SpeedVioLevel2 = speed.SpeedVioLevel2,
-                                SpeedVioLevel3 = speed.SpeedVioLevel3,
-                                SpeedVioLevel4 = speed.SpeedVioLevel4,
-                                TotalSpeedVio = speed.TotalSpeedVio,
-                                RatioSpeedVio = (atv?.TotalKm != null && atv.TotalKm > 1000) ? (speed.TotalSpeedVio * 1000 / atv.TotalKm) : speed.TotalSpeedVio,
-                                TotalKmVio = speed.TotalKmVio,
-                                TotalKm = atv?.TotalKm,
-                                TotalTimeVio = speed.TotalTimeVio,
-                                TotalTime = atv?.TotalTime
-                            }).ToList();
+                        result = (from speed in speedGroup
+                                  join vhc in vehicleInfo on speed.VehicleID equals vhc.VehicleID
+                                  join atv in activityGroup on vhc.VehicleID equals atv.VehicleID into activityGroupJoin
+                                  from atv in activityGroupJoin.DefaultIfEmpty()
+                                  orderby speed.VehicleID
+                                  select new GetAllSpeedViolationVehicleDto
+                                  {
+                                      VehicleID = vhc.VehicleID,
+                                      VehiclePlate = vhc.VehiclePlate,
+                                      PrivateCode = vhc.PrivateCode,
+                                      TransportType = vhc.TransportType,
+                                      SpeedVioLevel1 = speed.SpeedVioLevel1,
+                                      SpeedVioLevel2 = speed.SpeedVioLevel2,
+                                      SpeedVioLevel3 = speed.SpeedVioLevel3,
+                                      SpeedVioLevel4 = speed.SpeedVioLevel4,
+                                      TotalSpeedVio = speed.TotalSpeedVio,
+                                      RatioSpeedVio = (atv?.TotalKm != null && atv.TotalKm > 1000) ? (speed.TotalSpeedVio * 1000 / atv.TotalKm) : speed.TotalSpeedVio,
+                                      TotalKmVio = speed.TotalKmVio,
+                                      TotalKm = atv?.TotalKm,
+                                      TotalTimeVio = speed.TotalTimeVio,
+                                      TotalTime = atv?.TotalTime
+                                  }).ToList();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -154,14 +161,14 @@ namespace Infra_Persistence.Services
         /// Name       Date       Comments
         /// minhpv    9/8/2023   created
         /// </Modified>
-        private async Task<IEnumerable<GetVehicleInfomationDto>> GetVehicleInfomation(SpeedViolationVehicleInput input)
+        private async Task<IEnumerable<GetVehicleInfomationDto>> GetVehicleInfomation(SpeedViolationVehicleInput input, HttpClient httpClient)
         {
             var result = new List<GetVehicleInfomationDto>();
             try
             {
-                var tranportTypes = await _data.GetTransportTypes();
-                var vehicleTransportTypes = await _data.GetVehicleTransportType();
-                var vehicles = await _data.GetVehicleInfo(input.CompanyId);
+                var tranportTypes = await _data.GetTransportTypes(httpClient);
+                var vehicleTransportTypes = await _data.GetVehicleTransportType(httpClient);
+                var vehicles = await _data.GetVehicleInfo(input.CompanyId, httpClient);
 
                 if (tranportTypes.Any() && vehicleTransportTypes.Any() && vehicles.Any())
                 {
@@ -193,12 +200,12 @@ namespace Infra_Persistence.Services
         /// Name       Date       Comments
         /// minhpv    9/8/2023   created
         /// </Modified>
-        private async Task<IEnumerable<GetActivitySummariesDto>> GetActivitySummaries(SpeedViolationVehicleInput input)
+        private async Task<IEnumerable<GetActivitySummariesDto>> GetActivitySummaries(SpeedViolationVehicleInput input, HttpClient httpClient)
         {
             var result = new List<GetActivitySummariesDto>();
             try
             {
-                var activitySummaries = await _data.GetActivitySummaries(input.CompanyId);
+                var activitySummaries = await _data.GetActivitySummaries(input.CompanyId, httpClient);
 
                 if (activitySummaries.Any())
                 {
@@ -227,14 +234,14 @@ namespace Infra_Persistence.Services
         /// Name       Date       Comments
         /// minhpv    9/13/2023   created
         /// </Modified>
-        private async Task<IEnumerable<GetSpeedOversDto>> GetSpeedOvers(SpeedViolationVehicleInput input)
+        private async Task<IEnumerable<GetSpeedOversDto>> GetSpeedOvers(SpeedViolationVehicleInput input, HttpClient httpClient)
         {
             var result = new List<GetSpeedOversDto>();
             try 
             {
                 //input.ToDate = input.FromDate!.Value.AddDays(60);// test perfromance
 
-                var speedOvers = await _data.GetSpeedOvers(input.FromDate ?? DateTime.Now, input.ToDate ?? DateTime.Now);
+                var speedOvers = await _data.GetSpeedOvers(input.FromDate ?? DateTime.Now, input.ToDate ?? DateTime.Now, httpClient);
 
                 if (speedOvers.Any())
                 {
