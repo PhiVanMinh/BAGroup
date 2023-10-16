@@ -279,7 +279,7 @@ namespace Infra_Persistence.Services
             List<GetAllSpeedViolationVehicleDto> result = new List<GetAllSpeedViolationVehicleDto>();
             try
             {
-                string cacheKey = $"{DateTime.Now.ToString("dd_MM_yyyy_hh")} {input.FromDate}_{input.ToDate}_{string.Join("_", input.ListVhcId)}";
+                string cacheKey = $"SpeedViolationService_GetDataToExportExcel_{input.FromDate}_{input.ToDate}_{string.Join("_", input.ListVhcId)}";
 
                 result = await _cacheHelper.GetDataFromCache<GetAllSpeedViolationVehicleDto>(cacheKey, 0, 0);
                 if (result.Count() == 0)

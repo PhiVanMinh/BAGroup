@@ -1,7 +1,7 @@
 version: '3.4'
 
 services:
-  basketdb:
+  redisdb:
     image: redis:alpine
 
   ba.api:

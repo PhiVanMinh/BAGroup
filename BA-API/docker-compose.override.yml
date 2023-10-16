@@ -2,8 +2,8 @@ version: '3.4'
 
 services:
 
-  basketdb:
-    container_name: basketdb
+  redisdb:
+    container_name: redisdb
     restart: always    
     ports:
         - "6379:6379"
@@ -13,10 +13,10 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - "ConnectionStrings:ServerLab3=Server=192.168.1.49\\BASQL;Database=GPS3_LAB;User Id=gps3_lab;Password=gps3_lab; TrustServerCertificate=true; Encrypt=False"
-      - "RedisCacheUrl=basketdb:6379"
+      - "RedisCacheUrl=redisdb:6379"
       - ASPNETCORE_URLS=https://+:443;http://+:80
     depends_on: 
-      - basketdb
+      - redisdb
     ports:
       - "8000:80"
       - "59120:443"
@@ -30,12 +30,12 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - "ConnectionStrings:Default=Server=host.docker.internal,1433;Database=LabDB;User Id=sa;Password=Minh&1234"  
       - "ConnectionStrings:ServerLab3=Server=192.168.1.49\\BASQL;Database=GPS3_LAB;User Id=gps3_lab;Password=gps3_lab; TrustServerCertificate=true; Encrypt=False"
-      - "RedisCacheUrl=basketdb:6379"
+      - "RedisCacheUrl=redisdb:6379"
       - "UrlBase=http://host.docker.internal:8000"
       - "GrpcSettings:ReportDataServiceUrl=http://reportdatagrpcservice:8002"
       - ASPNETCORE_URLS=https://+:443;http://+:80
     depends_on: 
-      - basketdb
+      - redisdb
       - reportspeedover.api
       - reportdatagrpcservice
     ports:
@@ -50,10 +50,10 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - "ConnectionStrings:ServerLab3=Server=192.168.1.49\\BASQL;Database=GPS3_LAB;User Id=gps3_lab;Password=gps3_lab; TrustServerCertificate=true; Encrypt=False"
-      - "RedisCacheUrl=basketdb:6379"
+      - "RedisCacheUrl=redisdb:6379"
       - ASPNETCORE_URLS=https://+:443;http://+:80
     depends_on: 
-      - basketdb
+      - redisdb
     ports:
      - "8002:80"
      - "59122:443"
