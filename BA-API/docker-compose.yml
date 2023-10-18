@@ -4,12 +4,11 @@ services:
   redisdb:
     image: redis:alpine
 
-  ba.api:
-    image: ${DOCKER_REGISTRY-}baapi
+  bagroup.api:
+    image: ${DOCKER_REGISTRY-}bagroupapi
     build:
       context: ..
-      dockerfile: WebApi/Dockerfile
-
+      dockerfile: BAGroup.API/Dockerfile
 
   reportdatagrpcservice:
     image: ${DOCKER_REGISTRY-}reportdatagrpcservice
@@ -29,4 +28,7 @@ services:
     build:
       context: .
       dockerfile: OcelotGateway/Dockerfile
+
+
+
 

@@ -3,43 +3,40 @@ using Application.Dto.SpeedViolation;
 using Application.Dto.Users;
 using Application.IService;
 using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
 using Infra_Persistence.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
-using Nest;
 using System.ComponentModel;
 using System.Data;
-using System.Reflection;
 using System.Text.Json;
 
-namespace WebApi.Controllers
+namespace BAGroup.API.Controllers
 {
-        /// <summary>Các API cho chức năng báo cáo vi phạm tốc độ</summary>
-        /// <Modified>
-        /// Name        Date        Comments
-        /// minhpv    9/05/2023     created
-        /// </Modified>
-        [ApiController]
-        [Route("[controller]")]
-        public class SpeedViolationController : ControllerBase
-        {
-            private readonly ISpeedViolationService _speedViolation;
-            private readonly ILogger<SpeedViolationController> _logger;
-            private readonly IDistributedCache _cache;
+    /// <summary>Các API cho chức năng báo cáo vi phạm tốc độ</summary>
+    /// <Modified>
+    /// Name        Date        Comments
+    /// minhpv    9/05/2023     created
+    /// </Modified>
+    [ApiController]
+    [Route("[controller]")]
+    public class SpeedViolationController : ControllerBase
+    {
+        private readonly ISpeedViolationService _speedViolation;
+        private readonly ILogger<SpeedViolationController> _logger;
+        private readonly IDistributedCache _cache;
 
-            public SpeedViolationController
-                (
-                ISpeedViolationService speedViolation,
-                ILogger<SpeedViolationController> logger,
-                IDistributedCache cache
-                )
-            {
-                _speedViolation = speedViolation;
-                _logger = logger;
-                _cache = cache;
-            }
+        public SpeedViolationController
+            (
+            ISpeedViolationService speedViolation,
+            ILogger<SpeedViolationController> logger,
+            IDistributedCache cache
+            )
+        {
+            _speedViolation = speedViolation;
+            _logger = logger;
+            _cache = cache;
+        }
 
         #region -- Lấy danh sách xe theo công ty
         /// <summary>Đưa ra danh sách xe theo công ty. Nếu hệ thống không thể truy cập đưa ra giá trị mặc định và thông báo</summary>
@@ -50,15 +47,15 @@ namespace WebApi.Controllers
         /// minhpv    9/05/2023     created
         /// </Modified>
         [HttpPost("list-vehicle")]
-        [Authorize(Policy = Policies.UserView)]
+        //[Authorize(Policy = Policies.UserView)]
         public async Task<IActionResult> GetVehicleByCompanyId(int input)
         {
-            List<GetVehicleListDto> result = new List<GetVehicleListDto> ();
+            List<GetVehicleListDto> result = new List<GetVehicleListDto>();
             var inputToString = JsonSerializer.Serialize<int>(input);
 
             try
             {
-              result = await _speedViolation.GetVehicleByCompanyId(input);
+                result = await _speedViolation.GetVehicleByCompanyId(input);
             }
             catch (Exception ex)
             {
@@ -79,33 +76,33 @@ namespace WebApi.Controllers
         [HttpPost("speed-violation")]
         //[Authorize(Policy = Policies.UserView)]
         public async Task<IActionResult> GetSpeedViolationVehicleList(SpeedViolationVehicleInput input)
+        {
+            var respon = new ResponDto<PagedResultDto<GetAllSpeedViolationVehicleDto>>();
+            var inputToString = JsonSerializer.Serialize<SpeedViolationVehicleInput>(input);
+
+            if (input.Page == 0 || input.PageSize == 0)
             {
-                var respon = new ResponDto<PagedResultDto<GetAllSpeedViolationVehicleDto>>();
-                var inputToString = JsonSerializer.Serialize<SpeedViolationVehicleInput>(input);
-
-                if (input.Page == 0 || input.PageSize == 0)
-                {
-                    return BadRequest("Vui lòng nhập đủ số trang và kích thước trang! ");
-                }
-                try
-                {
-                    var result = await _speedViolation.GetAllSpeedViolationVehicle(input);
-                    respon.Result = result;
-
-                }
-                catch (Exception ex)
-                {
-                    respon.StatusCode = 500;
-                    respon.Message = ex.Message;
-                    _logger.LogInformation($" {respon.Message} InputValue: {inputToString}");
-                    respon.Result = new PagedResultDto<GetAllSpeedViolationVehicleDto>
-                    {
-                        TotalCount = 0,
-                        Result = new List<GetAllSpeedViolationVehicleDto>()
-                    };
-                }
-                return Ok(respon);
+                return BadRequest("Vui lòng nhập đủ số trang và kích thước trang! ");
             }
+            try
+            {
+                var result = await _speedViolation.GetAllSpeedViolationVehicle(input);
+                respon.Result = result;
+
+            }
+            catch (Exception ex)
+            {
+                respon.StatusCode = 500;
+                respon.Message = ex.Message;
+                _logger.LogInformation($" {respon.Message} InputValue: {inputToString}");
+                respon.Result = new PagedResultDto<GetAllSpeedViolationVehicleDto>
+                {
+                    TotalCount = 0,
+                    Result = new List<GetAllSpeedViolationVehicleDto>()
+                };
+            }
+            return Ok(respon);
+        }
         #endregion
 
         #region -- Export excel
@@ -208,3 +205,4 @@ namespace WebApi.Controllers
         }
     }
 }
+

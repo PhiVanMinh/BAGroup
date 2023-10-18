@@ -5,6 +5,7 @@ using Application.IService;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
+using System.Net.Http;
 
 namespace Infra_Persistence.Services
 {
@@ -51,6 +52,7 @@ namespace Infra_Persistence.Services
             try
             {
                 var result = await _unitOfWork.SpeedViolationRepository.GetVehicleByCompanyId(input);
+                //var result = await _data.GetVehicleInfo(input, httpClient);
                 return result;
             }
             catch (Exception ex)
@@ -274,19 +276,53 @@ namespace Infra_Persistence.Services
         /// Name       Date       Comments
         /// minhpv    8/17/2023   created
         /// </Modified>
-        public async Task<List<GetAllSpeedViolationVehicleDto>> GetDataToExportExcel(SpeedViolationVehicleInput input)
+        public async Task<List<GetSpeedViolationToExportDto>> GetDataToExportExcel(SpeedViolationVehicleInput input)
         {
-            List<GetAllSpeedViolationVehicleDto> result = new List<GetAllSpeedViolationVehicleDto>();
+            List<GetSpeedViolationToExportDto> result = new List<GetSpeedViolationToExportDto>();
             try
             {
                 string cacheKey = $"SpeedViolationService_GetDataToExportExcel_{input.FromDate}_{input.ToDate}_{string.Join("_", input.ListVhcId)}";
 
-                result = await _cacheHelper.GetDataFromCache<GetAllSpeedViolationVehicleDto>(cacheKey, 0, 0);
+                result = await _cacheHelper.GetDataFromCache<GetSpeedViolationToExportDto>(cacheKey, 0, 0);
                 if (result.Count() == 0)
                 {
-                   var resultQuery = await GetSpeedViolationVehicle(input);
-                    result = resultQuery.ToList();
-                    _cacheHelper.AddEnumerableToSortedSet(cacheKey, resultQuery);
+                    using (var httpClientHandler = new HttpClientHandler())
+                    {
+                        httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+                        using (var httpClient = new HttpClient(httpClientHandler))
+                        {
+                            var vehicleInfo = await GetVehicleInfomation(input, httpClient);
+                            var activityGroup = await GetActivitySummaries(input, httpClient);
+                            var speedGroup = await GetSpeedOvers(input, httpClient);
+
+                           var resultQuery = from speed in speedGroup
+                                              join vhc in vehicleInfo on speed.VehicleID equals vhc.VehicleID
+                                              join atv in activityGroup on vhc.VehicleID equals atv.VehicleID into activityGroupJoin
+                                              from atv in activityGroupJoin.DefaultIfEmpty()
+                                              orderby speed.VehicleID
+                                              select new GetSpeedViolationToExportDto
+                                              {
+                                                  VehiclePlate = vhc.VehiclePlate,
+                                                  PrivateCode = vhc.PrivateCode,
+                                                  TransportType = vhc.TransportType,
+                                                  SpeedVioLevel1 = speed.SpeedVioLevel1,
+                                                  SpeedVioLevel2 = speed.SpeedVioLevel2,
+                                                  SpeedVioLevel3 = speed.SpeedVioLevel3,
+                                                  SpeedVioLevel4 = speed.SpeedVioLevel4,
+                                                  TotalSpeedVio = speed.TotalSpeedVio,
+                                                  RatioSpeedVio = (atv?.TotalKm != null && atv?.TotalKm > 1000) ? (speed.TotalSpeedVio * 1000 / atv?.TotalKm) : speed.TotalSpeedVio,
+                                                  TotalKmVio = Math.Round((decimal)(speed.TotalKmVio ?? 0), 2),
+                                                  TotalKm = Math.Round((decimal)(atv?.TotalKm ?? 0), 2),
+                                                  RatioKmVio = atv?.TotalKm != null ? Math.Round(((decimal)(speed.TotalKmVio ?? 0) * 100 / (decimal)atv?.TotalKm), 2) : 0,
+                                                  TotalTimeVio = formatMinuteToHourMinute(speed.TotalTimeVio ?? 0),
+                                                  TotalTime = formatMinuteToHourMinute(atv?.TotalTime ?? 0),
+                                                  RatioTimeVio = atv?.TotalTime != null ? Math.Round((decimal)((decimal)(speed.TotalTimeVio ?? 0) * 100 / atv?.TotalTime), 2) : 0
+                                              };
+
+                            result = resultQuery.ToList();
+                            _cacheHelper.AddEnumerableToSortedSet(cacheKey, resultQuery);
+                        }
+                    }
                 }
 
             }
@@ -295,6 +331,20 @@ namespace Infra_Persistence.Services
                 _logger.LogInformation(ex.Message);
             }
             return result;
+        }
+
+        /// <summary>Định dạng giá trị phút về hh:mm </summary>
+        /// <param name="input">tổng số phút</param>
+        /// <returns>Định dạng hh:mm </returns>
+        /// <Modified>
+        /// Name       Date       Comments
+        /// minhpv    09/11/2023   created
+        /// </Modified>
+        private static string formatMinuteToHourMinute(int input)
+        {
+            var hour = (input - (input % 60)) / 60;
+            var minute = input % 60;
+            return $"{(hour < 10 ? 0 : "")}{hour}:{(minute < 10 ? 0 : "")}{minute}";
         }
 
     }

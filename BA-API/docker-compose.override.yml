@@ -24,28 +24,6 @@ services:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
-  ba.api:
-    container_name: ba.api
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - "ConnectionStrings:Default=Server=host.docker.internal,1433;Database=LabDB;User Id=sa;Password=Minh&1234"  
-      - "ConnectionStrings:ServerLab3=Server=192.168.1.49\\BASQL;Database=GPS3_LAB;User Id=gps3_lab;Password=gps3_lab; TrustServerCertificate=true; Encrypt=False"
-      - "RedisCacheUrl=redisdb:6379"
-      - "UrlBase=http://host.docker.internal:8000"
-      - "GrpcSettings:ReportDataServiceUrl=http://reportdatagrpcservice:8002"
-      - ASPNETCORE_URLS=https://+:443;http://+:80
-    depends_on: 
-      - redisdb
-      - reportspeedover.api
-      - reportdatagrpcservice
-    ports:
-      - "8001:80"
-      - "59121:443"
-
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
-
   reportdatagrpcservice:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -66,7 +44,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
     depends_on: 
-      - ba.api
+      - bagroup.api
       - reportspeedover.api
     ports:
       - "8010:80"
@@ -75,3 +53,24 @@ services:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 
+
+  bagroup.api:
+    container_name: bagroup.api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "ConnectionStrings:Default=Server=host.docker.internal,1433;Database=LabDB;User Id=sa;Password=Minh&1234"  
+      - "ConnectionStrings:ServerLab3=Server=192.168.1.49\\BASQL;Database=GPS3_LAB;User Id=gps3_lab;Password=gps3_lab; TrustServerCertificate=true; Encrypt=False"
+      - "RedisCacheUrl=redisdb:6379"
+      - "UrlBase=http://host.docker.internal:8000"
+      - "GrpcSettings:ReportDataServiceUrl=http://reportdatagrpcservice:8002"
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+    depends_on: 
+      - redisdb
+      - reportspeedover.api
+      - reportdatagrpcservice
+    ports:
+      - "8001:80"
+      - "59121:443"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro

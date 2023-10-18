@@ -12,6 +12,6 @@ namespace Application.IService
     {
         public Task<PagedResultDto<GetAllSpeedViolationVehicleDto>> GetAllSpeedViolationVehicle(SpeedViolationVehicleInput input);
         public Task<List<GetVehicleListDto>> GetVehicleByCompanyId(int input);
-        public Task<List<GetAllSpeedViolationVehicleDto>> GetDataToExportExcel(SpeedViolationVehicleInput input);
+        public Task<List<GetSpeedViolationToExportDto>> GetDataToExportExcel(SpeedViolationVehicleInput input);
     }
 }

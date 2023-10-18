@@ -9,20 +9,20 @@ RUN sed -i 's/DEFAULT@SECLEVEL=2/DEFAULT@SECLEVEL=1/g' /etc/ssl/openssl.cnf
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["WebApi/BA.API.csproj", "WebApi/"]
+COPY ["BAGroup.API/BAGroup.API.csproj", "BAGroup.API/"]
 COPY ["Application/Application.csproj", "Application/"]
 COPY ["BA-API/Services.Common/Services.Common.csproj", "BA-API/Services.Common/"]
 COPY ["Infrastructure/Infrastructure.csproj", "Infrastructure/"]
 COPY ["Infra_Persistence/Infra_Persistence.csproj", "Infra_Persistence/"]
-RUN dotnet restore "WebApi/BA.API.csproj"
+RUN dotnet restore "BAGroup.API/BAGroup.API.csproj"
 COPY . .
-WORKDIR "/src/WebApi"
-RUN dotnet build "BA.API.csproj" -c Release -o /app/build
+WORKDIR "/src/BAGroup.API"
+RUN dotnet build "BAGroup.API.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "BA.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "BAGroup.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "BA.API.dll"]
+ENTRYPOINT ["dotnet", "BAGroup.API.dll"]

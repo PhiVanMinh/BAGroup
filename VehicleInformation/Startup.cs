@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using ReportSpeedOver.API.Common.Helpers;
 using ReportSpeedOver.API.Common.Interfaces.IHelper;
+using Serilog;
 using VehicleInformation.DbContext;
 using VehicleInformation.Interfaces.IRepository;
 using VehicleInformation.Interfaces.IService;
@@ -27,6 +28,9 @@ namespace VehicleInformation
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            Log.Logger = new LoggerConfiguration()
+                        .WriteTo.Console()
+                        .CreateLogger();
 
             services.AddSingleton<DapperContext>();
 
