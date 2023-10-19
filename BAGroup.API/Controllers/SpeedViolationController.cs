@@ -3,6 +3,7 @@ using Application.Dto.SpeedViolation;
 using Application.Dto.Users;
 using Application.IService;
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Infra_Persistence.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -130,7 +131,10 @@ namespace BAGroup.API.Controllers
                     var firstPossibleAddress = workSheet.Row(firstRowUsed.RowNumber()).FirstCell().Address;
                     var lastPossibleAddress = workSheet.LastCellUsed().Address;
 
-                    workSheet.Cell(1, 1).Value = $"BÁO CÁO VI PHẠM TỐC ĐỘ THEO ĐƠN VỊ VẬN TẢI TỪ {input.FromDate.Value.ToString("dd/MM/yyyy")} ĐẾN {input.ToDate.Value.ToString("dd/MM/yyyy")}";
+                    var titleName = $"BÁO CÁO VI PHẠM TỐC ĐỘ THEO ĐƠN VỊ VẬN TẢI TỪ {input.FromDate.Value.ToString("dd/MM/yyyy")} ĐẾN {input.ToDate.Value.ToString("dd/MM/yyyy")}"
+                                    + (input.ListVhcId.Count() > 0 ? $" CỦA XE {String.Join(", ", data.Select(e => e.PrivateCode))}": "");
+
+                    workSheet.Cell(1, 1).Value = titleName;
 
                     IXLCell cellForNewData = workSheet.Cell(workSheet.LastRowUsed().RowNumber() + 1, 1);
 
@@ -138,6 +142,9 @@ namespace BAGroup.API.Controllers
                     cellForNewData.InsertData(dt.Rows);
 
                     workSheet.Name = "BCVP";
+                    workSheet.Cell(1, 1).Style.Alignment.WrapText = true;
+                    //workSheet.Row(1).AdjustToContents();
+                    workSheet.Range($"A4:A{data.Count() + 3}").SetDataType(XLDataType.Number);
                     workSheet.Range($"A2:P{data.Count() + 3}").Style
                     .Border.SetTopBorder(XLBorderStyleValues.Thin)
                     .Border.SetRightBorder(XLBorderStyleValues.Thin)
