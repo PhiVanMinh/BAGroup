@@ -143,13 +143,18 @@ namespace BAGroup.API.Controllers
 
                     workSheet.Name = "BCVP";
                     workSheet.Cell(1, 1).Style.Alignment.WrapText = true;
-                    //workSheet.Row(1).AdjustToContents();
+
+                    workSheet.Row(1).Height = titleName.Length * (titleName.Length < 600 ? 0.35 : 0.2);
                     workSheet.Range($"A4:A{data.Count() + 3}").SetDataType(XLDataType.Number);
                     workSheet.Range($"A2:P{data.Count() + 3}").Style
                     .Border.SetTopBorder(XLBorderStyleValues.Thin)
                     .Border.SetRightBorder(XLBorderStyleValues.Thin)
                     .Border.SetBottomBorder(XLBorderStyleValues.Thin)
                     .Border.SetLeftBorder(XLBorderStyleValues.Thin);
+
+                    workSheet.PageSetup.FitToPages(1, 1);
+                    workSheet.PageSetup.PageOrientation = XLPageOrientation.Landscape;
+                    workSheet.PageSetup.PaperSize = XLPaperSize.A4Paper;
 
                     using (var stream = new MemoryStream())
                     {

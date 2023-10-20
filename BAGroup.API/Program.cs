@@ -106,7 +106,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 
 app.UseCors("MyPolicy");
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
